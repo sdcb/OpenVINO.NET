@@ -12,9 +12,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决�
 		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO", "src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj", "{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO", "src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj", "{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.AutoGen", "src\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj", "{88FABA6A-202F-448B-BD2B-4F3CCE5DCF63}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "generator", "generator", "{9E45E6A1-2F28-4604-80D0-9517077C5B5E}"
+	ProjectSection(SolutionItems) = preProject
+		generator\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj = generator\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,17 +29,12 @@ Global
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{88FABA6A-202F-448B-BD2B-4F3CCE5DCF63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88FABA6A-202F-448B-BD2B-4F3CCE5DCF63}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88FABA6A-202F-448B-BD2B-4F3CCE5DCF63}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88FABA6A-202F-448B-BD2B-4F3CCE5DCF63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1} = {FF193ABD-7BEF-48A8-A256-478FBF0ABBC8}
-		{88FABA6A-202F-448B-BD2B-4F3CCE5DCF63} = {FF193ABD-7BEF-48A8-A256-478FBF0ABBC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E5CE293-BD62-4ACF-B872-285B8C995E38}
