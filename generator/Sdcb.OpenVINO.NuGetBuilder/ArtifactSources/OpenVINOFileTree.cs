@@ -31,17 +31,14 @@ public class OpenVINOFileTree
 
         if (targetPath == "")
         {
-            switch (searchOption)
+            return searchOption switch
             {
-                case SearchOption.TopDirectoryOnly:
-                    return Children.Where(x => x.Type == itemType);
-                case SearchOption.AllDirectories:
-                    return Children.Where(x => x.Type == itemType)
-                                   .Concat(Children.Where(x => x.Type == FileTreeType.Directory)
-                                   .SelectMany(x => x.EnumerateItems(targetPath, itemType, searchOption)));
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(searchOption), searchOption, null);
-            }
+                SearchOption.TopDirectoryOnly => Children.Where(x => x.Type == itemType),
+                SearchOption.AllDirectories => Children.Where(x => x.Type == itemType)
+                                                   .Concat(Children.Where(x => x.Type == FileTreeType.Directory)
+                                                   .SelectMany(x => x.EnumerateItems(targetPath, itemType, searchOption))),
+                _ => throw new ArgumentOutOfRangeException(nameof(searchOption), searchOption, null),
+            };
         }
         else
         {
