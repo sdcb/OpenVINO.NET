@@ -24,19 +24,20 @@ public class OpenVINOFileTree
 
     public override string ToString() => $"{Type}: {Name}";
 
-    private IEnumerable<OpenVINOFileTree> EnumerateItems(string targetPath, FileTreeType itemType, SearchOption searchOption)
+    private IEnumerable<(string relationship, OpenVINOFileTree tree)> EnumerateItems(string targetPath, FileTreeType itemType, SearchOption searchOption, string relationship = "")
     {
-        if (Children == null) return Enumerable.Empty<OpenVINOFileTree>();
+        if (Children == null) return Enumerable.Empty<(string, OpenVINOFileTree)>();
         targetPath = targetPath.Trim('/');
 
         if (targetPath == "")
         {
             return searchOption switch
             {
-                SearchOption.TopDirectoryOnly => Children.Where(x => x.Type == itemType),
+                SearchOption.TopDirectoryOnly => Children.Where(x => x.Type == itemType).Select(x => (relationship, x)),
                 SearchOption.AllDirectories => Children.Where(x => x.Type == itemType)
+                                                   .Select(x => (relationship, x))
                                                    .Concat(Children.Where(x => x.Type == FileTreeType.Directory)
-                                                   .SelectMany(x => x.EnumerateItems(targetPath, itemType, searchOption))),
+                                                   .SelectMany(x => x.EnumerateItems(targetPath, itemType, searchOption, $"{relationship}/{x.Name}".Trim('/')))),
                 _ => throw new ArgumentOutOfRangeException(nameof(searchOption), searchOption, null),
             };
         }
@@ -46,7 +47,7 @@ public class OpenVINOFileTree
             string[] segments = targetPath.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
             if (children.TryGetValue(segments[0], out OpenVINOFileTree? item))
             {
-                return item.EnumerateItems(segments.Length > 1 ? segments[1] : "", itemType, searchOption);
+                return item.EnumerateItems(segments.Length > 1 ? segments[1] : "", itemType, searchOption, $"{relationship}/{segments[0]}".Trim('/'));
             }
             else
             {
@@ -55,12 +56,12 @@ public class OpenVINOFileTree
         }
     }
 
-    public IEnumerable<OpenVINOFileTree> EnumerateDirectories(string targetPath, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    public IEnumerable<(string relationship, OpenVINOFileTree tree)> EnumerateDirectories(string targetPath, SearchOption searchOption = SearchOption.TopDirectoryOnly)
     {
         return EnumerateItems(targetPath, FileTreeType.Directory, searchOption);
     }
 
-    public IEnumerable<OpenVINOFileTree> EnumerateFiles(string targetPath, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    public IEnumerable<(string relationship, OpenVINOFileTree tree)> EnumerateFiles(string targetPath, SearchOption searchOption = SearchOption.TopDirectoryOnly)
     {
         return EnumerateItems(targetPath, FileTreeType.File, searchOption);
     }
