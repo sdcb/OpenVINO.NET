@@ -9,7 +9,6 @@ class Program
     {
         IServiceProvider sp = ConfigureServices();
         Debug(sp);
-        
     }
 
     private static void Debug(IServiceProvider sp)
@@ -22,7 +21,6 @@ class Program
         return new ServiceCollection()
             .AddSingleton(_ => new CachedHttpGetService("cache"))
             .AddSingleton(sp => OpenVINOFileTreeRoot.LoadRootAsync(sp).GetAwaiter().GetResult())
-            .AddSingleton<ArtifactRepository>()
             .BuildServiceProvider();
     }
 }

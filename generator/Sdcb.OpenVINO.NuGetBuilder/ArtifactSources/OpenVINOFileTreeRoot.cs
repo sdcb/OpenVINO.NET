@@ -10,25 +10,40 @@ public class OpenVINOFileTreeRoot : OpenVINOFileTree
     {
         CachedHttpGetService http = sp.GetRequiredService<CachedHttpGetService>();
         string url = "https://storage.openvinotoolkit.org/filetree.json";
-        return await http.DownloadAsJsonAsync<OpenVINOFileTreeRoot>(url);
+        return await http.DownloadAsJsonAsync<OpenVINOFileTreeRoot>(url, cancellationToken);
     }
 
-    public IEnumerable<VersionFolder> VersionFolders => EnumerateDirectories("/repositories/openvino/packages")
-        .GroupBy(x => x.Name == "master")
-        .SelectMany(x => x.Key switch
+    public IEnumerable<VersionFolder> VersionFolders
+    {
+        get
         {
-            true => x.First().EnumerateDirectories("").Select(x => VersionFolder.FromFolder(x)),
-            false => x.Select(x => VersionFolder.FromFolder(x))
-        });
+            return EnumerateDirectories(VersionFolder.Prefix)
+                .GroupBy(x => x.Name == "master")
+                .SelectMany(x => x.Key switch
+                {
+                    true => x.First().EnumerateDirectories("").Select(x => VersionFolder.FromFolder(x)),
+                    false => x.Select(x => VersionFolder.FromFolder(x))
+                });
+        }
+    }
+
+    public VersionFolder LatestStableVersion => VersionFolders
+        .Where(x => !x.Version.IsPrerelease)
+        .OrderByDescending(x => x.Version)
+        .First();
 }
 
-public record VersionFolder(OpenVINOFileTree Folder, SemanticVersion Version)
+public partial record VersionFolder(string Path, OpenVINOFileTree Folder, SemanticVersion Version)
 {
+    public const string Prefix = "/repositories/openvino/packages";
+
     public override string ToString() => Version.ToString();
 
     public static VersionFolder FromFolder(OpenVINOFileTree Folder)
     {
-        return new VersionFolder(Folder, ParseOpenVINOVersion(Folder.Name));
+        SemanticVersion ver = ParseOpenVINOVersion(Folder.Name);
+        string path = ver.IsPrerelease ? $"{Prefix}/master/{Folder.Name}" : $"{Prefix}/{Folder.Name}";
+        return new VersionFolder(path, Folder, ver);
     }
 
     static SemanticVersion ParseOpenVINOVersion(string versionString)
@@ -46,7 +61,7 @@ public record VersionFolder(OpenVINOFileTree Folder, SemanticVersion Version)
         else if (versionParts.Length == 4 && versionParts[3].StartsWith("dev"))
         {
             // Remove 'dev' part and convert the last part (time) into a valid build metadata part
-            versionString = Regex.Replace(versionString, @"(.+)\.(dev)(\d{8})", "$1-$2.$3");
+            versionString = OpenVINODevVersionRegex().Replace(versionString, "$1-$2.$3");
         }
 
         // Try to parse the version string into a SemanticVersion object
@@ -59,4 +74,7 @@ public record VersionFolder(OpenVINOFileTree Folder, SemanticVersion Version)
             throw new FormatException($"{versionString} is not a known OpenVINO Version");
         }
     }
+
+    [GeneratedRegex("(.+)\\.(dev)(\\d{8})")]
+    private static partial Regex OpenVINODevVersionRegex();
 }

@@ -19,6 +19,25 @@ public class OpenVINOFileTreeTest
     [Fact]
     public void ListVersions()
     {
-        _console.WriteLine(string.Join(Environment.NewLine, _root.VersionFolders));
+        _console.WriteLine(string.Join(Environment.NewLine, _root.VersionFolders.OrderByDescending(x => x.Version)));
+    }
+
+    [Fact]
+    public void PrintLatestVersion()
+    {
+        _console.WriteLine(_root.LatestStableVersion.ToString());
+    }
+
+    [Fact]
+    public void ListPaths()
+    {
+        _console.WriteLine(string.Join(Environment.NewLine, _root.VersionFolders.OrderByDescending(x => x.Version).Select(x => x.Path)));
+    }
+
+    [Fact]
+    public void ListContainsInLatestStableVersion()
+    {
+        VersionFolder vf = _root.LatestStableVersion;
+        _console.WriteLine(string.Join(Environment.NewLine, vf.Folder.EnumerateFiles("").Select(x => x.Name)));
     }
 }
