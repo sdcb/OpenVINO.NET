@@ -15,9 +15,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO", "src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj", "{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "generator", "generator", "{9E45E6A1-2F28-4604-80D0-9517077C5B5E}"
-	ProjectSection(SolutionItems) = preProject
-		generator\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj = generator\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj
-	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.NuGetBuilder", "generator\Sdcb.OpenVINO.NuGetBuilder\Sdcb.OpenVINO.NuGetBuilder.csproj", "{E577C2FB-41B9-45ED-A820-8DCAEEC76307}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.AutoGen", "generator\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj", "{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.NuGetBuilder.Tests", "tests\Sdcb.OpenVINO.NuGetBuilder.Tests\Sdcb.OpenVINO.NuGetBuilder.Tests.csproj", "{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +32,27 @@ Global
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E577C2FB-41B9-45ED-A820-8DCAEEC76307}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E577C2FB-41B9-45ED-A820-8DCAEEC76307}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E577C2FB-41B9-45ED-A820-8DCAEEC76307}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E577C2FB-41B9-45ED-A820-8DCAEEC76307}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F00F49EE-49F0-45AE-8619-BD26FF81ECD1} = {FF193ABD-7BEF-48A8-A256-478FBF0ABBC8}
+		{E577C2FB-41B9-45ED-A820-8DCAEEC76307} = {9E45E6A1-2F28-4604-80D0-9517077C5B5E}
+		{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A} = {9E45E6A1-2F28-4604-80D0-9517077C5B5E}
+		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C} = {CF0B0CBC-EA90-486E-A006-50B76FE5C628}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E5CE293-BD62-4ACF-B872-285B8C995E38}
