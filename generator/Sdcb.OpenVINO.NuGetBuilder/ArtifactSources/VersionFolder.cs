@@ -1,5 +1,4 @@
 ﻿using NuGet.Versioning;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;

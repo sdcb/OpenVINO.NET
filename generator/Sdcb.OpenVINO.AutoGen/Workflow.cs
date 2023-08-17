@@ -5,7 +5,6 @@ using CppSharp;
 using Csa = CppSharp.AST;
 using Csp = CppSharp.Parser;
 using CppSharp.AST;
-using System.Text;
 
 namespace Sdcb.OpenVINO.AutoGen;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using static FParsec.CharParsers;
+﻿using static FParsec.CharParsers;
 
 namespace Sdcb.OpenVINO.AutoGen.ClangMarcroParsers.Units
 {

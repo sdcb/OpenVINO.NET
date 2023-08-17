@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sdcb.OpenVINO.NuGetBuilder;
 using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using System.Diagnostics;
 
 class Program
 {

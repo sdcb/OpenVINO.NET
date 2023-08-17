@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Sdcb.OpenVINO.AutoGen.ClangMarcroParsers.Units
+﻿namespace Sdcb.OpenVINO.AutoGen.ClangMarcroParsers.Units
 {
     public record CallExpression(string FunctionName, params IExpression[] Arguments) : IExpression
     {

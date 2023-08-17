@@ -1,5 +1,4 @@
 using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using System.Text.Json;
 using Xunit.Abstractions;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.Tests;

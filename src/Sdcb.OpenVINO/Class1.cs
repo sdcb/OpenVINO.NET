@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Sdcb.OpenVINO;
+﻿namespace Sdcb.OpenVINO;
 
 public class Class1
 {
