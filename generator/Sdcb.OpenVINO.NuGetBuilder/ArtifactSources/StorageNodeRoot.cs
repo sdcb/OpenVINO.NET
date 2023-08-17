@@ -1,16 +1,30 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
 
-public class OpenVINOFileTreeRoot : OpenVINOFileTree
+public record StorageNodeRoot : StorageNode
 {
     public const string BaseUrl = "https://storage.openvinotoolkit.org";
 
-    public static async Task<OpenVINOFileTreeRoot> LoadRootAsync(IServiceProvider sp, CancellationToken cancellationToken = default)
+    public StorageNodeRoot(StorageNodeRaw raw, StorageNode? parent = null) : base(raw, parent)
+    {
+    }
+
+    public static async Task<StorageNodeRoot> LoadRootFromHttp(IServiceProvider sp, CancellationToken cancellationToken = default)
     {
         CachedHttpGetService http = sp.GetRequiredService<CachedHttpGetService>();
         string url = $"{BaseUrl}/filetree.json";
-        return await http.DownloadAsJsonAsync<OpenVINOFileTreeRoot>(url, cancellationToken);
+        Stream stream = await http.DownloadAsStream(url, cancellationToken);
+        return await LoadRootFromStream(stream, cancellationToken);
+    }
+
+    public static async Task<StorageNodeRoot> LoadRootFromStream(Stream stream, CancellationToken cancellationToken = default)
+    {
+        StorageNodeRaw rootNode = await JsonSerializer.DeserializeAsync<StorageNodeRaw>(stream, cancellationToken: cancellationToken) 
+            ?? throw new Exception($"Failed to load filetree from stream.");
+
+        return new StorageNodeRoot(rootNode, parent: null);
     }
 
     public IEnumerable<VersionFolder> VersionFolders

@@ -4,13 +4,13 @@ using System.Text.RegularExpressions;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
 
-public partial record VersionFolder(string Path, OpenVINOFileTree Folder, SemanticVersion Version)
+public partial record VersionFolder(string Path, StorageNode Folder, SemanticVersion Version)
 {
     public const string Prefix = "/repositories/openvino/packages";
 
     public override string ToString() => Version.ToString();
 
-    public static VersionFolder FromFolder(OpenVINOFileTree Folder)
+    public static VersionFolder FromFolder(StorageNode Folder)
     {
         SemanticVersion ver = ParseOpenVINOVersion(Folder.Name);
         string path = ver.IsPrerelease ? $"{Prefix}/master/{Folder.Name}" : $"{Prefix}/{Folder.Name}";

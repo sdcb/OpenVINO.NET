@@ -7,13 +7,14 @@ namespace Sdcb.OpenVINO.NuGetBuilder.Tests;
 public class OpenVINOFileTreeTest
 {
     private readonly ITestOutputHelper _console;
-    private readonly OpenVINOFileTreeRoot _root;
+    private readonly StorageNodeRoot _root;
 
     public OpenVINOFileTreeTest(ITestOutputHelper console)
     {
         _console = console;
         string fileTreeJsonPath = @"asset/filetree.json";
-        _root = JsonSerializer.Deserialize<OpenVINOFileTreeRoot>(File.ReadAllText(fileTreeJsonPath)) ?? throw new Exception($"Failed to load {fileTreeJsonPath}.");
+        using FileStream stream = File.OpenRead(fileTreeJsonPath);
+        _root = StorageNodeRoot.LoadRootFromStream(stream).GetAwaiter().GetResult();
     }
 
     [Fact]

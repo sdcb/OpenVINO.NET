@@ -13,14 +13,14 @@ class Program
 
     private static void Debug(IServiceProvider sp)
     {
-        OpenVINOFileTreeRoot repo = sp.GetRequiredService<OpenVINOFileTreeRoot>();
+        StorageNodeRoot repo = sp.GetRequiredService<StorageNodeRoot>();
     }
 
     static IServiceProvider ConfigureServices()
     {
         return new ServiceCollection()
             .AddSingleton(_ => new CachedHttpGetService("cache"))
-            .AddSingleton(sp => OpenVINOFileTreeRoot.LoadRootAsync(sp).GetAwaiter().GetResult())
+            .AddSingleton(sp => StorageNodeRoot.LoadRootFromHttp(sp).GetAwaiter().GetResult())
             .BuildServiceProvider();
     }
 }
