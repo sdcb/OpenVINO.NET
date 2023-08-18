@@ -61,6 +61,19 @@ public class SourceExtractorTest
         await e.DownloadAsync(artifactInfo);
     }
 
+    [Fact]
+    public async Task ListDlls()
+    {
+        // prepair
+        byte[] zipArray = MockKeysFileAsZipByteArray(@"./asset/openvino-windows-keys.txt");
+        IArchive archive = ArchiveFactory.Open(new MemoryStream(zipArray));
+        archive.Entries.Where(x => 
+            x.Key.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) &&
+            !(x.Key.Contains(@"/Debug/") || x.Key.Contains("_debug."))
+            )
+            .ToList().ForEach(x => _console.WriteLine(x.Key));
+    }
+
     static byte[] MockKeysFileAsZipByteArray(string keyPath)
     {
         IWritableArchive zip = ArchiveFactory.Create(ArchiveType.Zip);
