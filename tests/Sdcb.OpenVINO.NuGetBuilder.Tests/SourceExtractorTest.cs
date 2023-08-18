@@ -34,8 +34,8 @@ public class SourceExtractorTest
         byte[] sha256 = await WindowsSourceExtractor.ReadSha256(TestCommon.Root.LatestStableVersion.Artifacts.Single(v => v.OS == KnownOS.Windows).Sha256Url, mock.Object);
 
         // assert
-        _console.WriteLine(WindowsSourceExtractor.ByteArrayToHexString(sha256));
-        Assert.Equal("00d4934e8228d0bceba8006e5433864f683b4a9ca517d25f0fca074b2add19fa", WindowsSourceExtractor.ByteArrayToHexString(sha256));
+        _console.WriteLine(HexUtils.ByteArrayToHexString(sha256));
+        Assert.Equal("00d4934e8228d0bceba8006e5433864f683b4a9ca517d25f0fca074b2add19fa", HexUtils.ByteArrayToHexString(sha256));
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class SourceExtractorTest
             {
                 var x when x == artifactInfo.Sha256Url => new MemoryStream(Encoding.UTF8.GetBytes(
                     $"""
-                    {WindowsSourceExtractor.ByteArrayToHexString(SHA256.HashData(zipArray))}  w_openvino_toolkit_windows_2023.1.0.dev20230728_x86_64.zip
+                    {HexUtils.ByteArrayToHexString(SHA256.HashData(zipArray))}  w_openvino_toolkit_windows_2023.1.0.dev20230728_x86_64.zip
                     """)),
                 var x when x == artifactInfo.DownloadUrl => new MemoryStream(zipArray),
                  _ => throw new Exception("Unknown"),
