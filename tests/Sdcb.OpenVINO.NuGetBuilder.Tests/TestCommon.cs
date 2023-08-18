@@ -11,5 +11,7 @@ public class TestCommon
         Root = StorageNodeRoot.LoadRootFromStream(stream).GetAwaiter().GetResult();
     }
 
+    public const string WindowsKeysFile = @"./asset/openvino-windows-keys.txt";
+
     public static StorageNodeRoot Root { get; }
 }

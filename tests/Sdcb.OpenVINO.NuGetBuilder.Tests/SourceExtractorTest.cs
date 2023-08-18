@@ -43,7 +43,7 @@ public class SourceExtractorTest
     {
         // prepair
         Mock<ICachedHttpGetService> mock = new();
-        byte[] zipArray = MockKeysFileAsZipByteArray(@"./asset/openvino-windows-keys.txt");
+        byte[] zipArray = MockKeysFileAsZipByteArray(TestCommon.WindowsKeysFile);
         ArtifactInfo artifactInfo = TestCommon.Root.LatestStableVersion.Artifacts.Single(v => v.OS == KnownOS.Windows);
         mock.Setup(x => x.DownloadAsStream(It.IsAny<string>(), default))
             .Returns<string, CancellationToken>((url, cts) => Task.FromResult<Stream>(url switch
@@ -58,25 +58,24 @@ public class SourceExtractorTest
 
         // act
         WindowsSourceExtractor e = new(mock.Object);
-        await e.DownloadAsync(artifactInfo);
+        await e.DownloadDynamicLibs(artifactInfo);
     }
 
     [Fact]
-    public async Task ListDlls()
+    public void ListDllsTest()
     {
         // prepair
-        byte[] zipArray = MockKeysFileAsZipByteArray(@"./asset/openvino-windows-keys.txt");
-        IArchive archive = ArchiveFactory.Open(new MemoryStream(zipArray));
-        archive.Entries.Where(x => 
-            x.Key.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) &&
-            !(x.Key.Contains(@"/Debug/") || x.Key.Contains("_debug."))
-            )
-            .ToList().ForEach(x => _console.WriteLine(x.Key));
+        IEnumerable<string> keys = File.ReadLines(TestCommon.WindowsKeysFile);
+        string[] dynamicLibs = keys.Where(WindowsSourceExtractor.FilterDynamicLibs)
+            .ToArray();
+
+        Assert.All(dynamicLibs, x => Assert.EndsWith(".dll", x, StringComparison.OrdinalIgnoreCase));
+        Assert.All(dynamicLibs, x => Assert.DoesNotContain("debug", x, StringComparison.OrdinalIgnoreCase));
     }
 
     static byte[] MockKeysFileAsZipByteArray(string keyPath)
     {
-        IWritableArchive zip = ArchiveFactory.Create(ArchiveType.Zip);
+        using IWritableArchive zip = ArchiveFactory.Create(ArchiveType.Zip);
         foreach (string item in File.ReadLines(keyPath))
         {
             zip.AddEntry(item, new MemoryStream(), true);

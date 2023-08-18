@@ -13,7 +13,7 @@ public record StorageNodeRoot : StorageNode
 
     public static async Task<StorageNodeRoot> LoadRootFromHttp(IServiceProvider sp, CancellationToken cancellationToken = default)
     {
-        CachedHttpGetService http = sp.GetRequiredService<CachedHttpGetService>();
+        ICachedHttpGetService http = sp.GetRequiredService<ICachedHttpGetService>();
         string url = $"{BaseUrl}/filetree.json";
         Stream stream = await http.DownloadAsStream(url, cancellationToken);
         return await LoadRootFromStream(stream, cancellationToken);
