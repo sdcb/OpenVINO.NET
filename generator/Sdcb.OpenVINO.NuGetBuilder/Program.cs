@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sdcb.OpenVINO.NuGetBuilder;
 using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Sdcb.OpenVINO.NuGetBuilder.Tests")]
 class Program
 {
     static void Main()

@@ -4,7 +4,7 @@ public record StorageNode
 {
     public string Name { get; }
 
-    public string LastModified { get; }
+    public DateTime LastModified { get; }
 
     public long Size { get; }
 
@@ -21,13 +21,13 @@ public record StorageNode
     public StorageNode(StorageNodeRaw raw, StorageNode? parent = null)
     {
         Name = raw.Name;
-        LastModified = raw.LastModified;
+        LastModified = DateTime.Parse(raw.LastModified);
         Size = raw.Size;
         Type = raw.Type;
         Parent = parent;
 
         // Compute the FullPath
-        FullPath = (parent?.FullPath ?? StorageNodeRoot.BaseUrl) + "/" + Name;
+        FullPath = parent == null ? StorageNodeRoot.BaseUrl : parent.FullPath + "/" + Name;
 
         // Recursively create child StorageNode objects
         if (raw.Children != null)

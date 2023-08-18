@@ -6,20 +6,16 @@ namespace Sdcb.OpenVINO.NuGetBuilder.Tests;
 public class ArtifactInfoTest
 {
     private readonly ITestOutputHelper _console;
-    private readonly StorageNodeRoot _root;
 
     public ArtifactInfoTest(ITestOutputHelper console)
     {
         _console = console;
-        string fileTreeJsonPath = @"asset/filetree.json";
-        using FileStream stream = File.OpenRead(fileTreeJsonPath);
-        _root = StorageNodeRoot.LoadRootFromStream(stream).GetAwaiter().GetResult();
     }
 
     [Fact]
     public void LatestStablePrintAllArtifacts()
     {
-        foreach (ArtifactInfo artifact in _root.LatestStableVersion.Artifacts)
+        foreach (ArtifactInfo artifact in TestCommon.Root.LatestStableVersion.Artifacts)
         {
             _console.WriteLine(artifact.ToString());
         }
@@ -28,7 +24,7 @@ public class ArtifactInfoTest
     [Fact]
     public void LatestPrintAllArtifacts()
     {
-        foreach (ArtifactInfo artifact in _root.LatestVersion.Artifacts)
+        foreach (ArtifactInfo artifact in TestCommon.Root.LatestVersion.Artifacts)
         {
             _console.WriteLine(artifact.ToString());
         }
