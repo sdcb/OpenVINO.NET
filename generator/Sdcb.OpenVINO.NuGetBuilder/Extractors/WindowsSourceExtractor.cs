@@ -14,7 +14,7 @@ public class WindowsSourceExtractor
         _http = http;
     }
 
-    public async Task DownloadDynamicLibs(ArtifactInfo artifact, CancellationToken cancellationToken = default)
+    public async Task<string> DownloadDynamicLibs(ArtifactInfo artifact, CancellationToken cancellationToken = default)
     {
         byte[] sha256 = await ReadSha256(artifact.Sha256Url, _http, cancellationToken);
         using Stream stream = await _http.DownloadAsStream(artifact.DownloadUrl, cancellationToken);
@@ -34,6 +34,7 @@ public class WindowsSourceExtractor
                 Overwrite = true,
             });
         }
+        return destinationFolder;
     }
 
     private static void VerifyStreamHash(string downloadUrl, byte[] sha256, Stream stream)
