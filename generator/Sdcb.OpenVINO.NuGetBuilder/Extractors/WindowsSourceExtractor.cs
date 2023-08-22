@@ -5,6 +5,8 @@ using System.Security.Cryptography;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.Extractors;
 
+public record ExtractedInfo(string Directory, string[] DynamicLibs);
+
 public class WindowsSourceExtractor
 {
     private readonly ICachedHttpGetService _http;
@@ -14,27 +16,41 @@ public class WindowsSourceExtractor
         _http = http;
     }
 
-    public async Task<string> DownloadDynamicLibs(ArtifactInfo artifact, CancellationToken cancellationToken = default)
+    public async Task<ExtractedInfo> DownloadDynamicLibs(ArtifactInfo artifact, CancellationToken cancellationToken = default)
     {
         byte[] sha256 = await ReadSha256(artifact.Sha256Url, _http, cancellationToken);
         using Stream stream = await _http.DownloadAsStream(artifact.DownloadUrl, cancellationToken);
         VerifyStreamHash(artifact.DownloadUrl, sha256, stream);
         using IArchive archive = ArchiveFactory.Open(stream);
-        IEnumerable<IArchiveEntry> dynamicLibs = archive.Entries.Where(x => FilterDynamicLibs(x.Key));
+        IArchiveEntry[] dynamicLibs = archive.Entries
+            .Where(x => FilterDynamicLibs(x.Key))
+            .ToArray();
 
         string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), artifact.Distribution);
         Directory.CreateDirectory(destinationFolder);
-        Console.WriteLine($"Extracting dynamic libs into {destinationFolder}...");
-        foreach (IArchiveEntry entry in dynamicLibs)
+        
+        string[] localDlls = dynamicLibs
+            .Select(x => Path.Combine(destinationFolder, Path.GetFileName(x.Key)))
+            .ToArray();
+        if (localDlls.All(File.Exists))
         {
-            Console.WriteLine($"{entry.Key}...");
-            entry.WriteToDirectory(artifact.Distribution, new ExtractionOptions
-            {
-                ExtractFullPath = false,
-                Overwrite = true,
-            });
+            Console.WriteLine($"Extracted dynamic libs already exists, skip.");
         }
-        return destinationFolder;
+        else
+        {
+            Console.WriteLine($"Extracting dynamic libs into {destinationFolder}...");
+            foreach (IArchiveEntry entry in dynamicLibs)
+            {
+                Console.WriteLine($"{entry.Key}...");
+                entry.WriteToDirectory(artifact.Distribution, new ExtractionOptions
+                {
+                    ExtractFullPath = false,
+                    Overwrite = true,
+                });
+            }
+        }
+
+        return new ExtractedInfo(destinationFolder, localDlls);
     }
 
     private static void VerifyStreamHash(string downloadUrl, byte[] sha256, Stream stream)
