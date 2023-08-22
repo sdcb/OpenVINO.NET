@@ -19,6 +19,7 @@ public class CachedHttpGetService : ICachedHttpGetService
 
         if (!File.Exists(localFilePath))
         {
+            Console.WriteLine($"Downloading {url} to {localFilePath}");
             // If the file does not exist locally, download it from the url and save it to the cache folder
             using HttpClient client = new();
             HttpResponseMessage response = await client.GetAsync(url, cancellationToken);
@@ -35,8 +36,12 @@ public class CachedHttpGetService : ICachedHttpGetService
             }
             else
             {
-                throw new Exception($"Error occurred while getting content from URL: {await response.Content.ReadAsStringAsync()}");
+                throw new Exception($"Error occurred while getting content from URL: {await response.Content.ReadAsStringAsync(cancellationToken)}");
             }
+        }
+        else
+        {
+            Console.WriteLine($"Using cached {localFilePath}");
         }
 
         // Now we're sure that the file exists already locally, load it from the file

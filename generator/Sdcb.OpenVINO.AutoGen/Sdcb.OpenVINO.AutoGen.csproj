@@ -24,7 +24,11 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Vanara.PInvoke.DbgHelp" Version="3.4.15" />
+    <PackageReference Include="Vanara.PInvoke.DbgHelp" Version="3.4.16" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sdcb.OpenVINO.NuGetBuilder\Sdcb.OpenVINO.NuGetBuilder.csproj" />
   </ItemGroup>
 
 </Project>

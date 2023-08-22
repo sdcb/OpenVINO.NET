@@ -1,28 +1,19 @@
-﻿using System.Diagnostics;
-using System.IO.Compression;
-using Vanara.PInvoke;
-using CppSharp;
-using Csa = CppSharp.AST;
-using Csp = CppSharp.Parser;
+﻿using CppSharp;
 using CppSharp.AST;
+using Csp = CppSharp.Parser;
+using Csa = CppSharp.AST;
+using Vanara.PInvoke;
+using System.Diagnostics;
+using Sdcb.OpenVINO.NuGetBuilder.Extractors;
 
-namespace Sdcb.OpenVINO.AutoGen;
+namespace Sdcb.OpenVINO.AutoGen.Parsers;
 
-internal class Workflow
+public class HeadersParser
 {
-    private readonly AppSettings _settings;
-
-    public Workflow(AppSettings settings)
+    public void Run(ExtractedInfo info)
     {
-        _settings = settings;
-    }
-
-    public async Task Run()
-    {
-        string localFilePath = await DownloadOpenVINOBinaries();
-        string extractedFolder = ExtractOpenVINOBinaries(localFilePath);
-        HashSet<string> symbols = LoadSymbols(extractedFolder);
-        TranslationUnit[] units = ParsingHeaders(extractedFolder);
+        HashSet<string> symbols = LoadSymbols(info.Directory);
+        TranslationUnit[] units = ParsingHeaders(info.Directory);
         WriteAll(units, symbols);
     }
 
@@ -133,7 +124,7 @@ internal class Workflow
         {
             ulong baseOfDll = DbgHelp.SymLoadModuleEx(hCurrentProcess, IntPtr.Zero, library, null, 0, 0, IntPtr.Zero, 0);
             if (baseOfDll == 0) throw new Exception($"SymLoadModuleEx failed for {library}.");
-            
+
             return DbgHelp.SymEnumSymbolsEx(hCurrentProcess, baseOfDll)
                 .Where(x => x.Flags.HasFlag(DbgHelp.SYMFLAG.SYMFLAG_EXPORT))
                 .Select(x => x.Name)
@@ -143,45 +134,5 @@ internal class Workflow
         {
             DbgHelp.SymCleanup(hCurrentProcess);
         }
-    }
-
-    private async Task<string> DownloadOpenVINOBinaries()
-    {
-        Directory.CreateDirectory(_settings.DownloadFolder);
-        string localFileName = _settings.DownloadUrl.Split('/').Last();
-        string localFilePath = Path.Combine(_settings.DownloadFolder, localFileName);
-        if (File.Exists(localFilePath))
-        {
-            Console.WriteLine($"Using exists {localFilePath}...");
-            return localFilePath;
-        }
-
-        Console.Write($"Downloading {_settings.DownloadUrl} into {localFilePath}...");
-        using HttpClient http = new HttpClient();
-        using Stream stream = await http.GetStreamAsync(_settings.DownloadUrl);
-        using FileStream localFileStream = File.OpenWrite(localFilePath);
-        await stream.CopyToAsync(localFileStream);
-
-        Console.WriteLine("Done");
-        return localFilePath;
-    }
-
-    private string ExtractOpenVINOBinaries(string localFilePath)
-    {
-        Directory.CreateDirectory(_settings.ExtractionFolder);
-        
-        using ZipArchive zip = ZipFile.OpenRead(localFilePath);
-        string rootFolderName = zip.Entries[0].FullName.Split('/')[0];
-        string destinationFolder = Path.Combine(_settings.ExtractionFolder, rootFolderName);
-        if (Directory.Exists(destinationFolder))
-        {
-            Console.WriteLine($"Using exists {destinationFolder}...");
-            return destinationFolder;
-        }
-
-        Console.Write($"Extracting {localFilePath} into {_settings.ExtractionFolder}...");
-        zip.ExtractToDirectory(_settings.ExtractionFolder, true);
-        Console.WriteLine("Done");
-        return destinationFolder;
     }
 }

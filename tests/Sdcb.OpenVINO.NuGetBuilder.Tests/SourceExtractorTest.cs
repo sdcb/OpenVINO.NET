@@ -31,7 +31,7 @@ public class SourceExtractorTest
                 """))));
 
         // act
-        byte[] sha256 = await WindowsSourceExtractor.ReadSha256(TestCommon.Root.LatestStableVersion.Artifacts.Single(v => v.OS == KnownOS.Windows).Sha256Url, mock.Object);
+        byte[] sha256 = await ArtifactDownloader.ReadSha256(TestCommon.Root.LatestStableVersion.Artifacts.Single(v => v.OS == KnownOS.Windows).Sha256Url, mock.Object);
 
         // assert
         _console.WriteLine(HexUtils.ByteArrayToHexString(sha256));
@@ -57,8 +57,8 @@ public class SourceExtractorTest
             }));
 
         // act
-        WindowsSourceExtractor e = new(mock.Object);
-        await e.DownloadDynamicLibs(artifactInfo);
+        ArtifactDownloader e = new(mock.Object);
+        await e.Download(artifactInfo);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class SourceExtractorTest
     {
         // prepair
         IEnumerable<string> keys = File.ReadLines(TestCommon.WindowsKeysFile);
-        string[] dynamicLibs = keys.Where(WindowsSourceExtractor.FilterDynamicLibs)
+        string[] dynamicLibs = keys.Where(ArchiveExtractor.FilterWindowsDlls)
             .ToArray();
 
         Assert.All(dynamicLibs, x => Assert.EndsWith(".dll", x, StringComparison.OrdinalIgnoreCase));

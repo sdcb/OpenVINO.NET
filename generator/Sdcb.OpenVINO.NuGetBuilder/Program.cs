@@ -11,12 +11,12 @@ class Program
     static async Task Main()
     {
         IServiceProvider sp = ConfigureServices();
-        WindowsSourceExtractor w = sp.GetRequiredService<WindowsSourceExtractor>();
-        WindowsPackageBuilder b = sp.GetRequiredService<WindowsPackageBuilder>();
+        ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
         ArtifactInfo artifact = root.LatestStableVersion.Artifacts.First(x => x.OS == KnownOS.Windows);
-        ExtractedInfo local = await w.DownloadDynamicLibs(artifact);
-        b.BuildNuGet(local, artifact);
+        string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), artifact.Distribution);
+        ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, ArchiveExtractor.FilterWindowsDlls, flatten: true);
+        WindowsPackageBuilder.BuildNuGet(local, artifact);
     }
 
     static IServiceProvider ConfigureServices()
@@ -24,8 +24,7 @@ class Program
         return new ServiceCollection()
             .AddSingleton<ICachedHttpGetService>(_ => new CachedHttpGetService("cache"))
             .AddSingleton(sp => StorageNodeRoot.LoadRootFromHttp(sp).GetAwaiter().GetResult())
-            .AddSingleton<WindowsSourceExtractor>()
-            .AddSingleton<WindowsPackageBuilder>()
+            .AddSingleton<ArtifactDownloader>()
             .BuildServiceProvider();
     }
 }

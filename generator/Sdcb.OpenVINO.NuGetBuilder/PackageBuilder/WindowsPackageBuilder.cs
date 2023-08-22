@@ -7,9 +7,9 @@ using Sdcb.OpenVINO.NuGetBuilder.Extractors;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.PackageBuilder;
 
-public class WindowsPackageBuilder
+public sealed class WindowsPackageBuilder
 {
-    public void BuildNuGet(ExtractedInfo local, ArtifactInfo artifactInfo)
+    public static void BuildNuGet(ExtractedInfo local, ArtifactInfo artifactInfo)
     {
         NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifactInfo);
         PrepairPropsFile(local, pkgInfo);
