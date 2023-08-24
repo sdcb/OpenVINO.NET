@@ -5,4 +5,8 @@
     <LangVersion>10</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Natives\" />
+  </ItemGroup>
+
 </Project>

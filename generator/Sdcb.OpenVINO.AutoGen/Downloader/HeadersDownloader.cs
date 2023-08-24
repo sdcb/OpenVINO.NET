@@ -27,6 +27,11 @@ public class HeadersDownloader
 
         Directory.CreateDirectory(_settings.DownloadFolder);
         ArtifactInfo artifact = vf.Artifacts.Single(x => x.OS == KnownOS.Windows);
-        return await _downloader.DownloadAndExtract(artifact, _settings.DownloadFolder, x => x.EndsWith(".h") || x.EndsWith(".dll"), flatten: false, cancellationToken: cancellationToken);
+        return await _downloader.DownloadAndExtract(
+            artifact, 
+            _settings.DownloadFolder, 
+            x => x.EndsWith(".h") || ArchiveExtractor.FilterWindowsDlls(x), 
+            flatten: false, 
+            cancellationToken: cancellationToken);
     }
 }

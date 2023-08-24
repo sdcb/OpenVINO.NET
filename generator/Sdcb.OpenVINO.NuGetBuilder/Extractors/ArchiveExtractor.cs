@@ -17,7 +17,7 @@ public class ArchiveExtractor
         Directory.CreateDirectory(destinationFolder);
 
         string[] localDlls = dynamicLibs
-            .Select(x => Path.Combine(destinationFolder, Path.GetFileName(x.Key)))
+            .Select(x => Path.Combine(destinationFolder, flatten ? Path.GetFileName(x.Key) : x.Key))
             .ToArray();
         if (localDlls.All(File.Exists))
         {
@@ -37,7 +37,8 @@ public class ArchiveExtractor
             }
         }
 
-        return new ExtractedInfo(destinationFolder, localDlls);
+        string rootFolderName = archive.Entries.First().Key.Split('/', StringSplitOptions.RemoveEmptyEntries).First();
+        return new ExtractedInfo(destinationFolder, rootFolderName, localDlls);
     }
 
     public static bool FilterWindowsDlls(string x)

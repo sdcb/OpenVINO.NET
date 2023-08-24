@@ -16,11 +16,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO", "src\Sdcb.O
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "generator", "generator", "{9E45E6A1-2F28-4604-80D0-9517077C5B5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.NuGetBuilder", "generator\Sdcb.OpenVINO.NuGetBuilder\Sdcb.OpenVINO.NuGetBuilder.csproj", "{E577C2FB-41B9-45ED-A820-8DCAEEC76307}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.NuGetBuilder", "generator\Sdcb.OpenVINO.NuGetBuilder\Sdcb.OpenVINO.NuGetBuilder.csproj", "{E577C2FB-41B9-45ED-A820-8DCAEEC76307}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.AutoGen", "generator\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj", "{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.NuGetBuilder.Tests", "tests\Sdcb.OpenVINO.NuGetBuilder.Tests\Sdcb.OpenVINO.NuGetBuilder.Tests.csproj", "{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.NuGetBuilder.Tests", "tests\Sdcb.OpenVINO.NuGetBuilder.Tests\Sdcb.OpenVINO.NuGetBuilder.Tests.csproj", "{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.AutoGen.Tests", "tests\Sdcb.OpenVINO.AutoGen.Tests\Sdcb.OpenVINO.AutoGen.Tests.csproj", "{7E1B1F9A-612A-439D-B6F2-86A79194BBCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E1B1F9A-612A-439D-B6F2-86A79194BBCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E1B1F9A-612A-439D-B6F2-86A79194BBCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E1B1F9A-612A-439D-B6F2-86A79194BBCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E1B1F9A-612A-439D-B6F2-86A79194BBCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{E577C2FB-41B9-45ED-A820-8DCAEEC76307} = {9E45E6A1-2F28-4604-80D0-9517077C5B5E}
 		{EC9DD302-910B-47A8-9FEB-EFB0D4E9F25A} = {9E45E6A1-2F28-4604-80D0-9517077C5B5E}
 		{BE7689D8-C7A3-4A96-B8AE-DFE4BC70FF7C} = {CF0B0CBC-EA90-486E-A006-50B76FE5C628}
+		{7E1B1F9A-612A-439D-B6F2-86A79194BBCB} = {CF0B0CBC-EA90-486E-A006-50B76FE5C628}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E5CE293-BD62-4ACF-B872-285B8C995E38}

@@ -4,6 +4,7 @@ using System.Xml;
 using System.Xml.XPath;
 using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.NuGetBuilder.Utils;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.PackageBuilder;
 
@@ -28,34 +29,10 @@ public sealed class WindowsPackageBuilder
         }
         else
         {
-            string iconFile = SearchFileByParents(new DirectoryInfo(destinationFolder), iconFileName);
+            string iconFile = DirectoryUtils.SearchFileByParents(new DirectoryInfo(destinationFolder), iconFileName);
             Console.WriteLine($"Copy {iconFile} to {destinationFile}.");
             File.Copy(iconFile, destinationFile);
         }
-    }
-
-    private static string SearchFileByParents(DirectoryInfo currentFolder, string fileName)
-    {
-        Stack<DirectoryInfo> stack = new();
-        stack.Push(currentFolder);
-
-        while (stack.Count > 0)
-        {
-            DirectoryInfo dir = stack.Pop();
-            string path = Path.Combine(dir.FullName, fileName);
-            if (File.Exists(path))
-            {
-                return path;
-            }
-
-            DirectoryInfo? parent = dir.Parent;
-            if (parent != null)
-            {
-                stack.Push(parent);
-            }
-        }
-
-        throw new FileNotFoundException($"{fileName} can't found in {currentFolder.FullName}.");
     }
 
     private static string PrepairPropsFile(ExtractedInfo local, NuGetPackageInfo pkgInfo)

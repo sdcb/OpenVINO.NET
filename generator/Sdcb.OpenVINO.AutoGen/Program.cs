@@ -6,10 +6,12 @@ using Sdcb.OpenVINO.AutoGen.Parsers;
 using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilder;
 using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.AutoGen.Headers;
 
 IServiceProvider services = ConfigureServices();
 ExtractedInfo info = (await services.GetRequiredService<HeadersDownloader>().DownloadAsync());
-services.GetRequiredService<HeadersParser>().Run(info);
+ParsedInfo parsed = HeadersParser.Parse(info);
+GeneratedAll all = GeneratedAll.Generate(parsed);
 
 
 static IServiceProvider ConfigureServices()
@@ -25,6 +27,5 @@ static IServiceProvider ConfigureServices()
         .AddSingleton(sp => StorageNodeRoot.LoadRootFromHttp(sp).GetAwaiter().GetResult())
         .AddSingleton<ArtifactDownloader>()
         .AddSingleton<HeadersDownloader>()
-        .AddSingleton<HeadersParser>()
         .BuildServiceProvider();
 }
