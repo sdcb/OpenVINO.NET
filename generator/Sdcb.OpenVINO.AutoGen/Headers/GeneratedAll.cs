@@ -4,8 +4,9 @@ public record GeneratedAll(GeneratedUnits Functions, GeneratedUnits Enums, Gener
 {
     public static GeneratedAll Generate(ParsedInfo info)
     {
-        GeneratedUnits functions = FunctionGenerator.Run(info);
-        return new GeneratedAll(functions, new(), new());
+        GeneratedUnits functions = FunctionGenerator.Generate(info);
+        GeneratedUnits enums = EnumGenerator.Generate(info);
+        return new GeneratedAll(functions, enums, new());
     }
 }
 
