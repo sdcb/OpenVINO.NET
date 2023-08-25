@@ -33,6 +33,14 @@ public class EnumGenerator
         StringBuilder sb = new();
         using StringWriter sw = new(sb);
         using IndentedTextWriter w = new(sw, "    ");
+        if (@enum.Comment != null)
+        {
+            w.WriteLine($"/// <summary>{@enum.Comment.BriefText}</summary>");
+        }
+        else
+        {
+            w.WriteLine($"/// <summary>enum: {@enum.Name}</summary>");
+        }
         w.WriteLine($"[CSourceInfo(\"{((TranslationUnit)@enum.OriginalNamespace).FileName}\", {@enum.LineNumberStart}, {@enum.LineNumberEnd})]");
         w.WriteLine($"public enum {@enum.Name}");
         w.BeginIdent(() =>

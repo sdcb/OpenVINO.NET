@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Sdcb.OpenVINO.Natives;
 
+/// <summary>This enum contains codes for all possible return values of the interface functions</summary>
 [CSourceInfo("ov_common.h", 135, 163)]
 public enum ov_status_e
 {
@@ -62,6 +63,7 @@ public enum ov_status_e
 }
 
 
+/// <summary>This enum contains codes for element type.</summary>
 [CSourceInfo("ov_common.h", 170, 189)]
 public enum ov_element_type_e
 {
@@ -121,6 +123,7 @@ public enum ov_element_type_e
 }
 
 
+/// <summary>enum: Status</summary>
 [CSourceInfo("ov_infer_request.h", 40, 44)]
 public enum Status
 {
@@ -135,6 +138,7 @@ public enum Status
 }
 
 
+/// <summary>This enum contains enumerations for color format.</summary>
 [CSourceInfo("ov_prepostprocess.h", 72, 83)]
 public enum ov_color_format_e
 {
@@ -170,6 +174,7 @@ public enum ov_color_format_e
 }
 
 
+/// <summary>This enum contains codes for all preprocess resize algorithm.</summary>
 [CSourceInfo("ov_prepostprocess.h", 90, 94)]
 public enum ov_preprocess_resize_algorithm_e
 {
