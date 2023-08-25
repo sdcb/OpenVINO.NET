@@ -7,12 +7,13 @@ using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilder;
 using Sdcb.OpenVINO.NuGetBuilder.Extractors;
 using Sdcb.OpenVINO.AutoGen.Headers;
+using Sdcb.OpenVINO.AutoGen.Writers;
 
 IServiceProvider services = ConfigureServices();
 ExtractedInfo info = (await services.GetRequiredService<HeadersDownloader>().DownloadAsync());
 ParsedInfo parsed = HeadersParser.Parse(info);
 GeneratedAll all = GeneratedAll.Generate(parsed);
-
+TransformWriter.WriteAll(all, TransformWriter.DestinationFolder, "Sdcb.OpenVINO.Natives");
 
 static IServiceProvider ConfigureServices()
 {

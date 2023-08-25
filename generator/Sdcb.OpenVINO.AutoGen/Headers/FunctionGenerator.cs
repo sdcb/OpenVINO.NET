@@ -25,12 +25,12 @@ internal class FunctionGenerator
         paramsText = paramsText == null ? "" : Environment.NewLine + paramsText;
         return new GeneratedUnit(function.Name, $"""
             /// <summary>{function.Comment.BriefText}</summary>{paramsText}
-            {CSharpUtils.TypeTransform(function.ReturnType.Type)} {function.Name}({string.Join(", ", function.Parameters.Select(TransformOneParameter))});
+            [DllImport(Dll)] public static extern {CSharpUtils.TypeTransform(function.ReturnType.Type)} {function.Name}({string.Join(", ", function.Parameters.Select(TransformOneParameter))});
             """);
     }
 
     static string TransformOneParameter(Parameter p)
     {
-        return $"{CSharpUtils.TypeTransform(p.QualifiedType.Type)} {p.Name}";
+        return $"{CSharpUtils.TypeTransform(p.QualifiedType.Type)} {CSharpUtils.CSharpKeywordTransform(p.Name)}";
     }
 }

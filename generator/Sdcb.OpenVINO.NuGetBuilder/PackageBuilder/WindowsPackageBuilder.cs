@@ -29,7 +29,7 @@ public sealed class WindowsPackageBuilder
         }
         else
         {
-            string iconFile = DirectoryUtils.SearchFileByParents(new DirectoryInfo(destinationFolder), iconFileName);
+            string iconFile = DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo(destinationFolder), iconFileName).FullName;
             Console.WriteLine($"Copy {iconFile} to {destinationFile}.");
             File.Copy(iconFile, destinationFile);
         }

@@ -2,7 +2,7 @@
 
 public static class DirectoryUtils
 {
-    public static string SearchFileByParents(DirectoryInfo currentFolder, string fileName)
+    public static FileInfo SearchFileInCurrentAndParentDirectories(DirectoryInfo currentFolder, string fileName)
     {
         Stack<DirectoryInfo> stack = new();
         stack.Push(currentFolder);
@@ -10,10 +10,10 @@ public static class DirectoryUtils
         while (stack.Count > 0)
         {
             DirectoryInfo dir = stack.Pop();
-            string path = Path.Combine(dir.FullName, fileName);
-            if (File.Exists(path))
+            FileInfo r = new FileInfo(Path.Combine(dir.FullName, fileName));
+            if (r.Exists)
             {
-                return path;
+                return r;
             }
 
             DirectoryInfo? parent = dir.Parent;
