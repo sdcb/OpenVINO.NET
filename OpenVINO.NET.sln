@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.AutoGen.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.NuGetBuilder.Tests", "generator\tests\Sdcb.OpenVINO.NuGetBuilder.Tests\Sdcb.OpenVINO.NuGetBuilder.Tests.csproj", "{0548FF1C-0972-4B67-A9D1-B1A984234C59}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.Tests", "tests\Sdcb.OpenVINO.Tests\Sdcb.OpenVINO.Tests.csproj", "{C5A2B816-CA4A-4938-8A30-3ED5C55834CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{0548FF1C-0972-4B67-A9D1-B1A984234C59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0548FF1C-0972-4B67-A9D1-B1A984234C59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0548FF1C-0972-4B67-A9D1-B1A984234C59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5A2B816-CA4A-4938-8A30-3ED5C55834CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5A2B816-CA4A-4938-8A30-3ED5C55834CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5A2B816-CA4A-4938-8A30-3ED5C55834CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5A2B816-CA4A-4938-8A30-3ED5C55834CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +69,7 @@ Global
 		{BA1C1F61-31A9-42D9-A607-03494BBCD04E} = {9E45E6A1-2F28-4604-80D0-9517077C5B5E}
 		{C8739839-3C18-4520-9064-7040A9DE53D1} = {BA1C1F61-31A9-42D9-A607-03494BBCD04E}
 		{0548FF1C-0972-4B67-A9D1-B1A984234C59} = {BA1C1F61-31A9-42D9-A607-03494BBCD04E}
+		{C5A2B816-CA4A-4938-8A30-3ED5C55834CF} = {CF0B0CBC-EA90-486E-A006-50B76FE5C628}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E5CE293-BD62-4ACF-B872-285B8C995E38}
