@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
@@ -21,6 +22,15 @@ public class VersionTest
     public unsafe void PrintVersion()
     {
         ov_version v = new();
-        NativeMethods.ov_get_openvino_version(&v);
+        try
+        {
+            NativeMethods.ov_get_openvino_version(&v);
+            _console.WriteLine(Marshal.PtrToStringAnsi((IntPtr)v.buildNumber));
+            _console.WriteLine(Marshal.PtrToStringAnsi((IntPtr)v.description));
+        }
+        finally
+        {
+            NativeMethods.ov_version_free(&v);
+        }
     }
 }
