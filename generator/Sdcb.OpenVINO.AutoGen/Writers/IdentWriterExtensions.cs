@@ -13,9 +13,9 @@ internal static class IdentWriterExtensions
         w.WriteLine("}");
     }
 
-    public static void WriteLines(this IndentedTextWriter w, string text)
+    public static void WriteLines(this IndentedTextWriter w, IEnumerable<string> lines)
     {
-        foreach (string line in text.Split(Environment.NewLine))
+        foreach (string line in lines)
         {
             w.WriteLine(line);
         }

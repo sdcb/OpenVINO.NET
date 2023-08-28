@@ -123,7 +123,6 @@ public enum ov_element_type_e
 }
 
 
-/// <summary>enum: Status</summary>
 [CSourceInfo("ov_infer_request.h", 40, 44)]
 public enum Status
 {

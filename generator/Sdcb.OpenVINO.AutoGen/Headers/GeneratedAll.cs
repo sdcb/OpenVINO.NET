@@ -1,4 +1,6 @@
-﻿namespace Sdcb.OpenVINO.AutoGen.Headers;
+﻿using Sdcb.OpenVINO.AutoGen.Headers.Generators;
+
+namespace Sdcb.OpenVINO.AutoGen.Headers;
 
 public record GeneratedAll(GeneratedUnits Functions, GeneratedUnits Enums, GeneratedUnits Structs)
 {
@@ -6,7 +8,8 @@ public record GeneratedAll(GeneratedUnits Functions, GeneratedUnits Enums, Gener
     {
         GeneratedUnits functions = FunctionGenerator.Generate(info);
         GeneratedUnits enums = EnumGenerator.Generate(info);
-        return new GeneratedAll(functions, enums, new());
+        GeneratedUnits structs = StructsGenerator.Generate(info);
+        return new GeneratedAll(functions, enums, structs);
     }
 }
 

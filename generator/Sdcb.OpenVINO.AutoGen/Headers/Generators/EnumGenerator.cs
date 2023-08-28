@@ -3,7 +3,7 @@ using Sdcb.OpenVINO.AutoGen.Writers;
 using System.CodeDom.Compiler;
 using System.Text;
 
-namespace Sdcb.OpenVINO.AutoGen.Headers;
+namespace Sdcb.OpenVINO.AutoGen.Headers.Generators;
 
 public class EnumGenerator
 {
@@ -13,47 +13,31 @@ public class EnumGenerator
                     .SelectMany(x => x.Enums)
                     .OrderBy(x => ((TranslationUnit)x.OriginalNamespace).FileName)
                     .ToArray();
-        Console.WriteLine($"Detected enums: {info.Units.SelectMany(x => x.Enums).Count()}");
-        GeneratedUnits enums = new(rawEnums.Select(TransformOneEnum));
+        Console.WriteLine($"Detected enums: {rawEnums.Length}");
+        GeneratedUnits enums = new(rawEnums.Select(TransformOne));
         return enums;
     }
 
-    private static GeneratedUnit TransformOneEnum(Enumeration @enum)
+    private static GeneratedUnit TransformOne(Enumeration @enum)
     {
-        var items = @enum.Items.Select(x => new
-        {
-            x.Name,
-            Comment = x.Comment.FullComment.Blocks
-                .OfType<ParagraphComment>()
-                .Select(x => x.Content.OfType<TextComment>().Select(x => x.Text).Aggregate((x, y) => $"{x}{Environment.NewLine}{y}"))
-                .Aggregate((x, y) => $"{x}{Environment.NewLine}{y}").Trim(),
-            Value = ConvertValue(x.Value, @enum.BuiltinType.Type),
-        }).ToArray();
-
         StringBuilder sb = new();
         using StringWriter sw = new(sb);
         using IndentedTextWriter w = new(sw, "    ");
-        if (@enum.Comment != null)
-        {
-            w.WriteLine($"/// <summary>{@enum.Comment.BriefText}</summary>");
-        }
-        else
-        {
-            w.WriteLine($"/// <summary>enum: {@enum.Name}</summary>");
-        }
+
+        w.WriteLines(@enum.Comment.ToBriefCode());
         w.WriteLine($"[CSourceInfo(\"{((TranslationUnit)@enum.OriginalNamespace).FileName}\", {@enum.LineNumberStart}, {@enum.LineNumberEnd})]");
         w.WriteLine($"public enum {@enum.Name}");
         w.BeginIdent(() =>
         {
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < @enum.Items.Count; i++)
             {
-                var item = items[i];
-                w.WriteLine($"/// <summary>{item.Comment}</summary>");
-                w.WriteLine($"{item.Name} = {item.Value},");
-                if (i != items.Length - 1) w.WriteLine();
+                Enumeration.Item item = @enum.Items[i];
+                w.WriteLines(item.Comment.ToSummaryCode());
+                w.WriteLine($"{item.Name} = {ConvertValue(item.Value, @enum.BuiltinType.Type)},");
+                if (i != @enum.Items.Count - 1) w.WriteLine();
             }
         });
-        
+
         return new GeneratedUnit(@enum.Name, sb.ToString());
     }
 

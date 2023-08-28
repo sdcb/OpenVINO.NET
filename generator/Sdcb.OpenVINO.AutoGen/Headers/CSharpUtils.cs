@@ -28,6 +28,8 @@ internal static class CSharpUtils
             BuiltinType bi => PrimitiveTypeToCSharp(bi.Type),
             TypedefType tdef => TypeTransform(tdef.Declaration.Type),
             TagType tag => tag.Declaration.Name,
+            AttributedType attr => TypeTransform(attr.Modified.Type),
+            FunctionType => "IntPtr",
             _ => type.ToString(),
         };
     }

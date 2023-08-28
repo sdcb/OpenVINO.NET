@@ -1,6 +1,6 @@
 ﻿using CppSharp.AST;
 
-namespace Sdcb.OpenVINO.AutoGen.Headers;
+namespace Sdcb.OpenVINO.AutoGen.Headers.Generators;
 
 internal class FunctionGenerator
 {
