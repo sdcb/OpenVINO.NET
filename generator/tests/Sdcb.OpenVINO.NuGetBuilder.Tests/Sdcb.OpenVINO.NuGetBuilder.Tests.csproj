@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\generator\Sdcb.OpenVINO.NuGetBuilder\Sdcb.OpenVINO.NuGetBuilder.csproj" />
+    <ProjectReference Include="..\..\Sdcb.OpenVINO.NuGetBuilder\Sdcb.OpenVINO.NuGetBuilder.csproj" />
   </ItemGroup>
 
 </Project>

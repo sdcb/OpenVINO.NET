@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\generator\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj" />
+    <ProjectReference Include="..\..\Sdcb.OpenVINO.AutoGen\Sdcb.OpenVINO.AutoGen.csproj" />
   </ItemGroup>
 
 </Project>
