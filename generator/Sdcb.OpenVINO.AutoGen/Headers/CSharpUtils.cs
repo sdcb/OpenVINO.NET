@@ -24,12 +24,16 @@ internal static class CSharpUtils
     {
         return type switch
         {
-            PointerType p => $"{TypeTransform(p.Pointee)}*",
+            PointerType p => p.Pointee switch
+            {
+                var x when x is AttributedType attr && attr.Modified.Type is FunctionType func => TypeTransform(func),
+                _ => $"{TypeTransform(p.Pointee)}*"
+            },
             BuiltinType bi => PrimitiveTypeToCSharp(bi.Type),
             TypedefType tdef => TypeTransform(tdef.Declaration.Type),
             TagType tag => tag.Declaration.Name,
             AttributedType attr => TypeTransform(attr.Modified.Type),
-            FunctionType => "IntPtr",
+            FunctionType func => $"delegate*<{string.Join(",", func.Parameters.Select(p => TypeTransform(p.Type)))}, {TypeTransform(func.ReturnType.Type)}>",
             _ => type.ToString(),
         };
     }

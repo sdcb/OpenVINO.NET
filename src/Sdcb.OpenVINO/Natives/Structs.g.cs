@@ -80,7 +80,7 @@ public struct ov_dimension
 public unsafe struct ov_callback_t
 {
     /// <summary>The callback func</summary>
-    public IntPtr* callback_func;
+    public delegate*<void*, void> callback_func;
     
     /// <summary>The args of callback func</summary>
     public void* args;
