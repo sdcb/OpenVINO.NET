@@ -23,7 +23,7 @@ public sealed class WindowsPackageBuilder
     {
         const string iconFileName = "icon.png";
         string destinationFile = Path.Combine(destinationFolder, iconFileName);
-        if (Path.Exists(destinationFolder))
+        if (Path.Exists(destinationFile))
         {
             Console.WriteLine($"{destinationFile} already exists, skip.");
         }
