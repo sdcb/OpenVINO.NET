@@ -17,7 +17,7 @@ public unsafe struct ov_available_devices_t
     public byte** devices;
     
     /// <summary>devices' number</summary>
-    public ulong size;
+    public nint size;
 }
 
 
@@ -35,7 +35,7 @@ public unsafe struct ov_core_version_list_t
     public ov_core_version_t* versions;
     
     /// <summary>A number of versions in the array</summary>
-    public ulong size;
+    public nint size;
 }
 
 
@@ -101,7 +101,7 @@ public unsafe struct ov_profiling_info_list_t
     public ov_profiling_info_t* profiling_infos;
     
     /// <summary>The list size</summary>
-    public ulong size;
+    public nint size;
 }
 
 

@@ -30,7 +30,11 @@ internal static class CSharpUtils
                 _ => $"{TypeTransform(p.Pointee)}*"
             },
             BuiltinType bi => PrimitiveTypeToCSharp(bi.Type),
-            TypedefType tdef => TypeTransform(tdef.Declaration.Type),
+            TypedefType tdef => tdef.Declaration.Name switch
+            {
+                "size_t" => "nint", 
+                _ => TypeTransform(tdef.Declaration.Type),
+            },
             TagType tag => tag.Declaration.Name,
             AttributedType attr => TypeTransform(attr.Modified.Type),
             FunctionType func => $"delegate*<{string.Join(",", func.Parameters.Select(p => TypeTransform(p.Type)))}, {TypeTransform(func.ReturnType.Type)}>",
