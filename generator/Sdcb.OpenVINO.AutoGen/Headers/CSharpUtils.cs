@@ -33,6 +33,7 @@ internal static class CSharpUtils
             TypedefType tdef => tdef.Declaration.Name switch
             {
                 "size_t" => "nint", 
+                "wchar_t" => "char",
                 _ => TypeTransform(tdef.Declaration.Type),
             },
             TagType tag => tag.Declaration.Name,

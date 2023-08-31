@@ -134,7 +134,7 @@ public static unsafe partial class NativeMethods
     /// <param name="xml_config_file_ws">A path to model file with unicode.</param>
     /// <param name="core">A pointer to the newly created ov_core_t.</param>
     [DllImport(Dll), CSourceInfo("ov_core.h", 116, 117)]
-    public static extern ov_status_e ov_core_create_with_config_unicode(ushort* xml_config_file_ws, ov_core** core);
+    public static extern ov_status_e ov_core_create_with_config_unicode(char* xml_config_file_ws, ov_core** core);
     
     /// <summary>Release the memory allocated by ov_core_t.</summary>
     /// <param name="core">A pointer to the ov_core_t to free memory.</param>
@@ -155,7 +155,7 @@ public static unsafe partial class NativeMethods
     /// <param name="bin_path">Path to a data file.  For IR format (*.bin):   * if `bin_path` is empty, will try to read a bin file with the same name as xml and   * if the bin file with the same name is not found, will load IR without weights.  For the following file formats the `bin_path` parameter is not used:   * ONNX format (*.onnx)   * PDPD (*.pdmodel)   * TF (*.pb)   * TFLite (*.tflite)</param>
     /// <param name="model">A pointer to the newly created model.</param>
     [DllImport(Dll), CSourceInfo("ov_core.h", 166, 170)]
-    public static extern ov_status_e ov_core_read_model_unicode(ov_core* core, ushort* model_path, ushort* bin_path, ov_model** model);
+    public static extern ov_status_e ov_core_read_model_unicode(ov_core* core, char* model_path, char* bin_path, ov_model** model);
     
     /// <summary>Reads models from IR / ONNX / PDPD / TF / TFLite formats.</summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
@@ -193,7 +193,7 @@ public static unsafe partial class NativeMethods
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
     /// <param name="...">Optional pack of pairs:  <char * property_key, char* property_value> relevant only  for this load operation operation. Supported property key please see ov_property.h.</param>
     [DllImport(Dll), CSourceInfo("ov_core.h", 251, 257)]
-    public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, ushort* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model);
+    public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, char* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model);
     
     /// <summary>Sets properties for a device, acceptable keys can be found in ov_property_key_xxx.</summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
