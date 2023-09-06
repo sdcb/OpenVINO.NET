@@ -1,4 +1,4 @@
-using System;
+#pragma warning disable CS1591
 using System.Runtime.InteropServices;
 
 namespace Sdcb.OpenVINO.Natives;

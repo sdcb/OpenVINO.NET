@@ -24,7 +24,7 @@ public static class TransformWriter
     {
         using StreamWriter sw = new(filePath);
         using IndentedTextWriter w = new(sw, "    ");
-        w.WriteLine("using System;");
+        w.WriteLine("#pragma warning disable CS1591"); // 缺少对公共可见类型或成员的 XML 注释
         w.WriteLine("using System.Runtime.InteropServices;");
         w.WriteLine();
         w.WriteLine($"namespace {ns};");
@@ -36,7 +36,7 @@ public static class TransformWriter
     {
         using StreamWriter sw = new(filePath);
         using IndentedTextWriter w = new(sw, "    ");
-        w.WriteLine("using System;");
+        w.WriteLine("#pragma warning disable CS1591");  // 缺少对公共可见类型或成员的 XML 注释
         w.WriteLine("using System.Runtime.InteropServices;");
         w.WriteLine();
         w.WriteLine($"namespace {ns};");
