@@ -1,5 +1,6 @@
 ﻿using CppSharp.AST;
 using Sdcb.OpenVINO.AutoGen.Writers;
+using System;
 using System.CodeDom.Compiler;
 using System.Text;
 
@@ -11,7 +12,6 @@ public class EnumGenerator
     {
         Enumeration[] rawEnums = info.Units
                     .SelectMany(x => x.Enums)
-                    .OrderBy(x => ((TranslationUnit)x.OriginalNamespace).FileName)
                     .ToArray();
         Console.WriteLine($"Detected enums: {rawEnums.Length}");
         GeneratedUnits enums = new(rawEnums.Select(TransformOne));
@@ -20,14 +20,21 @@ public class EnumGenerator
 
     private static GeneratedUnit TransformOne(Enumeration @enum)
     {
-        StringBuilder sb = new();
-        using StringWriter sw = new(sb);
-        using IndentedTextWriter w = new(sw, "    ");
+        string headerFile = ((TranslationUnit)@enum.OriginalNamespace).FileName;
+
+        IndentedLinesWriter w = new();
 
         w.WriteLines(@enum.Comment.ToBriefCode());
-        w.WriteLine($"[CSourceInfo(\"{((TranslationUnit)@enum.OriginalNamespace).FileName}\", {@enum.LineNumberStart}, {@enum.LineNumberEnd})]");
+
+        VerbatimLineComment? groupBlock = @enum.Comment?.FullComment.Blocks
+            .OfType<VerbatimLineComment>()
+            .Where(x => x.CommandKind == CommentCommandKind.A && x.Text.Trim() != @enum.Name)
+            .SingleOrDefault();
+        string? group = groupBlock?.Text.Trim();
+
+        w.WriteLine($"[CSourceInfo(\"{headerFile}\", {@enum.LineNumberStart}, {@enum.LineNumberEnd}, \"{group}\")]");
         w.WriteLine($"public enum {@enum.Name}");
-        w.BeginIdent(() =>
+        using (w.BeginIdent())
         {
             for (int i = 0; i < @enum.Items.Count; i++)
             {
@@ -36,9 +43,9 @@ public class EnumGenerator
                 w.WriteLine($"{item.Name} = {ConvertValue(item.Value, @enum.BuiltinType.Type)},");
                 if (i != @enum.Items.Count - 1) w.WriteLine();
             }
-        });
+        };
 
-        return new GeneratedUnit(@enum.Name, sb.ToString());
+        return new GeneratedUnit(@enum.Name, group, headerFile, w.Lines);
     }
 
     private static object ConvertValue(ulong value, PrimitiveType primitiveType)

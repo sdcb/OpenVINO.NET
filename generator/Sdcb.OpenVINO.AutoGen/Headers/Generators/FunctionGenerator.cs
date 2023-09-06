@@ -24,10 +24,10 @@ internal class FunctionGenerator
 
     static GeneratedUnit TransformOneFunction(Function func)
     {
-        StringBuilder body = new();
+        IndentedLinesWriter w = new ();
         if (func.Comment.BriefText != null)
         {
-            body.AppendLine($"/// <summary>{XmlEscape(func.Comment.BriefText)}</summary>");
+            w.WriteLine($"/// <summary>{XmlEscape(func.Comment.BriefText)}</summary>");
         }
 
         List<FunctionParameter> allParams = func.Parameters
@@ -43,7 +43,7 @@ internal class FunctionGenerator
             .Select((x, i) => (x, i)))
         {
             string raw = string.Concat(v.x.ParagraphComment.Content.OfType<TextComment>().Select(x => x.Text)).Trim();
-            body.AppendLine($"/// <param name=\"{allParams[v.i].NameUnescaped}\">{XmlEscape(raw)}</param>");
+            w.WriteLine($"/// <param name=\"{allParams[v.i].NameUnescaped}\">{XmlEscape(raw)}</param>");
         }
 
         BlockCommandComment? returnBlock = func.Comment.FullComment.Blocks
@@ -52,22 +52,18 @@ internal class FunctionGenerator
         if (returnBlock != null)
         {
             string detail = string.Concat(returnBlock.ParagraphComment.Content.OfType<TextComment>().Select(x => x.Text)).Trim();
-            body.AppendLine($"/// <returns>{XmlEscape(detail)}</returns>");
+            w.WriteLine($"/// <returns>{XmlEscape(detail)}</returns>");
         }
 
         VerbatimLineComment? groupBlock = func.Comment.FullComment.Blocks
             .OfType<VerbatimLineComment>()
             .SingleOrDefault(x => x.CommandKind == CommentCommandKind.A);
-        if (groupBlock != null)
-        {
-            body.AppendLine($"[DllImport(Dll), CSourceInfo(\"{((TranslationUnit)func.OriginalNamespace).FileName}\", {func.LineNumberStart}, {func.LineNumberEnd}, \"{groupBlock.Text.Trim()}\")]");
-        }
-        else
-        {
-            body.AppendLine($"[DllImport(Dll), CSourceInfo(\"{((TranslationUnit)func.OriginalNamespace).FileName}\", {func.LineNumberStart}, {func.LineNumberEnd})]");
-        }
-        body.AppendLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", allParams)});");
-        return new GeneratedUnit(func.Name, body.ToString());
+        string? group = groupBlock?.Text.Trim();
+        string headerFile = ((TranslationUnit)func.OriginalNamespace).FileName;
+
+        w.WriteLine($"[DllImport(Dll), CSourceInfo(\"{headerFile}\", {func.LineNumberStart}, {func.LineNumberEnd}, \"{group}\")]");
+        w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", allParams)});");
+        return new GeneratedUnit(func.Name, group, headerFile, w.Lines);
     }
 
     static string XmlEscape(string s) => SecurityElement.Escape(s);

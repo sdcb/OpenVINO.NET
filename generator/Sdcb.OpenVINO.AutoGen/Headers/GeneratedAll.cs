@@ -15,7 +15,7 @@ public record GeneratedAll(GeneratedUnits Functions, GeneratedUnits Enums, Gener
 
 public class GeneratedUnits : List<GeneratedUnit>
 {
-    public GeneratedUnits(IEnumerable<GeneratedUnit> collection) : base(collection) 
+    public GeneratedUnits(IEnumerable<GeneratedUnit> collection) : base(collection)
     {
     }
 
@@ -23,7 +23,11 @@ public class GeneratedUnits : List<GeneratedUnit>
     {
     }
 
-    public string Text => string.Join(Environment.NewLine, this.Select(x => x.Text));
+    public IEnumerable<string> Lines => this
+        .OrderBy(x => x.HeaderFile)
+        //.ThenBy(x => x.Group)
+        //.ThenBy(x => x.Name)
+        .Aggregate(Enumerable.Empty<string>(), (a, b) => a.Concat(new[] { Environment.NewLine }).Concat(b.Lines));
 }
 
-public record GeneratedUnit(string Name, string Text);
+public record GeneratedUnit(string Name, string? Group, string HeaderFile, IEnumerable<string> Lines);

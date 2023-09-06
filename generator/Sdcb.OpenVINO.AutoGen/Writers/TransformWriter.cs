@@ -1,7 +1,5 @@
 ﻿using Sdcb.OpenVINO.AutoGen.Headers;
 using Sdcb.OpenVINO.NuGetBuilder.Utils;
-using SharpCompress.Common;
-using System;
 using System.CodeDom.Compiler;
 
 namespace Sdcb.OpenVINO.AutoGen.Writers;
@@ -29,7 +27,7 @@ public static class TransformWriter
         w.WriteLine();
         w.WriteLine($"namespace {ns};");
         w.WriteLine();
-        w.WriteLine(enums.Text);
+        w.WriteLines(enums.Lines);
     }
 
     private static void WriteFunctions(GeneratedUnits funcs, string filePath, string ns)
@@ -46,10 +44,7 @@ public static class TransformWriter
         w.WriteLine($"public static unsafe partial class NativeMethods");
         w.BeginIdent(() =>
         {
-            foreach (string line in funcs.Text.Split(Environment.NewLine))
-            {
-                w.WriteLine(line);
-            }
+            w.WriteLines(funcs.Lines);
         });
     }
 }

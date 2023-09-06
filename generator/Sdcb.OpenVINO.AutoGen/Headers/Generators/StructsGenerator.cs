@@ -22,15 +22,21 @@ public class StructsGenerator
 
     private static GeneratedUnit TransformOne(Class @class)
     {
-        StringBuilder sb = new();
-        using StringWriter sw = new(sb);
-        using IndentedTextWriter w = new(sw, "    ");
+        IndentedLinesWriter w = new();
         w.WriteLines(@class.Comment.ToBriefCode());
-        w.WriteLine($"[StructLayout(LayoutKind.Sequential), CSourceInfo(\"{((TranslationUnit)@class.OriginalNamespace).FileName}\", {@class.LineNumberStart}, {@class.LineNumberEnd})]");
+
+        VerbatimLineComment? groupBlock = @class.Comment?.FullComment.Blocks
+            .OfType<VerbatimLineComment>()
+            .Where(x => x.CommandKind == CommentCommandKind.A && x.Text.Trim() != @class.Name)
+            .LastOrDefault();
+        string? group = groupBlock?.Text.Trim();
+        string headerFile = ((TranslationUnit)@class.OriginalNamespace).FileName;
+
+        w.WriteLine($"[StructLayout(LayoutKind.Sequential), CSourceInfo(\"{headerFile}\", {@class.LineNumberStart}, {@class.LineNumberEnd}, \"{group}\")]");
 
         string unsafeBlock = @class.Fields.Any(x => CSharpUtils.TypeTransform(x.Type).Contains('*')) ? "unsafe " : "";
         w.WriteLine($"public {unsafeBlock}struct {@class.Name}");
-        w.BeginIdent(() =>
+        using (w.BeginIdent())
         {
             for (int i = 0; i < @class.Fields.Count; i++)
             {
@@ -39,8 +45,8 @@ public class StructsGenerator
                 w.WriteLine($"public {CSharpUtils.TypeTransform(field.Type)} {CSharpUtils.CSharpKeywordTransform(field.Name)};");
                 if (i != @class.Fields.Count - 1) w.WriteLine();
             }
-        });
+        }
 
-        return new GeneratedUnit(@class.Name, sb.ToString());
+        return new GeneratedUnit(@class.Name, group, headerFile, w.Lines);
     }
 }
