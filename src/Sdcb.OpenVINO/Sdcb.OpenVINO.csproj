@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard2.0;net48;net6</TargetFrameworks>
     <LangVersion>10</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
     <IncludeSymbols>true</IncludeSymbols>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>

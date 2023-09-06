@@ -62,7 +62,6 @@ public enum ov_status_e
     UNKNOW_EXCEPTION = -17,
 }
 
-
 /// <summary>This enum contains codes for element type.</summary>
 [CSourceInfo("ov_common.h", 170, 189)]
 public enum ov_element_type_e
@@ -122,7 +121,6 @@ public enum ov_element_type_e
     U64 = 17,
 }
 
-
 [CSourceInfo("ov_infer_request.h", 40, 44)]
 public enum Status
 {
@@ -135,7 +133,6 @@ public enum Status
     /// <summary>A node is executed.</summary>
     EXECUTED = 2,
 }
-
 
 /// <summary>This enum contains enumerations for color format.</summary>
 [CSourceInfo("ov_prepostprocess.h", 72, 83)]
@@ -171,7 +168,6 @@ public enum ov_color_format_e
     /// <summary>Image in BGRX interleaved format (4 channels)</summary>
     BGRX = 9,
 }
-
 
 /// <summary>This enum contains codes for all preprocess resize algorithm.</summary>
 [CSourceInfo("ov_prepostprocess.h", 90, 94)]

@@ -17,11 +17,13 @@ public class CSourceInfoAttribute : Attribute
     /// <param name="headerFileName">The openvino C library header file name.</param>
     /// <param name="lineNumberStart">The first line number of the function definition.</param>
     /// <param name="lineNumberEnd">The last line number of the function definition.</param>
-    public CSourceInfoAttribute(string headerFileName, int lineNumberStart, int lineNumberEnd)
+    /// <param name="group">The group name of the unit.</param>
+    public CSourceInfoAttribute(string headerFileName, int lineNumberStart, int lineNumberEnd, string? group = null)
     {
         HeaderFileName = headerFileName;
         LineNumberStart = lineNumberStart;
         LineNumberEnd = lineNumberEnd;
+        Group = group;
     }
 
     /// <summary>The openvino C library header file name.</summary>
@@ -32,4 +34,7 @@ public class CSourceInfoAttribute : Attribute
 
     /// <summary>The last line number of the function definition.</summary>
     public int LineNumberEnd { get; }
+
+    /// <summary>The group name of the unit.</summary>
+    public string? Group { get; }
 }

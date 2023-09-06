@@ -23,7 +23,7 @@ public class GeneratedUnits : List<GeneratedUnit>
     {
     }
 
-    public string Text => string.Join(Environment.NewLine + Environment.NewLine, this.Select(x => x.Text));
+    public string Text => string.Join(Environment.NewLine, this.Select(x => x.Text));
 }
 
 public record GeneratedUnit(string Name, string Text);

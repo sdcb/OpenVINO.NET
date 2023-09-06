@@ -36,7 +36,9 @@ public static class TransformWriter
     {
         using StreamWriter sw = new(filePath);
         using IndentedTextWriter w = new(sw, "    ");
-        w.WriteLine("#pragma warning disable CS1591");  // 缺少对公共可见类型或成员的 XML 注释
+        w.WriteLine("#pragma warning disable CS1591"); // 缺少对公共可见类型或成员的 XML 注释
+        w.WriteLine("#pragma warning disable CS1573"); // 参数在 XML 注释中没有匹配的 param 标记(但其他参数有)
+        w.WriteLine("using System;");
         w.WriteLine("using System.Runtime.InteropServices;");
         w.WriteLine();
         w.WriteLine($"namespace {ns};");

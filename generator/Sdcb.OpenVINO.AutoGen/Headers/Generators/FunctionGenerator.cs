@@ -1,4 +1,6 @@
 ﻿using CppSharp.AST;
+using System.Security;
+using System.Text;
 
 namespace Sdcb.OpenVINO.AutoGen.Headers.Generators;
 
@@ -22,21 +24,60 @@ internal class FunctionGenerator
 
     static GeneratedUnit TransformOneFunction(Function func)
     {
-        string paramsText = func.Comment.FullComment.Blocks
-            .OfType<ParamCommandComment>()
-            .Select(x => $"/// <param name=\"{x.Arguments[0].Text}\">{string.Join(" ", x.ParagraphComment.Content.OfType<TextComment>().Select(x => x.Text)).Trim()}</param>")
-            .Aggregate((x, y) => $"{x}{Environment.NewLine}{y}");
+        StringBuilder body = new();
+        if (func.Comment.BriefText != null)
+        {
+            body.AppendLine($"/// <summary>{XmlEscape(func.Comment.BriefText)}</summary>");
+        }
 
-        paramsText = paramsText == null ? "" : Environment.NewLine + paramsText;
-        return new GeneratedUnit(func.Name, $"""
-            /// <summary>{func.Comment.BriefText}</summary>{paramsText}
-            [DllImport(Dll), CSourceInfo("{((TranslationUnit)func.OriginalNamespace).FileName}", {func.LineNumberStart}, {func.LineNumberEnd})]
-            public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", func.Parameters.Select(TransformOneParameter))});
-            """);
+        List<FunctionParameter> allParams = func.Parameters
+            .Select(x => (FunctionParameter)x)
+            .ToList();
+        if (func.IsVariadic)
+        {
+            allParams.Add(new("IntPtr", "variadic"));
+        }
+
+        foreach ((ParamCommandComment x, int i) v in func.Comment.FullComment.Blocks
+            .OfType<ParamCommandComment>()
+            .Select((x, i) => (x, i)))
+        {
+            string raw = string.Concat(v.x.ParagraphComment.Content.OfType<TextComment>().Select(x => x.Text)).Trim();
+            body.AppendLine($"/// <param name=\"{allParams[v.i].NameUnescaped}\">{XmlEscape(raw)}</param>");
+        }
+
+        BlockCommandComment? returnBlock = func.Comment.FullComment.Blocks
+            .OfType<BlockCommandComment>()
+            .SingleOrDefault(x => x.CommandKind == CommentCommandKind.Return);
+        if (returnBlock != null)
+        {
+            string detail = string.Concat(returnBlock.ParagraphComment.Content.OfType<TextComment>().Select(x => x.Text)).Trim();
+            body.AppendLine($"/// <returns>{XmlEscape(detail)}</returns>");
+        }
+
+        VerbatimLineComment? groupBlock = func.Comment.FullComment.Blocks
+            .OfType<VerbatimLineComment>()
+            .SingleOrDefault(x => x.CommandKind == CommentCommandKind.A);
+        if (groupBlock != null)
+        {
+            body.AppendLine($"[DllImport(Dll), CSourceInfo(\"{((TranslationUnit)func.OriginalNamespace).FileName}\", {func.LineNumberStart}, {func.LineNumberEnd}, \"{groupBlock.Text.Trim()}\")]");
+        }
+        else
+        {
+            body.AppendLine($"[DllImport(Dll), CSourceInfo(\"{((TranslationUnit)func.OriginalNamespace).FileName}\", {func.LineNumberStart}, {func.LineNumberEnd})]");
+        }
+        body.AppendLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", allParams)});");
+        return new GeneratedUnit(func.Name, body.ToString());
     }
 
-    static string TransformOneParameter(Parameter p)
+    static string XmlEscape(string s) => SecurityElement.Escape(s);
+
+    record FunctionParameter(string Type, string NameUnescaped)
     {
-        return $"{CSharpUtils.TypeTransform(p.QualifiedType.Type)} {CSharpUtils.CSharpKeywordTransform(p.Name)}";
+        public string Name => CSharpUtils.CSharpKeywordTransform(NameUnescaped);
+
+        public static explicit operator FunctionParameter(Parameter p) => new(CSharpUtils.TypeTransform(p.QualifiedType.Type), p.Name);
+
+        public override string ToString() => $"{Type} {Name}";
     }
 }
