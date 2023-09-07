@@ -23,7 +23,8 @@ public class StructsGenerator
     private static GeneratedUnit TransformOne(Class @class)
     {
         IndentedLinesWriter w = new();
-        w.WriteLines(@class.Comment.ToBriefCode());
+        DoxygenTags tags = DoxygenTags.Parse(@class.Comment?.Text);
+        w.WriteLines(tags.ToBriefComment());
 
         VerbatimLineComment? groupBlock = @class.Comment?.FullComment.Blocks
             .OfType<VerbatimLineComment>()
@@ -41,7 +42,8 @@ public class StructsGenerator
             for (int i = 0; i < @class.Fields.Count; i++)
             {
                 Field field = @class.Fields[i];
-                w.WriteLines(field.Comment.ToSummaryCode());
+                DoxygenTags itemTags = DoxygenTags.Parse(field.Comment.Text);
+                w.WriteLines(itemTags.ToBriefComment());
                 w.WriteLine($"public {CSharpUtils.TypeTransform(field.Type)} {CSharpUtils.CSharpKeywordTransform(field.Name)};");
                 if (i != @class.Fields.Count - 1) w.WriteLine();
             }

@@ -24,56 +24,35 @@ internal class FunctionGenerator
 
     static GeneratedUnit TransformOneFunction(Function func)
     {
-        IndentedLinesWriter w = new ();
-        if (func.Comment.BriefText != null)
-        {
-            w.WriteLine($"/// <summary>{XmlEscape(func.Comment.BriefText)}</summary>");
-        }
+        IndentedLinesWriter w = new();
 
-        List<FunctionParameter> allParams = func.Parameters
-            .Select(x => (FunctionParameter)x)
+        List<RealFuncParam> realParams = func.Parameters
+            .Select(x => (RealFuncParam)x)
             .ToList();
         if (func.IsVariadic)
         {
-            allParams.Add(new("IntPtr", "variadic"));
+            realParams.Add(new("IntPtr", "variadic"));
         }
 
-        foreach ((ParamCommandComment x, int i) v in func.Comment.FullComment.Blocks
-            .OfType<ParamCommandComment>()
-            .Select((x, i) => (x, i)))
-        {
-            string raw = string.Concat(v.x.ParagraphComment.Content.OfType<TextComment>().Select(x => x.Text)).Trim();
-            w.WriteLine($"/// <param name=\"{allParams[v.i].NameUnescaped}\">{XmlEscape(raw)}</param>");
-        }
+        DoxygenTags tags = DoxygenTags.Parse(func.Comment.Text);
+        w.WriteLines(tags.ToBriefComment());
+        w.WriteLines(tags.ToParamsComment(realParams));
+        w.WriteLines(tags.ToReturnsComment());
 
-        BlockCommandComment? returnBlock = func.Comment.FullComment.Blocks
-            .OfType<BlockCommandComment>()
-            .SingleOrDefault(x => x.CommandKind == CommentCommandKind.Return);
-        if (returnBlock != null)
-        {
-            string detail = string.Concat(returnBlock.ParagraphComment.Content.OfType<TextComment>().Select(x => x.Text)).Trim();
-            w.WriteLine($"/// <returns>{XmlEscape(detail)}</returns>");
-        }
-
-        VerbatimLineComment? groupBlock = func.Comment.FullComment.Blocks
-            .OfType<VerbatimLineComment>()
-            .SingleOrDefault(x => x.CommandKind == CommentCommandKind.A);
-        string? group = groupBlock?.Text.Trim();
+        string? group = tags.Group;
         string headerFile = ((TranslationUnit)func.OriginalNamespace).FileName;
 
         w.WriteLine($"[DllImport(Dll), CSourceInfo(\"{headerFile}\", {func.LineNumberStart}, {func.LineNumberEnd}, \"{group}\")]");
-        w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", allParams)});");
+        w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams)});");
         return new GeneratedUnit(func.Name, group, headerFile, w.Lines);
     }
+}
 
-    static string XmlEscape(string s) => SecurityElement.Escape(s);
+public record RealFuncParam(string Type, string NameUnescaped)
+{
+    public string Name => CSharpUtils.CSharpKeywordTransform(NameUnescaped);
 
-    record FunctionParameter(string Type, string NameUnescaped)
-    {
-        public string Name => CSharpUtils.CSharpKeywordTransform(NameUnescaped);
+    public static explicit operator RealFuncParam(Parameter p) => new(CSharpUtils.TypeTransform(p.QualifiedType.Type), p.Name);
 
-        public static explicit operator FunctionParameter(Parameter p) => new(CSharpUtils.TypeTransform(p.QualifiedType.Type), p.Name);
-
-        public override string ToString() => $"{Type} {Name}";
-    }
+    public override string ToString() => $"{Type} {Name}";
 }

@@ -15,10 +15,10 @@ public struct ov_compiled_model
 [StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 63, 66, "ov_core_c_api")]
 public unsafe struct ov_available_devices_t
 {
-    /// <summary>devices' name</summary>
+    /// <summary>devices&apos; name</summary>
     public byte** devices;
 
-    /// <summary>devices' number</summary>
+    /// <summary>devices&apos; number</summary>
     public nint size;
 }
 
@@ -29,7 +29,7 @@ public struct ov_core
 }
 
 
-/// <summary>Represents version information that describes all devices and ov runtime library</summary>
+/// <summary> Represents version information that describes all devices and ov runtime library</summary>
 [StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 53, 56, "ov_core_c_api")]
 public unsafe struct ov_core_version_list_t
 {
@@ -41,7 +41,7 @@ public unsafe struct ov_core_version_list_t
 }
 
 
-/// <summary>Represents version information that describes device and ov runtime library</summary>
+/// <summary> Represents version information that describes device and ov runtime library</summary>
 [StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 43, 46, "ov_core_c_api")]
 public unsafe struct ov_core_version_t
 {
@@ -155,7 +155,16 @@ public struct ov_output_port
 }
 
 
-/// <summary>It represents a shape that may be partially or totally dynamic. A PartialShape may have: Dynamic rank. (Informal notation: `?`) Static rank, but dynamic dimensions on some or all axes. (Informal notation examples: `{1,2,?,4}`, `{?,?,?}`, `{-1,-1,-1}`) Static rank, and static dimensions on all axes. (Informal notation examples: `{1,2,3,4}`, `{6}`, `{}`)</summary>
+/// <summary>
+/// <para>It represents a shape that may be partially or totally dynamic.</para>
+/// <para>A PartialShape may have:</para>
+/// <para>Dynamic rank. (Informal notation: `?`)</para>
+/// <para>Static rank, but dynamic dimensions on some or all axes.</para>
+/// <para>    (Informal notation examples: `{1,2,?,4}`, `{?,?,?}`, `{-1,-1,-1}`)</para>
+/// <para>Static rank, and static dimensions on all axes.</para>
+/// <para>    (Informal notation examples: `{1,2,3,4}`, `{6}`, `{}`)</para>
+/// <para>An interface to make user can initialize ov_partial_shape_t</para>
+/// </summary>
 [StructLayout(LayoutKind.Sequential), CSourceInfo("ov_partial_shape.h", 32, 35, "ov_partial_shape_c_api")]
 public unsafe struct ov_partial_shape
 {

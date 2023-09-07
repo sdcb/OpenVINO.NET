@@ -471,7 +471,7 @@ public class OVCoreTest
 
                 fixed (byte* deviceName = Encoding.UTF8.GetBytes("CPU"))
                 {
-                    Check(ov_core_compile_model(core, newModel, deviceName, 0, &compiledModel));
+                    Check(ov_core_compile_model(core, newModel, deviceName, 0, &compiledModel, IntPtr.Zero));
                 }
 
                 Check(ov_compiled_model_create_infer_request(compiledModel, &inferRequest));

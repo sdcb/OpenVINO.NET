@@ -107,7 +107,10 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Sets properties for a device, acceptable keys can be found in ov_property_key_xxx.</summary>
     /// <param name="compiled_model">A pointer to the ov_compiled_model_t.</param>
-    /// <param name="variadic">variadic paramaters The format is &lt;char *property_key, char* property_value&gt;. Supported property key please see ov_property.h.</param>
+    /// <param name="variadic">
+    /// <para>variadic paramaters The format is &lt;char *property_key, char* property_value&gt;.</para>
+    /// <para>Supported property key please see ov_property.h.</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_compiled_model.h", 148, 149, "ov_compiled_model_c_api")]
     public static extern ov_status_e ov_compiled_model_set_property(ov_compiled_model* compiled_model, IntPtr variadic);
@@ -122,7 +125,10 @@ public static unsafe partial class NativeMethods
     public static extern ov_status_e ov_compiled_model_get_property(ov_compiled_model* compiled_model, byte* property_key, byte** property_value);
     
 
-    /// <summary>Exports the current compiled model to an output stream `std::ostream`. The exported model can also be imported via the ov::Core::import_model method.</summary>
+    /// <summary>
+    /// <para>Exports the current compiled model to an output stream `std::ostream`.</para>
+    /// <para>The exported model can also be imported via the ov::Core::import_model method.</para>
+    /// </summary>
     /// <param name="compiled_model">A pointer to the ov_compiled_model_t.</param>
     /// <param name="export_model_path">Path to the file.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
@@ -136,7 +142,10 @@ public static unsafe partial class NativeMethods
     public static extern void ov_compiled_model_free(ov_compiled_model* compiled_model);
     
 
-    /// <summary>Returns pointer to device-specific shared context on a remote accelerator device that was used to create this CompiledModel.</summary>
+    /// <summary>
+    /// <para>Returns pointer to device-specific shared context</para>
+    /// <para>on a remote accelerator device that was used to create this CompiledModel.</para>
+    /// </summary>
     /// <param name="compiled_model">A pointer to the ov_compiled_model_t.</param>
     /// <param name="context">Return context.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
@@ -157,22 +166,34 @@ public static unsafe partial class NativeMethods
     public static extern void ov_version_free(ov_version* version);
     
 
-    /// <summary>Constructs OpenVINO Core instance by default. See RegisterPlugins for more details.</summary>
+    /// <summary>
+    /// <para>Constructs OpenVINO Core instance by default.</para>
+    /// <para>See RegisterPlugins for more details.</para>
+    /// </summary>
     /// <param name="core">A pointer to the newly created ov_core_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 92, 93, "ov_core_c_api")]
     public static extern ov_status_e ov_core_create(ov_core** core);
     
 
-    /// <summary>Constructs OpenVINO Core instance using XML configuration file with devices description. See RegisterPlugins for more details.</summary>
-    /// <param name="xml_config_file">A path to .xml file with devices to load from. If XML configuration file is not specified, then default plugin.xml file will be used.</param>
+    /// <summary>
+    /// <para>Constructs OpenVINO Core instance using XML configuration file with devices description.</para>
+    /// <para>See RegisterPlugins for more details.</para>
+    /// </summary>
+    /// <param name="xml_config_file">
+    /// <para>A path to .xml file with devices to load from. If XML configuration file is not specified,</para>
+    /// <para>then default plugin.xml file will be used.</para>
+    /// </param>
     /// <param name="core">A pointer to the newly created ov_core_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 104, 105, "ov_core_c_api")]
     public static extern ov_status_e ov_core_create_with_config(byte* xml_config_file, ov_core** core);
     
 
-    /// <summary>Constructs OpenVINO Core instance. See RegisterPlugins for more details.</summary>
+    /// <summary>
+    /// <para>Constructs OpenVINO Core instance.</para>
+    /// <para>See RegisterPlugins for more details.</para>
+    /// </summary>
     /// <param name="xml_config_file_ws">A path to model file with unicode.</param>
     /// <param name="core">A pointer to the newly created ov_core_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
@@ -189,7 +210,17 @@ public static unsafe partial class NativeMethods
     /// <summary>Reads models from IR / ONNX / PDPD / TF / TFLite formats.</summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="model_path">Path to a model.</param>
-    /// <param name="bin_path">Path to a data file. For IR format (*.bin):  * if `bin_path` is empty, will try to read a bin file with the same name as xml and  * if the bin file with the same name is not found, will load IR without weights. For the following file formats the `bin_path` parameter is not used:  * ONNX format (*.onnx)  * PDPD (*.pdmodel)  * TF (*.pb)  * TFLite (*.tflite)</param>
+    /// <param name="bin_path">
+    /// <para>Path to a data file.</para>
+    /// <para>For IR format (*.bin):</para>
+    /// <para> * if `bin_path` is empty, will try to read a bin file with the same name as xml and</para>
+    /// <para> * if the bin file with the same name is not found, will load IR without weights.</para>
+    /// <para>For the following file formats the `bin_path` parameter is not used:</para>
+    /// <para> * ONNX format (*.onnx)</para>
+    /// <para> * PDPD (*.pdmodel)</para>
+    /// <para> * TF (*.pb)</para>
+    /// <para> * TFLite (*.tflite)</para>
+    /// </param>
     /// <param name="model">A pointer to the newly created model.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 145, 146, "ov_core_c_api")]
@@ -199,7 +230,17 @@ public static unsafe partial class NativeMethods
     /// <summary>Reads models from IR / ONNX / PDPD / TF / TFLite formats, path is unicode.</summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="model_path">Path to a model.</param>
-    /// <param name="bin_path">Path to a data file. For IR format (*.bin):  * if `bin_path` is empty, will try to read a bin file with the same name as xml and  * if the bin file with the same name is not found, will load IR without weights. For the following file formats the `bin_path` parameter is not used:  * ONNX format (*.onnx)  * PDPD (*.pdmodel)  * TF (*.pb)  * TFLite (*.tflite)</param>
+    /// <param name="bin_path">
+    /// <para>Path to a data file.</para>
+    /// <para>For IR format (*.bin):</para>
+    /// <para> * if `bin_path` is empty, will try to read a bin file with the same name as xml and</para>
+    /// <para> * if the bin file with the same name is not found, will load IR without weights.</para>
+    /// <para>For the following file formats the `bin_path` parameter is not used:</para>
+    /// <para> * ONNX format (*.onnx)</para>
+    /// <para> * PDPD (*.pdmodel)</para>
+    /// <para> * TF (*.pb)</para>
+    /// <para> * TFLite (*.tflite)</para>
+    /// </param>
     /// <param name="model">A pointer to the newly created model.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 166, 170, "ov_core_c_api")]
@@ -210,43 +251,67 @@ public static unsafe partial class NativeMethods
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="model_str">String with a model in IR / ONNX / PDPD / TF / TFLite format.</param>
     /// <param name="weights">Shared pointer to a constant tensor with weights.</param>
-    /// <param name="model">A pointer to the newly created model. Reading ONNX / PDPD / TF / TFLite models does not support loading weights from the  tensors.</param>
+    /// <param name="model">
+    /// <para>A pointer to the newly created model.</para>
+    /// <para>Reading ONNX / PDPD / TF / TFLite models does not support loading weights from the @p weights tensors.</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 186, 190, "ov_core_c_api")]
     public static extern ov_status_e ov_core_read_model_from_memory(ov_core* core, byte* model_str, ov_tensor* weights, ov_model** model);
     
 
-    /// <summary>Creates a compiled model from a source model object. Users can create as many compiled models as they need and use them simultaneously (up to the limitation of the hardware resources).</summary>
+    /// <summary>
+    /// <para>Creates a compiled model from a source model object.</para>
+    /// <para>Users can create as many compiled models as they need and use</para>
+    /// <para>them simultaneously (up to the limitation of the hardware resources).</para>
+    /// </summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="model">Model object acquired from Core::read_model.</param>
     /// <param name="device_name">Name of a device to load a model to.</param>
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">paramater: Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only for this load operation operation. Supported property key please see ov_property.h.</param>
+    /// <param name="variadic">
+    /// <para>paramater: Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
+    /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 206, 212, "ov_core_c_api")]
     public static extern ov_status_e ov_core_compile_model(ov_core* core, ov_model* model, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
     
 
-    /// <summary>Reads a model and creates a compiled model from the IR/ONNX/PDPD file. This can be more efficient than using the ov_core_read_model_from_XXX + ov_core_compile_model flow, especially for cases when caching is enabled and a cached model is available.</summary>
+    /// <summary>
+    /// <para>Reads a model and creates a compiled model from the IR/ONNX/PDPD file.</para>
+    /// <para>This can be more efficient than using the ov_core_read_model_from_XXX + ov_core_compile_model flow,</para>
+    /// <para>especially for cases when caching is enabled and a cached model is available.</para>
+    /// </summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="model_path">Path to a model.</param>
     /// <param name="device_name">Name of a device to load a model to.</param>
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only for this load operation operation. Supported property key please see ov_property.h.</param>
+    /// <param name="variadic">
+    /// <para>Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
+    /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 228, 234, "ov_core_c_api")]
     public static extern ov_status_e ov_core_compile_model_from_file(ov_core* core, byte* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
     
 
-    /// <summary>Reads a model and creates a compiled model from the IR/ONNX/PDPD file. This can be more efficient than using the ov_core_read_model_from_XXX + ov_core_compile_model flow, especially for cases when caching is enabled and a cached model is available.</summary>
+    /// <summary>
+    /// <para>Reads a model and creates a compiled model from the IR/ONNX/PDPD file.</para>
+    /// <para>This can be more efficient than using the ov_core_read_model_from_XXX + ov_core_compile_model flow,</para>
+    /// <para>especially for cases when caching is enabled and a cached model is available.</para>
+    /// </summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="model_path">Path to a model.</param>
     /// <param name="device_name">Name of a device to load a model to.</param>
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only for this load operation operation. Supported property key please see ov_property.h.</param>
+    /// <param name="variadic">
+    /// <para>Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
+    /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 251, 257, "ov_core_c_api")]
     public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, char* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
@@ -255,16 +320,22 @@ public static unsafe partial class NativeMethods
     /// <summary>Sets properties for a device, acceptable keys can be found in ov_property_key_xxx.</summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="device_name">Name of a device.</param>
-    /// <param name="variadic">variadic paramaters The format is &lt;char* property_key, char* property_value&gt;. Supported property key please see ov_property.h.</param>
+    /// <param name="variadic">
+    /// <para>variadic paramaters The format is &lt;char* property_key, char* property_value&gt;.</para>
+    /// <para>Supported property key please see ov_property.h.</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 270, 271, "ov_core_c_api")]
     public static extern ov_status_e ov_core_set_property(ov_core* core, byte* device_name, IntPtr variadic);
     
 
-    /// <summary>Gets properties related to device behaviour. The method extracts information that can be set via the set_property method.</summary>
+    /// <summary>
+    /// <para>Gets properties related to device behaviour.</para>
+    /// <para>The method extracts information that can be set via the set_property method.</para>
+    /// </summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
-    /// <param name="device_name">Name of a device to get a property value.</param>
-    /// <param name="property_key">Property key.</param>
+    /// <param name="device_name"> Name of a device to get a property value.</param>
+    /// <param name="property_key"> Property key.</param>
     /// <param name="property_value">A pointer to property value with string format.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 283, 284, "ov_core_c_api")]
@@ -273,7 +344,10 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Returns devices available for inference.</summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
-    /// <param name="devices">A pointer to the ov_available_devices_t instance. Core objects go over all registered plugins and ask about available devices.</param>
+    /// <param name="devices">
+    /// <para>A pointer to the ov_available_devices_t instance.</para>
+    /// <para>Core objects go over all registered plugins and ask about available devices.</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_core.h", 294, 295, "ov_core_c_api")]
     public static extern ov_status_e ov_core_get_available_devices(ov_core* core, ov_available_devices_t* devices);
@@ -297,7 +371,11 @@ public static unsafe partial class NativeMethods
     public static extern ov_status_e ov_core_import_model(ov_core* core, byte* content, nint content_size, byte* device_name, ov_compiled_model** compiled_model);
     
 
-    /// <summary>Returns device plugins version information. Device name can be complex and identify multiple devices at once like `HETERO:CPU,GPU`; in this case, std::map contains multiple entries, each per device.</summary>
+    /// <summary>
+    /// <para>Returns device plugins version information.</para>
+    /// <para>Device name can be complex and identify multiple devices at once like `HETERO:CPU,GPU`;</para>
+    /// <para>in this case, std::map contains multiple entries, each per device.</para>
+    /// </summary>
     /// <param name="core">A pointer to the ov_core_t instance.</param>
     /// <param name="device_name">Device name to identify a plugin.</param>
     /// <param name="versions">A pointer to versions corresponding to device_name.</param>
@@ -312,7 +390,10 @@ public static unsafe partial class NativeMethods
     public static extern void ov_core_versions_free(ov_core_version_list_t* versions);
     
 
-    /// <summary>Creates a new remote shared context object on the specified accelerator device using specified plugin-specific low-level device API parameters (device handle, pointer, context, etc.).</summary>
+    /// <summary>
+    /// <para>Creates a new remote shared context object on the specified accelerator device</para>
+    /// <para>using specified plugin-specific low-level device API parameters (device handle, pointer, context, etc.).</para>
+    /// </summary>
     /// <param name="core">A pointer to the ov_core_t instance.</param>
     /// <param name="device_name">Device name to identify a plugin.</param>
     /// <param name="context_args_size">How many property args will be for this remote context creation.</param>
@@ -353,7 +434,7 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Set an input/output tensor to infer on by the name of tensor.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="tensor_name">Name of the input or output tensor.</param>
+    /// <param name="tensor_name"> Name of the input or output tensor.</param>
     /// <param name="tensor">Reference to the tensor.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 70, 71, "ov_infer_request_c_api")]
@@ -371,7 +452,10 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Set an input/output tensor to infer request for the port.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="port">Const port of the input or output tensor, which can be got by call interface from ov_model_t/ov_compiled_model_t.</param>
+    /// <param name="port">
+    /// <para>Const port of the input or output tensor, which can be got by call interface from</para>
+    /// <para>ov_model_t/ov_compiled_model_t.</para>
+    /// </param>
     /// <param name="tensor">Reference to the tensor.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 95, 98, "ov_infer_request_c_api")]
@@ -380,7 +464,7 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Set an input tensor to infer on by the index of tensor.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="idx">Index of the input port. If  is greater than the number of model inputs, an error will return.</param>
+    /// <param name="idx">Index of the input port. If @p idx is greater than the number of model inputs, an error will return.</param>
     /// <param name="tensor">Reference to the tensor.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 108, 111, "ov_infer_request_c_api")]
@@ -423,7 +507,7 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Get an input/output tensor by const port.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="port">Port of the tensor to get.  is not found, an error will return.</param>
+    /// <param name="port">Port of the tensor to get. @p port is not found, an error will return.</param>
     /// <param name="tensor">Reference to the tensor.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 168, 171, "ov_infer_request_c_api")]
@@ -432,7 +516,7 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Get an input/output tensor by port.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="port">Port of the tensor to get.  is not found, an error will return.</param>
+    /// <param name="port">Port of the tensor to get. @p port is not found, an error will return.</param>
     /// <param name="tensor">Reference to the tensor.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 181, 184, "ov_infer_request_c_api")]
@@ -441,7 +525,10 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Get an input tensor by the index of input tensor.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="idx">Index of the tensor to get.  If the tensor with the specified  is not found, an error will return.</param>
+    /// <param name="idx">
+    /// <para>Index of the tensor to get. @p idx. If the tensor with the specified @p idx is not found, an error will</para>
+    /// <para>return.</para>
+    /// </param>
     /// <param name="tensor">Reference to the tensor.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 195, 198, "ov_infer_request_c_api")]
@@ -458,7 +545,10 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Get an output tensor by the index of output tensor.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="idx">Index of the tensor to get.  If the tensor with the specified  is not found, an error will return.</param>
+    /// <param name="idx">
+    /// <para>Index of the tensor to get. @p idx. If the tensor with the specified @p idx is not found, an error will</para>
+    /// <para>return.</para>
+    /// </param>
     /// <param name="tensor">Reference to the tensor.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 219, 222, "ov_infer_request_c_api")]
@@ -501,7 +591,10 @@ public static unsafe partial class NativeMethods
     public static extern ov_status_e ov_infer_request_wait(ov_infer_request* infer_request);
     
 
-    /// <summary>Waits for the result to become available. Blocks until the specified timeout has elapsed or the result becomes available, whichever comes first.</summary>
+    /// <summary>
+    /// <para>Waits for the result to become available. Blocks until the specified timeout has elapsed or the result</para>
+    /// <para>becomes available, whichever comes first.</para>
+    /// </summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
     /// <param name="timeout">Maximum duration, in milliseconds, to block for.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
@@ -511,7 +604,7 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Set callback function, which will be called when inference is done.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="callback">A function to be called.</param>
+    /// <param name="callback"> A function to be called.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 289, 290, "ov_infer_request_c_api")]
     public static extern ov_status_e ov_infer_request_set_callback(ov_infer_request* infer_request, ov_callback_t* callback);
@@ -525,7 +618,7 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Query performance measures per layer to identify the most time consuming operation.</summary>
     /// <param name="infer_request">A pointer to the ov_infer_request_t.</param>
-    /// <param name="profiling_infos">Vector of profiling information for operations in a model.</param>
+    /// <param name="profiling_infos"> Vector of profiling information for operations in a model.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_infer_request.h", 307, 308, "ov_infer_request_c_api")]
     public static extern ov_status_e ov_infer_request_get_profiling_info(ov_infer_request* infer_request, ov_profiling_info_list_t* profiling_infos);
@@ -800,7 +893,13 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Initialze a partial shape with static rank and dynamic dimension.</summary>
     /// <param name="rank">support static rank.</param>
-    /// <param name="dims">support dynamic and static dimension.  Static rank, but dynamic dimensions on some or all axes.     Examples: `{1,2,?,4}` or `{?,?,?}` or `{1,2,-1,4}`  Static rank, and static dimensions on all axes.     Examples: `{1,2,3,4}` or `{6}` or `{}`</param>
+    /// <param name="dims">
+    /// <para>support dynamic and static dimension.</para>
+    /// <para> Static rank, but dynamic dimensions on some or all axes.</para>
+    /// <para>    Examples: `{1,2,?,4}` or `{?,?,?}` or `{1,2,-1,4}`</para>
+    /// <para> Static rank, and static dimensions on all axes.</para>
+    /// <para>    Examples: `{1,2,3,4}` or `{6}` or `{}`</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_partial_shape.h", 49, 50, "ov_partial_shape_c_api")]
     public static extern ov_status_e ov_partial_shape_create(long rank, ov_dimension* dims, ov_partial_shape* partial_shape_obj);
@@ -808,7 +907,15 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Initialze a partial shape with dynamic rank and dynamic dimension.</summary>
     /// <param name="rank">support dynamic and static rank.</param>
-    /// <param name="dims">support dynamic and static dimension.  Dynamic rank:     Example: `?`  Static rank, but dynamic dimensions on some or all axes.     Examples: `{1,2,?,4}` or `{?,?,?}` or `{1,2,-1,4}`  Static rank, and static dimensions on all axes.     Examples: `{1,2,3,4}` or `{6}` or `{}&quot;`</param>
+    /// <param name="dims">
+    /// <para>support dynamic and static dimension.</para>
+    /// <para> Dynamic rank:</para>
+    /// <para>    Example: `?`</para>
+    /// <para> Static rank, but dynamic dimensions on some or all axes.</para>
+    /// <para>    Examples: `{1,2,?,4}` or `{?,?,?}` or `{1,2,-1,4}`</para>
+    /// <para> Static rank, and static dimensions on all axes.</para>
+    /// <para>    Examples: `{1,2,3,4}` or `{6}` or `{}&quot;`</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_partial_shape.h", 66, 69, "ov_partial_shape_c_api")]
     public static extern ov_status_e ov_partial_shape_create_dynamic(ov_dimension rank, ov_dimension* dims, ov_partial_shape* partial_shape_obj);
@@ -816,7 +923,11 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Initialize a partial shape with static rank and static dimension.</summary>
     /// <param name="rank">support static rank.</param>
-    /// <param name="dims">support static dimension.  Static rank, and static dimensions on all axes.     Examples: `{1,2,3,4}` or `{6}` or `{}`</param>
+    /// <param name="dims">
+    /// <para>support static dimension.</para>
+    /// <para> Static rank, and static dimensions on all axes.</para>
+    /// <para>    Examples: `{1,2,3,4}` or `{6}` or `{}`</para>
+    /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_partial_shape.h", 81, 82, "ov_partial_shape_c_api")]
     public static extern ov_status_e ov_partial_shape_create_static(long rank, long* dims, ov_partial_shape* partial_shape_obj);
@@ -959,9 +1070,16 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Crop input tensor between begin and end coordinates.</summary>
     /// <param name="preprocess_input_process_steps">A pointer to ov_preprocess_preprocess_steps_t.</param>
-    /// <param name="begin">Pointer to begin indexes for input tensor cropping. Negative values represent counting elements from the end of input tensor</param>
+    /// <param name="begin">
+    /// <para>Pointer to begin indexes for input tensor cropping.</para>
+    /// <para>Negative values represent counting elements from the end of input tensor</para>
+    /// </param>
     /// <param name="begin_size">The size of begin array</param>
-    /// <param name="end">Pointer to end indexes for input tensor cropping. End indexes are exclusive, which means values including end edge are not included in the output slice. Negative values represent counting elements from the end of input tensor</param>
+    /// <param name="end">
+    /// <para>Pointer to end indexes for input tensor cropping.</para>
+    /// <para>End indexes are exclusive, which means values including end edge are not included in the output slice.</para>
+    /// <para>Negative values represent counting elements from the end of input tensor</para>
+    /// </param>
     /// <param name="end_size">The size of end array</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_prepostprocess.h", 241, 246, "ov_prepostprocess_c_api")]
@@ -1149,7 +1267,11 @@ public static unsafe partial class NativeMethods
     public static extern bool ov_rank_is_dynamic(ov_dimension rank);
     
 
-    /// <summary>Allocates memory tensor in device memory or wraps user-supplied memory handle using the specified tensor description and low-level device-specific parameters. Returns a pointer to the object that implements the RemoteTensor interface.</summary>
+    /// <summary>
+    /// <para>Allocates memory tensor in device memory or wraps user-supplied memory handle</para>
+    /// <para>using the specified tensor description and low-level device-specific parameters.</para>
+    /// <para>Returns a pointer to the object that implements the RemoteTensor interface.</para>
+    /// </summary>
     /// <param name="context">A pointer to the ov_remote_context_t instance.</param>
     /// <param name="type">Defines the element type of the tensor.</param>
     /// <param name="shape">Defines the shape of the tensor.</param>
@@ -1169,7 +1291,14 @@ public static unsafe partial class NativeMethods
     public static extern ov_status_e ov_remote_context_get_device_name(ov_remote_context* context, byte** device_name);
     
 
-    /// <summary>Returns a string contains device-specific parameters required for low-level operations with the underlying object. Parameters include device/context handles, access flags, etc. Content of the returned map depends on a remote execution context that is currently set on the device (working scenario). One actaul example: &quot;CONTEXT_TYPE OCL OCL_CONTEXT 0x5583b2ec7b40 OCL_QUEUE 0x5583b2e98ff0&quot;</summary>
+    /// <summary>
+    /// <para>Returns a string contains device-specific parameters required for low-level</para>
+    /// <para>operations with the underlying object.</para>
+    /// <para>Parameters include device/context handles, access flags,</para>
+    /// <para>etc. Content of the returned map depends on a remote execution context that is</para>
+    /// <para>currently set on the device (working scenario).</para>
+    /// <para>One actaul example: &quot;CONTEXT_TYPE OCL OCL_CONTEXT 0x5583b2ec7b40 OCL_QUEUE 0x5583b2e98ff0&quot;</para>
+    /// </summary>
     /// <param name="context">A pointer to the ov_remote_context_t instance.</param>
     /// <param name="size">The size of param pairs.</param>
     /// <param name="params">Param name:value list.</param>
@@ -1178,7 +1307,11 @@ public static unsafe partial class NativeMethods
     public static extern ov_status_e ov_remote_context_get_params(ov_remote_context* context, nint* size, byte** @params);
     
 
-    /// <summary>This method is used to create a host tensor object friendly for the device in current context. For example, GPU context may allocate USM host memory (if corresponding extension is available), which could be more efficient than regular host memory.</summary>
+    /// <summary>
+    /// <para>This method is used to create a host tensor object friendly for the device in current context.</para>
+    /// <para>For example, GPU context may allocate USM host memory (if corresponding extension is available),</para>
+    /// <para>which could be more efficient than regular host memory.</para>
+    /// </summary>
     /// <param name="context">A pointer to the ov_remote_context_t instance.</param>
     /// <param name="type">Defines the element type of the tensor.</param>
     /// <param name="shape">Defines the shape of the tensor.</param>
@@ -1195,7 +1328,14 @@ public static unsafe partial class NativeMethods
     public static extern void ov_remote_context_free(ov_remote_context* context);
     
 
-    /// <summary>Returns a string contains device-specific parameters required for low-level operations with underlying object. Parameters include device/context/surface/buffer handles, access flags, etc. Content of the returned map depends on remote execution context that is currently set on the device (working scenario). One example: &quot;MEM_HANDLE:0x559ff6904b00;OCL_CONTEXT:0x559ff71d62f0;SHARED_MEM_TYPE:OCL_BUFFER;&quot;</summary>
+    /// <summary>
+    /// <para>Returns a string contains device-specific parameters required for low-level</para>
+    /// <para>operations with underlying object.</para>
+    /// <para>Parameters include device/context/surface/buffer handles, access flags,</para>
+    /// <para>etc. Content of the returned map depends on remote execution context that is</para>
+    /// <para>currently set on the device (working scenario).</para>
+    /// <para>One example: &quot;MEM_HANDLE:0x559ff6904b00;OCL_CONTEXT:0x559ff71d62f0;SHARED_MEM_TYPE:OCL_BUFFER;&quot;</para>
+    /// </summary>
     /// <param name="tensor">Pointer to ov_tensor_t that contains host tensor.</param>
     /// <param name="size">The size of param pairs.</param>
     /// <param name="params">Param name:value list.</param>

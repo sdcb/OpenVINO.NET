@@ -20,11 +20,11 @@ public class EnumGenerator
 
     private static GeneratedUnit TransformOne(Enumeration @enum)
     {
-        string headerFile = ((TranslationUnit)@enum.OriginalNamespace).FileName;
-
         IndentedLinesWriter w = new();
+        string headerFile = ((TranslationUnit)@enum.OriginalNamespace).FileName;
+        DoxygenTags tags = DoxygenTags.Parse(@enum.Comment?.Text);
 
-        w.WriteLines(@enum.Comment.ToBriefCode());
+        w.WriteLines(tags.ToBriefComment());
 
         VerbatimLineComment? groupBlock = @enum.Comment?.FullComment.Blocks
             .OfType<VerbatimLineComment>()
@@ -39,7 +39,8 @@ public class EnumGenerator
             for (int i = 0; i < @enum.Items.Count; i++)
             {
                 Enumeration.Item item = @enum.Items[i];
-                w.WriteLines(item.Comment.ToSummaryCode());
+                DoxygenTags itemTags = DoxygenTags.Parse(item.Comment.Text);
+                w.WriteLines(itemTags.ToBriefComment());
                 w.WriteLine($"{item.Name} = {ConvertValue(item.Value, @enum.BuiltinType.Type)},");
                 if (i != @enum.Items.Count - 1) w.WriteLine();
             }
