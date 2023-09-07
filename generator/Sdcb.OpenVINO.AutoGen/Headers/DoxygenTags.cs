@@ -39,7 +39,7 @@ public class DoxygenTags
         }
     }
 
-    private IEnumerable<string> ToComment(string? value, string startTagName, string? endTagName = null)
+    private static IEnumerable<string> ToComment(string? value, string startTagName, string? endTagName = null)
     {
         endTagName ??= startTagName;
 

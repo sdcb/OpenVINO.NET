@@ -5,51 +5,17 @@ namespace Sdcb.OpenVINO.Natives;
 
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_compiled_model.h", 26, 26, "")]
+/// <summary>type define ov_compiled_model_t from ov_compiled_model</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_compiled_model.h", 26, 26, "ov_compiled_model_c_api")]
 public struct ov_compiled_model
 {
 }
 
 
-/// <summary>Represent all available devices.</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 63, 66, "ov_core_c_api")]
-public unsafe struct ov_available_devices_t
-{
-    /// <summary>devices&apos; name</summary>
-    public byte** devices;
-
-    /// <summary>devices&apos; number</summary>
-    public nint size;
-}
-
-
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 26, 26, "")]
+/// <summary>type define ov_core_t from ov_core</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 26, 26, "ov_core_c_api")]
 public struct ov_core
 {
-}
-
-
-/// <summary> Represents version information that describes all devices and ov runtime library</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 53, 56, "ov_core_c_api")]
-public unsafe struct ov_core_version_list_t
-{
-    /// <summary>An array of device versions</summary>
-    public ov_core_version_t* versions;
-
-    /// <summary>A number of versions in the array</summary>
-    public nint size;
-}
-
-
-/// <summary> Represents version information that describes device and ov runtime library</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 43, 46, "ov_core_c_api")]
-public unsafe struct ov_core_version_t
-{
-    /// <summary>A device name</summary>
-    public byte* device_name;
-
-    /// <summary>Version</summary>
-    public ov_version version;
 }
 
 
@@ -65,6 +31,42 @@ public unsafe struct ov_version
 }
 
 
+/// <summary> Represents version information that describes device and ov runtime library</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 43, 46, "ov_core_c_api")]
+public unsafe struct ov_core_version_t
+{
+    /// <summary>A device name</summary>
+    public byte* device_name;
+
+    /// <summary>Version</summary>
+    public ov_version version;
+}
+
+
+/// <summary> Represents version information that describes all devices and ov runtime library</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 53, 56, "ov_core_c_api")]
+public unsafe struct ov_core_version_list_t
+{
+    /// <summary>An array of device versions</summary>
+    public ov_core_version_t* versions;
+
+    /// <summary>A number of versions in the array</summary>
+    public nint size;
+}
+
+
+/// <summary>Represent all available devices.</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 63, 66, "ov_core_c_api")]
+public unsafe struct ov_available_devices_t
+{
+    /// <summary>devices&apos; name</summary>
+    public byte** devices;
+
+    /// <summary>devices&apos; number</summary>
+    public nint size;
+}
+
+
 /// <summary>This is a structure interface equal to ov::Dimension</summary>
 [StructLayout(LayoutKind.Sequential), CSourceInfo("ov_dimension.h", 20, 23, "ov_dimension_c_api")]
 public struct ov_dimension
@@ -77,6 +79,13 @@ public struct ov_dimension
 }
 
 
+/// <summary>type define ov_infer_request_t from ov_infer_request</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_infer_request.h", 22, 22, "ov_infer_request_c_api")]
+public struct ov_infer_request
+{
+}
+
+
 /// <summary>Completion callback definition about the function and args</summary>
 [StructLayout(LayoutKind.Sequential), CSourceInfo("ov_infer_request.h", 29, 32, "ov_infer_request_c_api")]
 public unsafe struct ov_callback_t
@@ -86,24 +95,6 @@ public unsafe struct ov_callback_t
 
     /// <summary>The args of callback func</summary>
     public void* args;
-}
-
-
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_infer_request.h", 22, 22, "")]
-public struct ov_infer_request
-{
-}
-
-
-/// <summary>A list of profiling info data</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_infer_request.h", 57, 60, "ov_infer_request_c_api")]
-public unsafe struct ov_profiling_info_list_t
-{
-    /// <summary>The list of ov_profilling_info_t</summary>
-    public ov_profiling_info_t* profiling_infos;
-
-    /// <summary>The list size</summary>
-    public nint size;
 }
 
 
@@ -131,25 +122,41 @@ public unsafe struct ov_profiling_info_t
 }
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_layout.h", 20, 20, "")]
+/// <summary>A list of profiling info data</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_infer_request.h", 57, 60, "ov_infer_request_c_api")]
+public unsafe struct ov_profiling_info_list_t
+{
+    /// <summary>The list of ov_profilling_info_t</summary>
+    public ov_profiling_info_t* profiling_infos;
+
+    /// <summary>The list size</summary>
+    public nint size;
+}
+
+
+/// <summary>type define ov_layout_t from ov_layout</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_layout.h", 20, 20, "ov_layout_c_api")]
 public struct ov_layout
 {
 }
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_model.h", 22, 22, "")]
+/// <summary>type define ov_model_t from ov_model</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_model.h", 22, 22, "ov_model_c_api")]
 public struct ov_model
 {
 }
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_node.h", 22, 22, "")]
+/// <summary>type define ov_output_const_port_t from ov_output_const_port</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_node.h", 22, 22, "ov_node_c_api")]
 public struct ov_output_const_port
 {
 }
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_node.h", 29, 29, "")]
+/// <summary>type define ov_output_port_t from ov_output_port</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_node.h", 29, 29, "ov_node_c_api")]
 public struct ov_output_port
 {
 }
@@ -176,43 +183,50 @@ public unsafe struct ov_partial_shape
 }
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 30, 30, "")]
-public struct ov_preprocess_input_info
-{
-}
-
-
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 58, 58, "")]
-public struct ov_preprocess_input_model_info
-{
-}
-
-
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 37, 37, "")]
-public struct ov_preprocess_input_tensor_info
-{
-}
-
-
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 44, 44, "")]
-public struct ov_preprocess_output_info
-{
-}
-
-
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 51, 51, "")]
-public struct ov_preprocess_output_tensor_info
-{
-}
-
-
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 23, 23, "")]
+/// <summary>type define ov_preprocess_prepostprocessor_t from ov_preprocess_prepostprocessor</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 23, 23, "ov_prepostprocess_c_api")]
 public struct ov_preprocess_prepostprocessor
 {
 }
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 65, 65, "")]
+/// <summary>type define ov_preprocess_input_info_t from ov_preprocess_input_info</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 30, 30, "ov_prepostprocess_c_api")]
+public struct ov_preprocess_input_info
+{
+}
+
+
+/// <summary>type define ov_preprocess_input_tensor_info_t from ov_preprocess_input_tensor_info</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 37, 37, "ov_prepostprocess_c_api")]
+public struct ov_preprocess_input_tensor_info
+{
+}
+
+
+/// <summary>type define ov_preprocess_output_info_t from ov_preprocess_output_info</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 44, 44, "ov_prepostprocess_c_api")]
+public struct ov_preprocess_output_info
+{
+}
+
+
+/// <summary>type define ov_preprocess_output_tensor_info_t from ov_preprocess_output_tensor_info</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 51, 51, "ov_prepostprocess_c_api")]
+public struct ov_preprocess_output_tensor_info
+{
+}
+
+
+/// <summary>type define ov_preprocess_input_model_info_t from ov_preprocess_input_model_info</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 58, 58, "ov_prepostprocess_c_api")]
+public struct ov_preprocess_input_model_info
+{
+}
+
+
+/// <summary>type define ov_preprocess_preprocess_steps_t from ov_preprocess_preprocess_steps</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_prepostprocess.h", 65, 65, "ov_prepostprocess_c_api")]
 public struct ov_preprocess_preprocess_steps
 {
 }
@@ -236,7 +250,8 @@ public unsafe struct ov_shape_t
 }
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_tensor.h", 22, 22, "")]
+/// <summary>type define ov_tensor_t from ov_tensor</summary>
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_tensor.h", 22, 22, "ov_tensor_c_api")]
 public struct ov_tensor
 {
 }

@@ -46,7 +46,7 @@ public class EnumGenerator
             }
         };
 
-        return new GeneratedUnit(@enum.Name, group, headerFile, w.Lines);
+        return new GeneratedUnit(@enum.Name, group, @enum.LineNumberStart, @enum.LineNumberEnd, headerFile, w.Lines);
     }
 
     private static object ConvertValue(ulong value, PrimitiveType primitiveType)

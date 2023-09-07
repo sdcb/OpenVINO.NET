@@ -1,9 +1,4 @@
 ﻿using CppSharp.AST;
-using Sdcb.OpenVINO.AutoGen.Writers;
-using System;
-using System.CodeDom.Compiler;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Sdcb.OpenVINO.AutoGen.Headers.Generators;
 
@@ -11,32 +6,34 @@ public class StructsGenerator
 {
     public static GeneratedUnits Generate(ParsedInfo info)
     {
+        Dictionary<string, TypedefNameDecl> typeMappings = info.Units
+            .SelectMany(x => x.Typedefs)
+            .Where(x => x.Type is TagType)
+            .ToDictionary(k => ((TagType)k.Type).Declaration.Name, v => v);
+
         Class[] structs = info.Units
-                    .SelectMany(x => x.Classes)
-                    .OrderBy(x => ((TranslationUnit)x.OriginalNamespace).FileName)
-                    .ThenBy(x => x.Name)
-                    .ToArray();
+            .SelectMany(x => x.Classes)
+            .ToArray();
         Console.WriteLine($"Detected structs: {structs.Length}");
-        return new(structs.Select(TransformOne));
+        return new(structs.Select(x => TransformOne(x, typeMappings)));
     }
 
-    private static GeneratedUnit TransformOne(Class @class)
+    private static GeneratedUnit TransformOne(Class @class, Dictionary<string, TypedefNameDecl> typeMappings)
     {
+        TypedefNameDecl? typedef = typeMappings.GetValueOrDefault(@class.Name);
+        string name = @class.Name;
+
         IndentedLinesWriter w = new();
-        DoxygenTags tags = DoxygenTags.Parse(@class.Comment?.Text);
+        DoxygenTags tags = DoxygenTags.Parse(typedef?.Comment?.Text ?? @class.Comment?.Text);
         w.WriteLines(tags.ToBriefComment());
 
-        VerbatimLineComment? groupBlock = @class.Comment?.FullComment.Blocks
-            .OfType<VerbatimLineComment>()
-            .Where(x => x.CommandKind == CommentCommandKind.A && x.Text.Trim() != @class.Name)
-            .LastOrDefault();
-        string? group = groupBlock?.Text.Trim();
+        string? group = tags.Group;
         string headerFile = ((TranslationUnit)@class.OriginalNamespace).FileName;
 
         w.WriteLine($"[StructLayout(LayoutKind.Sequential), CSourceInfo(\"{headerFile}\", {@class.LineNumberStart}, {@class.LineNumberEnd}, \"{group}\")]");
 
         string unsafeBlock = @class.Fields.Any(x => CSharpUtils.TypeTransform(x.Type).Contains('*')) ? "unsafe " : "";
-        w.WriteLine($"public {unsafeBlock}struct {@class.Name}");
+        w.WriteLine($"public {unsafeBlock}struct {name}");
         using (w.BeginIdent())
         {
             for (int i = 0; i < @class.Fields.Count; i++)
@@ -49,6 +46,6 @@ public class StructsGenerator
             }
         }
 
-        return new GeneratedUnit(@class.Name, group, headerFile, w.Lines);
+        return new GeneratedUnit(name, group, @class.LineNumberStart, @class.LineNumberEnd, headerFile, w.Lines);
     }
 }

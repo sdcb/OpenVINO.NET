@@ -25,9 +25,9 @@ public class GeneratedUnits : List<GeneratedUnit>
 
     public IEnumerable<string> Lines => this
         .OrderBy(x => x.HeaderFile)
-        //.ThenBy(x => x.Group)
+        .ThenBy(x => x.LineNumberStart)
         //.ThenBy(x => x.Name)
         .Aggregate(Enumerable.Empty<string>(), (a, b) => a.Concat(new[] { Environment.NewLine }).Concat(b.Lines));
 }
 
-public record GeneratedUnit(string Name, string? Group, string HeaderFile, IEnumerable<string> Lines);
+public record GeneratedUnit(string Name, string? Group, int LineNumberStart, int LineNumberEnd, string HeaderFile, IEnumerable<string> Lines);
