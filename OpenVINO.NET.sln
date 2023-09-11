@@ -26,7 +26,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.AutoGen.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.NuGetBuilder.Tests", "generator\tests\Sdcb.OpenVINO.NuGetBuilder.Tests\Sdcb.OpenVINO.NuGetBuilder.Tests.csproj", "{0548FF1C-0972-4B67-A9D1-B1A984234C59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.Tests", "tests\Sdcb.OpenVINO.Tests\Sdcb.OpenVINO.Tests.csproj", "{C5A2B816-CA4A-4938-8A30-3ED5C55834CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.Tests", "tests\Sdcb.OpenVINO.Tests\Sdcb.OpenVINO.Tests.csproj", "{C5A2B816-CA4A-4938-8A30-3ED5C55834CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{74240672-224E-4E55-AF99-5EEA096BB2F4}"
+	ProjectSection(SolutionItems) = preProject
+		build\00-common.linq = build\00-common.linq
+		build\01-build-packages.linq = build\01-build-packages.linq
+		build\02-publish-proget-nuget.linq = build\02-publish-proget-nuget.linq
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
