@@ -10,6 +10,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
+    <Description>High quality .NET wrapper for OpenVINO™ toolkit.</Description>
   </PropertyGroup>
 
   <ItemGroup>
