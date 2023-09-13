@@ -411,7 +411,7 @@ public class OVCoreTest
     }
 
     [Fact]
-    public unsafe void InferAll()
+    public unsafe void PreprocessSteps()
     {
         ov_core* core = null;
         ov_model* model = null;
