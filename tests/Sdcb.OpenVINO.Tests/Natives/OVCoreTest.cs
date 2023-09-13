@@ -411,7 +411,7 @@ public class OVCoreTest
     }
 
     [Fact]
-    public unsafe void PreprocessSteps()
+    public unsafe void InferAll()
     {
         ov_core* core = null;
         ov_model* model = null;
@@ -442,9 +442,11 @@ public class OVCoreTest
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
                 using Mat mat = Cv2.ImRead(@"assets\text.png");
+                Cv2.CopyMakeBorder(mat, mat, 0, 960 - mat.Height, 0, 960 - mat.Width, BorderTypes.Constant, new Scalar(0, 0, 0));
+                mat.ConvertTo(mat, MatType.CV_32FC3, 1.0 / 255);
                 long* dims = stackalloc long[4] { 1, mat.Height, mat.Width, 3 };
                 Check(ov_shape_create(4, dims, &shape));
-                Check(ov_tensor_create_from_host_ptr(ov_element_type_e.U8, shape, (void*)mat.Data, &tensor));
+                Check(ov_tensor_create_from_host_ptr(ov_element_type_e.F32, shape, (void*)mat.Data, &tensor));
                 Check(ov_preprocess_prepostprocessor_create(model, &preprocessor));
                 Check(ov_preprocess_prepostprocessor_get_input_info_by_index(preprocessor, 0, &inputInfo));
                 Check(ov_preprocess_input_info_get_tensor_info(inputInfo, &inputTensorInfo));
@@ -455,7 +457,7 @@ public class OVCoreTest
 
                 Check(ov_preprocess_input_info_get_preprocess_steps(inputInfo, &preprocessSteps));
                 Assert.True(preprocessSteps != null);
-                Check(ov_preprocess_preprocess_steps_resize(preprocessSteps, ov_preprocess_resize_algorithm_e.RESIZE_LINEAR));
+                //Check(ov_preprocess_preprocess_steps_resize(preprocessSteps, ov_preprocess_resize_algorithm_e.RESIZE_LINEAR));
                 Check(ov_preprocess_input_info_get_model_info(inputInfo, &modelInfo));
                 Assert.True(modelInfo != null);
 
@@ -478,6 +480,35 @@ public class OVCoreTest
                 Check(ov_infer_request_set_input_tensor_by_index(inferRequest, 0, tensor));
                 Check(ov_infer_request_infer(inferRequest));
                 Check(ov_infer_request_get_output_tensor_by_index(inferRequest, 0, &outputTensor));
+
+                
+                ov_shape_t outputShape;
+                try
+                {
+                    void* data;
+                    nint byteSize;
+                    ov_element_type_e elementType; Check(ov_tensor_data(outputTensor, &data));
+
+                    Assert.True(data != null);
+
+                    Check(ov_tensor_get_byte_size(outputTensor, &byteSize));
+                    Assert.True(byteSize > 0);
+
+                    Check(ov_tensor_get_shape(outputTensor, &outputShape));
+                    Assert.Equal(4, outputShape.rank);
+                    Assert.Equal(new long[] { 1, 1, 960, 960 }, new ReadOnlySpan<long>(outputShape.dims, 4).ToArray());
+
+                    Check(ov_tensor_get_element_type(outputTensor, &elementType));
+                    Assert.Equal(ov_element_type_e.F32, elementType);
+
+                    using Mat result = new((int)outputShape.dims[2], (int)outputShape.dims[3], MatType.CV_32FC1, (IntPtr)data);
+                    result.ConvertTo(result, MatType.CV_8SC1, 255);
+                    result.SaveImage("result.png");
+                }
+                finally
+                {
+                    ov_shape_free(&outputShape);
+                }
             }
         }
         finally
