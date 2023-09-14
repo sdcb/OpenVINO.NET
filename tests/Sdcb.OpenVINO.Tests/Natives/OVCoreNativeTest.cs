@@ -10,24 +10,29 @@ namespace Sdcb.OpenVINO.Tests.Natives;
 
 using static NativeMethods;
 
-public class OVCoreTest
+public class OVCoreNativeTest
 {
     private readonly ITestOutputHelper _console;
     private readonly string _modelFile;
 
-    public OVCoreTest(ITestOutputHelper console)
+    public OVCoreNativeTest(ITestOutputHelper console)
     {
         _console = console;
+        _modelFile = PrepareModel();
+    }
 
+    internal static string PrepareModel()
+    {
         string dir = "ppocrv3-det-cn";
-        _modelFile = new FileInfo(Path.Combine(dir, "inference.pdmodel")).FullName;
+        string modelFile = new FileInfo(Path.Combine(dir, "inference.pdmodel")).FullName;
 
-        if (!File.Exists(_modelFile))
+        if (!File.Exists(modelFile))
         {
             Assembly asm = Assembly.LoadFrom("Sdcb.PaddleOCR.Models.LocalV3.dll");
             WriteStreamToLocal(asm, "Sdcb.PaddleOCR.Models.LocalV3.models.ch_PP_OCRv3_det.inference.pdmodel", dir, "inference.pdmodel");
             WriteStreamToLocal(asm, "Sdcb.PaddleOCR.Models.LocalV3.models.ch_PP_OCRv3_det.inference.pdiparams", dir, "inference.pdiparams");
         }
+        return modelFile;
     }
 
     private static void WriteStreamToLocal(Assembly asm, string resourceName, string localDir, string localFile)

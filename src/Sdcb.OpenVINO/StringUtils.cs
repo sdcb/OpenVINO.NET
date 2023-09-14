@@ -23,4 +23,6 @@ public static string? UTF8PtrToString(IntPtr ptr)
         return new string(psbyte, 0, length, Encoding.UTF8);
     }
 #endif
+
+
 }

@@ -139,7 +139,7 @@ public class OVCore : NativeResource
         else
         {
             fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(modelPath))
-            fixed (byte* binPathPtr = Encoding.UTF8.GetBytes(binPath))
+            fixed (byte* binPathPtr = binPath == null ? null : Encoding.UTF8.GetBytes(binPath))
             {
                 OpenVINOException.ThrowIfFailed(ov_core_read_model((ov_core*)Handle, modelPathPtr, binPathPtr, &model));
             }
