@@ -69,7 +69,7 @@ public class SourceExtractorTest
         string[] dynamicLibs = keys.Where(ArchiveExtractor.FilterWindowsDlls)
             .ToArray();
 
-        Assert.All(dynamicLibs, x => Assert.EndsWith(".dll", x, StringComparison.OrdinalIgnoreCase));
+        Assert.All(dynamicLibs.Where(x => !x.EndsWith("cache.json")), x => Assert.EndsWith(".dll", x, StringComparison.OrdinalIgnoreCase));
         Assert.All(dynamicLibs, x => Assert.DoesNotContain("debug", x, StringComparison.OrdinalIgnoreCase));
     }
 

@@ -10,13 +10,24 @@ namespace Sdcb.OpenVINO.NuGetBuilder.PackageBuilder;
 
 public sealed class WindowsPackageBuilder
 {
-    public static void BuildNuGet(ExtractedInfo local, ArtifactInfo artifactInfo)
+    public static void BuildNuGet(ExtractedInfo local, ArtifactInfo artifactInfo, string? suffix, string outputDir)
     {
         NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifactInfo);
         PrepairPropsFile(local, pkgInfo);
         PrepairIconFile(local.Directory);
         string nuspecFilePath = PrepairNuspecFile(local, pkgInfo);
-        Process.Start("nuget", $"pack {nuspecFilePath} -Version {artifactInfo.Version} -OutputDirectory {local.Directory}");
+        string cmd = suffix != null
+            ? $"pack {nuspecFilePath} -Version {artifactInfo.Version} -Suffix {suffix} -OutputDirectory {outputDir}"
+            : $"pack {nuspecFilePath} -Version {artifactInfo.Version} -OutputDirectory {outputDir}";
+        using Process ps = Process.Start(new ProcessStartInfo("nuget", cmd)
+        {
+            WorkingDirectory = local.Directory,
+        })!;
+        ps.WaitForExit();
+        if (ps.ExitCode != 0)
+        {
+            throw new Exception("NuGet generation failed.");
+        }
     }
 
     private static void PrepairIconFile(string destinationFolder)
@@ -67,37 +78,45 @@ public sealed class WindowsPackageBuilder
     private static string PrepairNuspecFile(ExtractedInfo local, NuGetPackageInfo pkgInfo)
     {
         XDocument nuspec = XDocument.Parse($"""
-            <?xml version="1.0" encoding="utf-8"?>
-            <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-              <metadata>
-                <id>{pkgInfo.Name}</id>
-                <version>0.1</version>
-                <title>{pkgInfo.NamePrefix} native bindings for {pkgInfo.Rid}</title>
-                <authors>sdcb</authors>
-                <requireLicenseAcceptance>true</requireLicenseAcceptance>
-                <description>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.Rid}.</description>
-                <summary>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.Rid}.</summary>
-                <releaseNotes></releaseNotes>
-                <copyright>Copyright {DateTime.Now.Year}</copyright>
+        <?xml version="1.0" encoding="utf-8"?>
+        <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+            <metadata>
+            <id>{pkgInfo.Name}</id>
+            <version>0.1</version>
+            <title>{pkgInfo.NamePrefix} native bindings for {pkgInfo.Rid}</title>
+            <authors>sdcb</authors>
+            <requireLicenseAcceptance>true</requireLicenseAcceptance>
+            <description>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.Rid}.</description>
+            <summary>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.Rid}.</summary>
+            <releaseNotes></releaseNotes>
+            <copyright>Copyright {DateTime.Now.Year}</copyright>
 
-                <icon>images\icon.png</icon>
-                <license type="expression">Apache-2.0</license>
-                <projectUrl>https://github.com/sdcb/OpenVINO.NET</projectUrl>
-                <tags>Sdcb PaddleSharp AI Paddle OCR PaddleOCR linqpad-samples</tags>
-                <repository type="git" url="https://github.com/sdcb/OpenVINO.NET.git" />
-                <dependencies></dependencies>
-                <frameworkAssemblies>
-                </frameworkAssemblies>
-              </metadata>
-              <files>
-                <file src="icon.png" target="images\" />
-              </files>
-            </package>
-            """);
+            <icon>images\icon.png</icon>
+            <license type="expression">Apache-2.0</license>
+            <projectUrl>https://github.com/sdcb/OpenVINO.NET</projectUrl>
+            <tags>Sdcb OpenVINO AI linqpad-samples</tags>
+            <repository type="git" url="https://github.com/sdcb/OpenVINO.NET.git" />
+            <dependencies />
+            <frameworkAssemblies>
+            </frameworkAssemblies>
+            </metadata>
+            <files>
+            <file src="icon.png" target="images\" />
+            </files>
+        </package>
+        """);
         string ns = nuspec.Root!.GetDefaultNamespace().NamespaceName;
         XmlNamespaceManager nsr = new(new NameTable());
         nsr.AddNamespace("p", ns);
         XElement files = nuspec.XPathSelectElement("/p:package/p:files", nsr)!;
+        XElement deps = nuspec.XPathSelectElement("/p:package/p:metadata/p:dependencies", nsr)!;
+
+        File.WriteAllBytes(Path.Combine(local.Directory, "_._"), Array.Empty<byte>());
+        foreach (string dep in new[] { "netstandard2.0", "net45" })
+        {
+            files.Add(new XElement(XName.Get("file", ns), new XAttribute("src", "_._"), new XAttribute("target", @$"lib\{dep}\_._")));
+            deps.Add(new XElement(XName.Get("group", ns), new XAttribute("targetFramework", dep)));
+        }
 
         files.Add(local.DynamicLibs.Select(x => new XElement(
             XName.Get("file", ns),

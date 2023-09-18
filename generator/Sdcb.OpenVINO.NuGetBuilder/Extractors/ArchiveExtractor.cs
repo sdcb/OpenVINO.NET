@@ -1,5 +1,4 @@
-﻿using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using SharpCompress.Archives;
+﻿using SharpCompress.Archives;
 using SharpCompress.Common;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.Extractors;
@@ -43,7 +42,7 @@ public class ArchiveExtractor
 
     public static bool FilterWindowsDlls(string x)
     {
-        return x.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) &&
+        return (x.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) || x.EndsWith("cache.json")) &&
             !(x.Contains(@"/Debug/", StringComparison.OrdinalIgnoreCase) || x.Contains("_debug.", StringComparison.OrdinalIgnoreCase));
     }
 }

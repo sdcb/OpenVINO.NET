@@ -1,6 +1,4 @@
 ﻿using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using SharpCompress.Archives;
-using SharpCompress.Common;
 using System.Security.Cryptography;
 
 namespace Sdcb.OpenVINO.NuGetBuilder.Extractors;
