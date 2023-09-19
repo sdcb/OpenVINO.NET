@@ -1,6 +1,6 @@
 ﻿using Moq;
-using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
+using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers;
@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Xunit.Abstractions;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.Tests;
+namespace Sdcb.OpenVINO.NuGetBuilders.Tests;
 
 public class SourceExtractorTest
 {

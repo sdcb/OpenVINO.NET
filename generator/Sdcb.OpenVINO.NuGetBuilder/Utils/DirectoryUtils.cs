@@ -1,4 +1,4 @@
-﻿namespace Sdcb.OpenVINO.NuGetBuilder.Utils;
+﻿namespace Sdcb.OpenVINO.NuGetBuilders.Utils;
 
 public static class DirectoryUtils
 {

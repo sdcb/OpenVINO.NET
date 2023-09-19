@@ -1,5 +1,5 @@
 ﻿using Sdcb.OpenVINO.AutoGen.Headers;
-using Sdcb.OpenVINO.NuGetBuilder.Utils;
+using Sdcb.OpenVINO.NuGetBuilders.Utils;
 using System.CodeDom.Compiler;
 
 namespace Sdcb.OpenVINO.AutoGen.Writers;

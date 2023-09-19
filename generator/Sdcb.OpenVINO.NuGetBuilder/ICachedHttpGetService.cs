@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Sdcb.OpenVINO.NuGetBuilder
+namespace Sdcb.OpenVINO.NuGetBuilders
 {
     public interface ICachedHttpGetService
     {

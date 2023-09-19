@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 
 public record StorageNodeRoot : StorageNode
 {

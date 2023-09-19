@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Sdcb.OpenVINO.AutoGen;
 using Sdcb.OpenVINO.AutoGen.Downloader;
 using Sdcb.OpenVINO.AutoGen.Parsers;
-using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using Sdcb.OpenVINO.NuGetBuilder;
-using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
+using Sdcb.OpenVINO.NuGetBuilders;
+using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using Sdcb.OpenVINO.AutoGen.Headers;
 using Sdcb.OpenVINO.AutoGen.Writers;
 

@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.Extractors
+namespace Sdcb.OpenVINO.NuGetBuilders.Extractors
 {
     internal static class HexUtils
     {

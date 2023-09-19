@@ -1,10 +1,10 @@
-﻿using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+﻿using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using SharpCompress.Archives;
 using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.Tests;
+namespace Sdcb.OpenVINO.NuGetBuilders.Tests;
 
 public class CachedAssetCreator
 {

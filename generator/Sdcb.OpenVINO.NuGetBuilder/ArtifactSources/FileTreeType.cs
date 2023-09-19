@@ -1,4 +1,4 @@
-﻿namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+﻿namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 
 public enum FileTreeType
 {

@@ -1,7 +1,7 @@
-﻿using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+﻿using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using System.Security.Cryptography;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.Extractors;
+namespace Sdcb.OpenVINO.NuGetBuilders.Extractors;
 
 public class ArtifactDownloader
 {

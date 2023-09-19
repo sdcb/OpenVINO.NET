@@ -1,5 +1,5 @@
-﻿using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+﻿using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
+using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 
 namespace Sdcb.OpenVINO.AutoGen.Downloader;
 

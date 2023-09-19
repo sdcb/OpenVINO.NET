@@ -3,7 +3,7 @@ using CppSharp.AST;
 using Csp = CppSharp.Parser;
 using Vanara.PInvoke;
 using System.Diagnostics;
-using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using Sdcb.OpenVINO.AutoGen.Headers;
 
 namespace Sdcb.OpenVINO.AutoGen.Parsers;

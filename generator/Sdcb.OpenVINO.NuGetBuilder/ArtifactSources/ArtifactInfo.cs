@@ -1,7 +1,7 @@
 ﻿using NuGet.Versioning;
 using System.Text.RegularExpressions;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 
 public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch, SemanticVersion Version, DateTime UpdateTime, string ArchiveType, string DownloadUrl, string Sha256Url)
 {

@@ -1,4 +1,4 @@
-﻿namespace Sdcb.OpenVINO.NuGetBuilder;
+﻿namespace Sdcb.OpenVINO.NuGetBuilders;
 
 public class CachedHttpGetService : ICachedHttpGetService
 {

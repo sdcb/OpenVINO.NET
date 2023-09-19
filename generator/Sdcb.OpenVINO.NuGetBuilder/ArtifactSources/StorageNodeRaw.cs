@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 
 public record StorageNodeRaw
 {

@@ -1,7 +1,7 @@
 ﻿using NuGet.Versioning;
 using System.Text.RegularExpressions;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 
 public partial record VersionFolder(string Path, StorageNode Folder, SemanticVersion Version)
 {

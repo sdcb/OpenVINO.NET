@@ -2,13 +2,13 @@
 using System.Xml.Linq;
 using System.Xml;
 using System.Xml.XPath;
-using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
-using Sdcb.OpenVINO.NuGetBuilder.Extractors;
-using Sdcb.OpenVINO.NuGetBuilder.Utils;
+using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
+using Sdcb.OpenVINO.NuGetBuilders.Extractors;
+using Sdcb.OpenVINO.NuGetBuilders.Utils;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.PackageBuilder;
+namespace Sdcb.OpenVINO.NuGetBuilders.PackageBuilder;
 
-public sealed class WindowsPackageBuilder
+public sealed class PackageBuilder
 {
     public static void BuildNuGet(ExtractedInfo local, ArtifactInfo artifactInfo, string? suffix, string outputDir)
     {

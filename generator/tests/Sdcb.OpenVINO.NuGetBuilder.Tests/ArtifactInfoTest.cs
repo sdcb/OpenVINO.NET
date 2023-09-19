@@ -1,7 +1,7 @@
-﻿using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+﻿using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Xunit.Abstractions;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.Tests;
+namespace Sdcb.OpenVINO.NuGetBuilders.Tests;
 
 public class ArtifactInfoTest
 {

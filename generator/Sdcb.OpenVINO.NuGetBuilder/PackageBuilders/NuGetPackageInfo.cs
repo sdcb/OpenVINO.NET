@@ -1,7 +1,7 @@
-﻿using Sdcb.OpenVINO.NuGetBuilder.ArtifactSources;
+﻿using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using NuGet.Versioning;
 
-namespace Sdcb.OpenVINO.NuGetBuilder.PackageBuilder;
+namespace Sdcb.OpenVINO.NuGetBuilders.PackageBuilder;
 
 public record NuGetPackageInfo(string NamePrefix, string Rid, SemanticVersion Version)
 {
