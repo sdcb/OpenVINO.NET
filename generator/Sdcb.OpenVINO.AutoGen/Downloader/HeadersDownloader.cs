@@ -1,4 +1,5 @@
-﻿using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
+﻿using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 
 namespace Sdcb.OpenVINO.AutoGen.Downloader;
@@ -27,11 +28,22 @@ public class HeadersDownloader
 
         Directory.CreateDirectory(_settings.DownloadFolder);
         ArtifactInfo artifact = vf.Artifacts.Single(x => x.OS == KnownOS.Windows);
+
         return await _downloader.DownloadAndExtract(
-            artifact, 
-            _settings.DownloadFolder, 
-            x => x.EndsWith(".h") || ArchiveExtractor.FilterWindowsDlls(x), 
-            flatten: false, 
+            artifact,
+            _settings.DownloadFolder,
+            new WindowsHeadersLibFilter(),
+            flatten: false,
             cancellationToken: cancellationToken);
+    }
+}
+
+internal class WindowsHeadersLibFilter : ILibFilter
+{
+    WindowsLibFilter _w = new();
+
+    public bool Filter(string key)
+    {
+        return key.EndsWith(".h") || _w.Filter(key);
     }
 }

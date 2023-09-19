@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Sdcb.OpenVINO.NuGetBuilder.Extractors;
 using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using SharpCompress.Archives;
@@ -53,7 +54,7 @@ public class SourceExtractorTest
                     {HexUtils.ByteArrayToHexString(SHA256.HashData(zipArray))}  w_openvino_toolkit_windows_2023.1.0.dev20230728_x86_64.zip
                     """)),
                 var x when x == artifactInfo.DownloadUrl => new MemoryStream(zipArray),
-                 _ => throw new Exception("Unknown"),
+                _ => throw new Exception("Unknown"),
             }));
 
         // act
@@ -66,7 +67,8 @@ public class SourceExtractorTest
     {
         // prepair
         IEnumerable<string> keys = File.ReadLines(TestCommon.WindowsKeysFile);
-        string[] dynamicLibs = keys.Where(ArchiveExtractor.FilterWindowsDlls)
+        WindowsLibFilter f = new();
+        string[] dynamicLibs = keys.Where(f.Filter)
             .ToArray();
 
         Assert.All(dynamicLibs.Where(x => !x.EndsWith("cache.json")), x => Assert.EndsWith(".dll", x, StringComparison.OrdinalIgnoreCase));

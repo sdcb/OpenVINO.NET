@@ -1,4 +1,5 @@
-﻿using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
+﻿using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using System.Security.Cryptography;
 
 namespace Sdcb.OpenVINO.NuGetBuilders.Extractors;
@@ -20,10 +21,10 @@ public class ArtifactDownloader
         return stream;
     }
 
-    public async Task<ExtractedInfo> DownloadAndExtract(ArtifactInfo artifact, string destinationFolder, Func<string, bool> keyFilter, bool flatten, CancellationToken cancellationToken = default)
+    public async Task<ExtractedInfo> DownloadAndExtract(ArtifactInfo artifact, string destinationFolder, ILibFilter filter, bool flatten, CancellationToken cancellationToken = default)
     {
         using Stream stream = await Download(artifact, cancellationToken);
-        return ArchiveExtractor.Extract(stream, destinationFolder, keyFilter, flatten);
+        return ArchiveExtractor.Extract(stream, destinationFolder, filter, flatten);
     }
 
     private static void VerifyStreamHash(string downloadUrl, byte[] sha256, Stream stream)

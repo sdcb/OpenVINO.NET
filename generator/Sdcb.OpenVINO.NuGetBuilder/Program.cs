@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Sdcb.OpenVINO.NuGetBuilder.Extractors;
 using Sdcb.OpenVINO.NuGetBuilders;
 using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilders.Extractors;
@@ -36,7 +37,7 @@ class Program
     {
         ArtifactInfo artifact = root.LatestStableVersion.Artifacts.First(x => x.OS == KnownOS.Windows);
         string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), artifact.Distribution);
-        ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, ArchiveExtractor.FilterWindowsDlls, flatten: true);
+        ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new WindowsLibFilter(), flatten: true);
         PackageBuilder.BuildNuGet(local, artifact, versionSuffix, dir);
     }
 
@@ -44,7 +45,7 @@ class Program
     {
         ArtifactInfo artifact = root.LatestStableVersion.Artifacts.First(x => x.Distribution == "ubuntu22" && x.Arch == "x86_64");
         string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), artifact.Distribution);
-        ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, ArchiveExtractor.FilterLinuxDlls, flatten: true);
+        ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new LinuxLibFilter(), flatten: true);
         PackageBuilder.BuildNuGet(local, artifact, versionSuffix, dir);
     }
 
