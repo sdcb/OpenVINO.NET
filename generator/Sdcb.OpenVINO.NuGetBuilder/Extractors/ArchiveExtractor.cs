@@ -1,6 +1,7 @@
 ﻿using Sdcb.OpenVINO.NuGetBuilder.Extractors;
 using SharpCompress.Archives;
 using SharpCompress.Common;
+using SharpCompress.Readers;
 
 namespace Sdcb.OpenVINO.NuGetBuilders.Extractors;
 
@@ -30,7 +31,7 @@ internal class ArchiveReader : IDisposable
 
     private void ReadArchive(Stream stream)
     {
-        IArchive archive = ArchiveFactory.Open(stream);
+        IArchive archive = ArchiveFactory.Open(stream, new ReaderOptions {  LookForHeader = true });
         _archives.Add(archive);
         foreach (IArchiveEntry node in archive.Entries)
         {
@@ -52,37 +53,37 @@ internal class ArchiveReader : IDisposable
 
 public class ArchiveExtractor
 {
-public static ExtractedInfo Extract(Stream stream, string destinationFolder, ILibFilter keyFilter, bool flatten)
-{
-    using Stream _ = stream;
-    using ArchiveReader reader = ArchiveReader.Open(stream);
-    IArchiveEntry[] dynamicLibs = reader.Entries
-        .Where(x => keyFilter.Filter(x.Key))
-        .ToArray();
-
-    Directory.CreateDirectory(destinationFolder);
-
-    string[] localDlls = dynamicLibs
-        .Select(x => Path.Combine(destinationFolder, flatten ? Path.GetFileName(x.Key) : x.Key))
-        .ToArray();
-    if (localDlls.All(File.Exists))
+    public static ExtractedInfo Extract(Stream stream, string destinationFolder, ILibFilter keyFilter, bool flatten)
     {
-        Console.WriteLine($"Extracted artifacts already exists, skip.");
-    }
-    else
-    {
-        Console.WriteLine($"Extracting artifacts into {destinationFolder}...");
-        foreach (IArchiveEntry entry in dynamicLibs)
+        using Stream _ = stream;
+        using ArchiveReader reader = ArchiveReader.Open(stream);
+        IArchiveEntry[] dynamicLibs = reader.Entries
+            .Where(x => keyFilter.Filter(x.Key))
+            .ToArray();
+
+        Directory.CreateDirectory(destinationFolder);
+
+        string[] localDlls = dynamicLibs
+            .Select(x => Path.Combine(destinationFolder, flatten ? Path.GetFileName(x.Key) : x.Key))
+            .ToArray();
+        if (localDlls.All(File.Exists))
         {
-            Console.WriteLine($"{entry.Key}...");
-            entry.WriteToDirectory(destinationFolder, new ExtractionOptions
-            {
-                ExtractFullPath = !flatten,
-                Overwrite = true,
-            });
+            Console.WriteLine($"Extracted artifacts already exists, skip.");
         }
-    }
+        else
+        {
+            Console.WriteLine($"Extracting artifacts into {destinationFolder}...");
+            foreach (IArchiveEntry entry in dynamicLibs)
+            {
+                Console.WriteLine($"{entry.Key}...");
+                entry.WriteToDirectory(destinationFolder, new ExtractionOptions
+                {
+                    ExtractFullPath = !flatten,
+                    Overwrite = true,
+                });
+            }
+        }
 
-    return new ExtractedInfo(destinationFolder, reader.RootFolderName, localDlls);
-}
+        return new ExtractedInfo(destinationFolder, reader.RootFolderName, localDlls);
+    }
 }
