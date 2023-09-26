@@ -11,14 +11,15 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, SemanticVersion Ve
     {
         string ridOs = info.Distribution switch
         {
-            "centos7" => "centos",
-            "debian9" => "debian",
+            "centos7" => "centos.7",
+            "debian9" => "debian.9",
             "ubuntu18" => "ubuntu.18.04",
             "ubuntu20" => "ubuntu.20.04",
-            "ubuntu22" => "ubuntu",
+            "ubuntu22" => "ubuntu.22.04",
             "macos_10_15" => "osx.10.15",
             "macos_11_0" => "osx.11.0",
             "windows" => "win",
+            "rhel8" => "rhel.8",
             _ => throw new Exception($"Unknown distribution: {info.Distribution}")
         };
         string ridArch = info.Arch switch

@@ -10,15 +10,14 @@ namespace Sdcb.OpenVINO.NuGetBuilders.PackageBuilder;
 
 public sealed class PackageBuilder
 {
-    public static void BuildNuGet(ExtractedInfo local, ArtifactInfo artifactInfo, string? suffix, string outputDir)
+    public static void BuildNuGet(ExtractedInfo local, NuGetPackageInfo pkgInfo, string? suffix, string outputDir)
     {
-        NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifactInfo);
         PrepairPropsFile(local, pkgInfo);
         PrepairIconFile(local.Directory);
         string nuspecFilePath = PrepairNuspecFile(local, pkgInfo);
         string cmd = suffix != null
-            ? $"pack {nuspecFilePath} -Version {artifactInfo.Version} -Suffix {suffix} -OutputDirectory {outputDir}"
-            : $"pack {nuspecFilePath} -Version {artifactInfo.Version} -OutputDirectory {outputDir}";
+            ? $"pack {nuspecFilePath} -Version {pkgInfo.Version} -Suffix {suffix} -OutputDirectory {outputDir}"
+            : $"pack {nuspecFilePath} -Version {pkgInfo.Version} -OutputDirectory {outputDir}";
         using Process ps = Process.Start(new ProcessStartInfo("nuget", cmd)
         {
             WorkingDirectory = local.Directory,

@@ -32,6 +32,7 @@ public record StorageNodeRoot : StorageNode
         get
         {
             return EnumerateDirectories(VersionFolder.Prefix)
+                .Where(x => x.Name != "nightly")
                 .GroupBy(x => x.Name == "master")
                 .SelectMany(x => x.Key switch
                 {

@@ -1,4 +1,5 @@
 ﻿using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+using Sdcb.OpenVINO.NuGetBuilder.Utils;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Readers;
@@ -31,11 +32,11 @@ internal class ArchiveReader : IDisposable
 
     private void ReadArchive(Stream stream)
     {
-        IArchive archive = ArchiveFactory.Open(stream, new ReaderOptions {  LookForHeader = true });
+        IArchive archive = ArchiveFactory.Open(stream, new ReaderOptions { LookForHeader = true });
         _archives.Add(archive);
         foreach (IArchiveEntry node in archive.Entries)
         {
-            if (node.Key.EndsWith(".tar"))
+            if (node.Key == null  || node.Key.EndsWith(".tar"))
             {
                 MemoryStream ms = new();
                 using Stream nodeStream = node.OpenEntryStream();
@@ -60,6 +61,12 @@ public class ArchiveExtractor
         IArchiveEntry[] dynamicLibs = reader.Entries
             .Where(x => keyFilter.Filter(x.Key))
             .ToArray();
+        HashSet<string> knownPrefixes = dynamicLibs.Select(x => PathUtils.GetPart1FileNameWithoutExtension(x.Key)).ToHashSet();
+        Dictionary<string, IArchiveEntry[]> sameFileNameCaches = reader.Entries
+            .Select(x => (key: PathUtils.GetPart1FileNameWithoutExtension(x.Key), value: x))
+            .Where(x => knownPrefixes.Contains(x.key))
+            .GroupBy(x => x.key)
+            .ToDictionary(k => k.Key, v => v.Select(x => x.value).OrderBy(x => x.Key.Length).ToArray());
 
         Directory.CreateDirectory(destinationFolder);
 
@@ -75,12 +82,43 @@ public class ArchiveExtractor
             Console.WriteLine($"Extracting artifacts into {destinationFolder}...");
             foreach (IArchiveEntry entry in dynamicLibs)
             {
-                Console.WriteLine($"{entry.Key}...");
-                entry.WriteToDirectory(destinationFolder, new ExtractionOptions
+                if (entry.Size > 0)
                 {
-                    ExtractFullPath = !flatten,
-                    Overwrite = true,
-                });
+                    Console.WriteLine($"{entry.Key}...");
+                    entry.WriteToDirectory(destinationFolder, new ExtractionOptions
+                    {
+                        ExtractFullPath = !flatten,
+                        Overwrite = true,
+                    });
+                }
+                else
+                {
+                    // seems like a link
+                    IArchiveEntry[] sameFileNameEntries = sameFileNameCaches[PathUtils.GetPart1FileNameWithoutExtension(entry.Key)];
+                    int startIndex = Array.FindIndex(sameFileNameEntries, x => x.Key == entry.Key);
+                    bool copied = false;
+                    for (int i = startIndex + 1; i < sameFileNameEntries.Length; i++)
+                    {
+                        IArchiveEntry linkedEntry = sameFileNameEntries[i];
+                        if (linkedEntry.Size > 0)
+                        {
+                            Console.WriteLine($"{entry.Key} -> {Path.GetFileName(linkedEntry.Key)}");
+                            using Stream linkedStream = linkedEntry.OpenEntryStream();
+                            string destFolder = flatten ? destinationFolder : Path.Combine(destinationFolder, Path.GetDirectoryName(entry.Key)!);
+                            Directory.CreateDirectory(destFolder);
+                            string destFile = Path.Combine(destinationFolder, Path.GetFileName(entry.Key));
+                            using FileStream file = File.OpenWrite(destFile);
+                            linkedStream.CopyTo(file);
+                            copied = true;
+                            break;
+                        }
+                    }
+
+                    if (!copied)
+                    {
+                        throw new Exception($"Entry failed to find link: {entry.Key}.");
+                    }
+                }
             }
         }
 
