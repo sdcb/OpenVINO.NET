@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sdcb.OpenVINO;
 
@@ -15,51 +16,46 @@ public class Shape : CppObject, IList<long>
     ov_shape_t _shape;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Shape"/> class.
-    /// </summary>
-    public Shape() : base(owned: true)
-    {
-    }
-
-    /// <summary>
     /// Creates a new <see cref="Shape"/> instance with 4 dimensions.
     /// </summary>
     /// <param name="d1">The first dimension.</param>
     /// <param name="d2">The second dimension.</param>
     /// <param name="d3">The third dimension.</param>
     /// <param name="d4">The fourth dimension.</param>
-    /// <returns>A new <see cref="Shape"/> instance with 4 dimensions</returns>
-    public unsafe static Shape From(int d1, int d2, int d3, int d4)
+    public unsafe Shape(int d1, int d2, int d3, int d4) : base(owned: true)
     {
-        Shape s = new();
         long* dims = stackalloc long[4];
         dims[0] = d1;
         dims[1] = d2;
         dims[2] = d3;
         dims[3] = d4;
-        fixed (ov_shape_t* shapePtr = &s._shape)
+        fixed (ov_shape_t* shapePtr = &_shape)
         {
             OpenVINOException.ThrowIfFailed(ov_shape_create(4, dims, shapePtr));
         }
         GC.AddMemoryPressure(sizeof(long) * 4);
-        return s;
     }
 
     /// <summary>
     /// Creates a new <see cref="Shape"/> instance from a <see cref="ReadOnlySpan{T}"/> of dimensions.
     /// </summary>
     /// <param name="dims">The span containing the dimensions of the shape.</param>
-    /// <returns>A new <see cref="Shape"/> instance from a <see cref="ReadOnlySpan{T}"/> of dimensions.</returns>
-    public unsafe static Shape From(ReadOnlySpan<long> dims)
+    public unsafe Shape(ReadOnlySpan<long> dims) : base(owned: true)
     {
-        Shape s = new();
-        fixed (ov_shape_t* shapePtr = &s._shape)
+        fixed (ov_shape_t* shapePtr = &_shape)
         fixed (long* dimsPtr = dims)
         {
             OpenVINOException.ThrowIfFailed(ov_shape_create(dims.Length, dimsPtr, shapePtr));
         }
         GC.AddMemoryPressure(sizeof(long) * dims.Length);
-        return s;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Shape"/> class with the given dimensions.
+    /// </summary>
+    /// <param name="dims">The dimensions of the <see cref="Shape"/> as an array of integers.</param>
+    public unsafe Shape(params int[] dims) : this(dims.Select(x => (long)x).ToArray())
+    {
     }
 
     /// <summary>
@@ -193,7 +189,7 @@ public class Shape : CppObject, IList<long>
         GC.RemoveMemoryPressure(sizeof(long) * Count);
         fixed (ov_shape_t* ptr = &_shape)
         {
-            ov_shape_free(ptr);
+            ov_shape_free(ptr); // will set _shape.dims to null
         }
     }
 }
