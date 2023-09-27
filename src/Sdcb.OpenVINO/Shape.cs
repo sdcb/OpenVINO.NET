@@ -121,7 +121,7 @@ public class Shape : CppObject, IList<long>
     /// <returns>A string representation of the <see cref="Shape"/>.</returns>
     public override string ToString()
     {
-        return $"[{string.Join(",", this)}]";
+        return $"{{{string.Join(",", this)}}}";
     }
 
     /// <inheritdoc/>

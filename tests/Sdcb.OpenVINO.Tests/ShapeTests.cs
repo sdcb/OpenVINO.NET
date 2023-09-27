@@ -25,6 +25,13 @@ public class ShapeTests
     }
 
     [Fact]
+    public void ToStringTest()
+    {
+        using Shape shape = new(4, 3);
+        Assert.Equal("{4,3}", shape.ToString());
+    }
+
+    [Fact]
     public void CanRevealDisposed()
     {
         using Shape shape = new(4, 3, 2, 1);
