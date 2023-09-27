@@ -1,8 +1,5 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Sdcb.OpenVINO;
 
@@ -18,19 +15,21 @@ public class Model : NativeResource
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     /// <param name="owned">If set to <c>true</c> the instance owns the handle.</param>
-    public Model(IntPtr handle, bool owned = true) : base(handle, owned)
+    public unsafe Model(IntPtr handle, bool owned = true) : base(handle, owned)
     {
+        Inputs = new InputPortIndexer((ov_model*)Handle);
+        Output = new OutputPortIndexer((ov_model*)Handle);
     }
 
     /// <summary>
     /// Provides an indexer over the input nodes in the model.
     /// </summary>
-    public unsafe IPortIndexer Inputs => new InputPortIndexer((ov_model*)Handle);
+    public unsafe IPortIndexer Inputs { get; }
 
     /// <summary>
     /// Provides an indexer over the output nodes in the model.
     /// </summary>
-    public unsafe IPortIndexer Output => new OutputPortIndexer((ov_model*)Handle);
+    public unsafe IPortIndexer Output { get; }
 
     /// <inheritdoc/>
     protected unsafe override void ReleaseHandle(IntPtr handle)
