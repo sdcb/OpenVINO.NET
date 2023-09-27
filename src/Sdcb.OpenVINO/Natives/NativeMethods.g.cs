@@ -271,7 +271,7 @@ public static unsafe partial class NativeMethods
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
     /// <param name="variadic">
-    /// <para>paramater: Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
+    /// <para>property paramater: Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
     /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
     /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
@@ -386,7 +386,7 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Releases memory occupied by ov_core_version_list_t.</summary>
     /// <param name="versions">A pointer to the ie_core_versions to free memory.</param>
-    [DllImport(Dll), CSourceInfo("ov_core.h", 341, 341, "ov_core_c_api")]
+    [DllImport(Dll), CSourceInfo("ov_core.h", 341, 342, "ov_core_c_api")]
     public static extern void ov_core_versions_free(ov_core_version_list_t* versions);
     
 
@@ -398,9 +398,9 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Device name to identify a plugin.</param>
     /// <param name="context_args_size">How many property args will be for this remote context creation.</param>
     /// <param name="context">A pointer to the newly created remote context.</param>
-    /// <param name="variadic">parmameters Actual context property parameter for remote context</param>
+    /// <param name="variadic">variadic parmameters Actual context property parameter for remote context</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll), CSourceInfo("ov_core.h", 354, 359, "ov_core_c_api")]
+    [DllImport(Dll), CSourceInfo("ov_core.h", 355, 360, "ov_core_c_api")]
     public static extern ov_status_e ov_core_create_context(ov_core* core, byte* device_name, nint context_args_size, ov_remote_context** context, IntPtr variadic);
     
 
@@ -410,9 +410,9 @@ public static unsafe partial class NativeMethods
     /// <param name="context">A pointer to the newly created remote context.</param>
     /// <param name="property_args_size">How many args will be for this compiled model.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">parmameters Actual property parameter for remote context</param>
+    /// <param name="variadic">variadic parmameters Actual property parameter for remote context</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll), CSourceInfo("ov_core.h", 372, 378, "ov_core_c_api")]
+    [DllImport(Dll), CSourceInfo("ov_core.h", 373, 379, "ov_core_c_api")]
     public static extern ov_status_e ov_core_compile_model_with_context(ov_core* core, ov_model* model, ov_remote_context* context, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
     
 
@@ -421,7 +421,7 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Name of a device to get a default shared context from.</param>
     /// <param name="context">A pointer to the referenced remote context.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll), CSourceInfo("ov_core.h", 388, 389, "ov_core_c_api")]
+    [DllImport(Dll), CSourceInfo("ov_core.h", 389, 390, "ov_core_c_api")]
     public static extern ov_status_e ov_core_get_default_context(ov_core* core, byte* device_name, ov_remote_context** context);
     
 
@@ -1121,7 +1121,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t.</param>
     /// <param name="colorFormat">The enumerate of colorFormat</param>
     /// <param name="sub_names_size">The size of sub_names</param>
-    /// <param name="variadic">params sub_names Optional list of sub-names assigned for each plane (e.g. &quot;Y&quot;, &quot;UV&quot;).</param>
+    /// <param name="variadic">variadic params sub_names Optional list of sub-names assigned for each plane (e.g. &quot;Y&quot;, &quot;UV&quot;).</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_prepostprocess.h", 299, 304, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_color_format_with_subname(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_color_format_e colorFormat, nint sub_names_size, IntPtr variadic);
@@ -1277,7 +1277,7 @@ public static unsafe partial class NativeMethods
     /// <param name="shape">Defines the shape of the tensor.</param>
     /// <param name="object_args_size">Size of the low-level tensor object parameters.</param>
     /// <param name="remote_tensor">Pointer to returned ov_tensor_t that contains remote tensor instance.</param>
-    /// <param name="variadic">params Contains low-level tensor object parameters.</param>
+    /// <param name="variadic">variadic params Contains low-level tensor object parameters.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll), CSourceInfo("ov_remote_context.h", 31, 37, "ov_remote_context_c_api")]
     public static extern ov_status_e ov_remote_context_create_tensor(ov_remote_context* context, ov_element_type_e type, ov_shape_t shape, nint object_args_size, ov_tensor** remote_tensor, IntPtr variadic);
@@ -1324,7 +1324,7 @@ public static unsafe partial class NativeMethods
     /// <summary>Release the memory allocated by ov_remote_context_t.</summary>
     /// <param name="context">A pointer to the ov_remote_context_t to free memory.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll), CSourceInfo("ov_remote_context.h", 88, 88, "ov_remote_context_c_api")]
+    [DllImport(Dll), CSourceInfo("ov_remote_context.h", 88, 89, "ov_remote_context_c_api")]
     public static extern void ov_remote_context_free(ov_remote_context* context);
     
 
@@ -1340,7 +1340,7 @@ public static unsafe partial class NativeMethods
     /// <param name="size">The size of param pairs.</param>
     /// <param name="params">Param name:value list.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll), CSourceInfo("ov_remote_context.h", 103, 104, "ov_remote_context_c_api")]
+    [DllImport(Dll), CSourceInfo("ov_remote_context.h", 104, 105, "ov_remote_context_c_api")]
     public static extern ov_status_e ov_remote_tensor_get_params(ov_tensor* tensor, nint* size, byte** @params);
     
 
@@ -1348,7 +1348,7 @@ public static unsafe partial class NativeMethods
     /// <param name="remote_tensor">A pointer to the remote tensor instance.</param>
     /// <param name="device_name">Device name will be return.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll), CSourceInfo("ov_remote_context.h", 113, 114, "ov_remote_context_c_api")]
+    [DllImport(Dll), CSourceInfo("ov_remote_context.h", 114, 115, "ov_remote_context_c_api")]
     public static extern ov_status_e ov_remote_tensor_get_device_name(ov_tensor* remote_tensor, byte** device_name);
     
 
