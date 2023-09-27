@@ -11,7 +11,7 @@ namespace Sdcb.OpenVINO;
 /// <summary>
 /// Represents the core class for OpenVINO operations, implements IDisposable interface. 
 /// </summary>
-public class OVCore : NativeResource
+public class OVCore : CppPtrObject
 {
     /// <summary>
     /// Initializes a new instance of the OVCore class with a new handle.
@@ -38,13 +38,10 @@ public class OVCore : NativeResource
     {
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="OVCore"/> object.
-    /// </summary>
-    /// <param name="handle"> A handle for the unmanaged resources to release. </param>
-    protected unsafe override void ReleaseHandle(IntPtr handle)
+    /// <inheritdoc/>
+    protected unsafe override void ReleaseCore()
     {
-        ov_core* core = (ov_core*)handle;
+        ov_core* core = (ov_core*)Handle;
         ov_core_free(core);
     }
 

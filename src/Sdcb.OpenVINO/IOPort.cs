@@ -9,7 +9,7 @@ using static NativeMethods;
 /// Nodes are the backbone of the graph of Value dataflow.
 /// Every node has zero or more nodes as arguments and one value, which is either a tensor or a (possibly empty) tuple of values.
 /// </summary>
-public class IOPort : NativeResource
+public class IOPort : CppPtrObject
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="IOPort"/> class.
@@ -36,7 +36,7 @@ public class IOPort : NativeResource
     public bool IsConst { get; }
 
     /// <inheritdoc/>
-    protected unsafe override void ReleaseHandle(IntPtr handle)
+    protected unsafe override void ReleaseCore()
     {
         if (IsConst)
         {

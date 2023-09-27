@@ -1,17 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Sdcb.OpenVINO.Natives;
+using System;
 
 namespace Sdcb.OpenVINO;
 
-public class Tensor : NativeResource
+using static Sdcb.OpenVINO.Natives.NativeMethods;
+
+/// <summary>
+/// Represents a tensor in OpenVINO.
+/// </summary>
+public class Tensor : CppPtrObject
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Tensor"/> class.
+    /// </summary>
+    /// <param name="handle">The handle to the tensor.</param>
+    /// <param name="owned">Whether the handle is owned by this instance.</param>
     public Tensor(IntPtr handle, bool owned = true) : base(handle, owned)
     {
     }
 
-    protected override void ReleaseHandle(IntPtr handle)
+    /// <inheritdoc/>
+    protected unsafe override void ReleaseCore()
     {
-        throw new NotImplementedException();
+        ov_tensor_free((ov_tensor*)Handle);
     }
 }

@@ -6,44 +6,24 @@ namespace Sdcb.OpenVINO;
 /// Represents a base class for managing native resources.
 /// Implements the <see cref="System.IDisposable"/> interface.
 /// </summary>
-public abstract class NativeResource : IDisposable
+public abstract class CppPtrObject : CppObject
 {
     /// <summary>
     /// The handle to the native resource.
     /// </summary>
     protected IntPtr Handle;
 
-    /// <summary>
-    /// Determines whether the instance owns the handle.
-    /// </summary>
-    protected bool Owned;
+    /// <inheritdoc/>
+    public override bool Disposed => Handle == IntPtr.Zero;
 
     /// <summary>
-    /// Gets a value indicating whether this instance is disposed.
-    /// </summary>
-    /// <value>
-    ///   <c>true</c> if this instance is disposed; otherwise, <c>false</c>.
-    /// </value>
-    public bool Disposed => Handle == IntPtr.Zero;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NativeResource"/> class.
+    /// Initializes a new instance of the <see cref="CppPtrObject"/> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     /// <param name="owned">If set to <c>true</c> the instance owns the handle.</param>
-    public NativeResource(IntPtr handle, bool owned = true)
+    public CppPtrObject(IntPtr handle, bool owned = true) : base(owned)
     {
         Handle = handle;
-        Owned = owned;
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -54,30 +34,13 @@ public abstract class NativeResource : IDisposable
     /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects.
     /// Only unmanaged resources can be disposed.
     /// </param>
-    protected virtual void Dispose(bool disposing)
+    protected override void Dispose(bool disposing)
     {
         if (!Disposed && Owned)
         {
-            ReleaseHandle(Handle);
+            ReleaseCore();
         }
         Handle = IntPtr.Zero;
-    }
-
-    /// <summary>
-    /// Releases the native handle.
-    /// </summary>
-    /// <param name="handle">The native handle to release.</param>
-    protected abstract void ReleaseHandle(IntPtr handle);
-
-    /// <summary>
-    /// Throws an exception if the handle has been disposed.
-    /// </summary>
-    protected void ThrowIfDisposed()
-    {
-        if (Disposed)
-        {
-            throw new ObjectDisposedException(nameof(Handle));
-        }
     }
 
     /// <summary>
@@ -92,13 +55,5 @@ public abstract class NativeResource : IDisposable
     {
         ThrowIfDisposed();
         return Handle;
-    }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="NativeResource"/> class.
-    /// </summary>
-    ~NativeResource()
-    {
-        Dispose(false);
     }
 }

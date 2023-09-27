@@ -8,7 +8,7 @@ using static Sdcb.OpenVINO.Natives.NativeMethods;
 /// <summary>
 /// Represents the model loaded from an OpenVINO.
 /// </summary>
-public class Model : NativeResource
+public class Model : CppPtrObject
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Model"/> class.
@@ -32,8 +32,8 @@ public class Model : NativeResource
     public unsafe IPortIndexer Output { get; }
 
     /// <inheritdoc/>
-    protected unsafe override void ReleaseHandle(IntPtr handle)
+    protected unsafe override void ReleaseCore()
     {
-        ov_model_free((ov_model*)handle);
+        ov_model_free((ov_model*)Handle);
     }
 }
