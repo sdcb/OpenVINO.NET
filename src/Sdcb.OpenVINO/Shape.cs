@@ -6,190 +6,111 @@ using System.Linq;
 
 namespace Sdcb.OpenVINO;
 
-using static Sdcb.OpenVINO.Natives.NativeMethods;
-
 /// <summary>
-/// Represents an OpenVINO tensor shape.
+/// Represents a shape with managed memory and allows manipulation of each element.
 /// </summary>
-public class Shape : CppObject, IList<long>
+public class Shape : IEquatable<Shape>
 {
-    ov_shape_t _shape;
+    /// <summary>
+    /// Gets or sets the dimensions of the shape.
+    /// </summary>
+    /// <remarks>
+    /// The dimensions of the shape are represented as a one-dimensional array of 64-bit signed integers.
+    /// </remarks>
+    public long[] Dimensions { get; set; }
 
     /// <summary>
-    /// Creates a new <see cref="Shape"/> instance with 4 dimensions.
+    /// Initializes a new instance of the <see cref="Shape"/> class with an OpenVINO shape <see cref="ov_shape_t"/>.
     /// </summary>
-    /// <param name="d1">The first dimension.</param>
-    /// <param name="d2">The second dimension.</param>
-    /// <param name="d3">The third dimension.</param>
-    /// <param name="d4">The fourth dimension.</param>
-    public unsafe Shape(int d1, int d2, int d3, int d4) : base(owned: true)
+    /// <param name="shape">The OpenVINO <see cref="ov_shape_t"/> to initialize the <see cref="Shape"/> with.</param>
+    public unsafe Shape(in ov_shape_t shape)
     {
-        long* dims = stackalloc long[4];
-        dims[0] = d1;
-        dims[1] = d2;
-        dims[2] = d3;
-        dims[3] = d4;
-        fixed (ov_shape_t* shapePtr = &_shape)
+        Dimensions = new long[shape.rank];
+        for (int i = 0; i < shape.rank; ++i)
         {
-            OpenVINOException.ThrowIfFailed(ov_shape_create(4, dims, shapePtr));
-        }
-        GC.AddMemoryPressure(sizeof(long) * 4);
-    }
-
-    /// <summary>
-    /// Creates a new <see cref="Shape"/> instance from a <see cref="ReadOnlySpan{T}"/> of dimensions.
-    /// </summary>
-    /// <param name="dims">The span containing the dimensions of the shape.</param>
-    public unsafe Shape(ReadOnlySpan<long> dims) : base(owned: true)
-    {
-        fixed (ov_shape_t* shapePtr = &_shape)
-        fixed (long* dimsPtr = dims)
-        {
-            OpenVINOException.ThrowIfFailed(ov_shape_create(dims.Length, dimsPtr, shapePtr));
-        }
-        GC.AddMemoryPressure(sizeof(long) * dims.Length);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Shape"/> class with the given dimensions.
-    /// </summary>
-    /// <param name="dims">The dimensions of the <see cref="Shape"/> as an array of integers.</param>
-    public unsafe Shape(params int[] dims) : this(dims.Select(x => (long)x).ToArray())
-    {
-    }
-
-    /// <summary>
-    /// Gets the number of dimensions in the shape tensor.
-    /// </summary>
-    public int Count
-    {
-        get
-        {
-            ThrowIfDisposed();
-
-            return (int)_shape.rank;
-        }
-    }
-
-    bool ICollection<long>.IsReadOnly => false;
-
-    /// <inheritdoc/>
-    public unsafe override bool Disposed => _shape.dims == null;
-
-    /// <summary>
-    /// Gets or sets the dimension at the specified index in the shape tensor.
-    /// </summary>
-    /// <param name="index">The index of the dimension to get or set.</param>
-    /// <returns>The dimension at the specified index in the shape tensor.</returns>
-    public unsafe long this[int index]
-    {
-        get
-        {
-            ThrowIfDisposed();
-            if (index > _shape.rank)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
-            return _shape.dims[index];
-        }
-        set
-        {
-            ThrowIfDisposed();
-            if (index > _shape.rank)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
-            _shape.dims[index] = value;
+            Dimensions[i] = shape.dims[i];
         }
     }
 
     /// <summary>
-    /// Gets a <see cref="Span{T}"/> representation of the shape tensor.
+    /// Represents a shape with managed memory and allows manipulation of each element.
     /// </summary>
-    /// <returns>A <see cref="Span{T}"/> representation of the shape tensor.</returns>
-    public unsafe Span<long> AsSpan()
+    /// <param name="shape">A list of integers representing the shape of the tensor.</param>
+    public Shape(params long[] shape)
     {
-        ThrowIfDisposed();
-        return new Span<long>(_shape.dims, (int)_shape.rank);
+        Dimensions = shape;
     }
 
     /// <summary>
-    /// Gets a string representation of the <see cref="Shape"/>.
+    /// Compares this instance with an object of the same type and determines whether they are equal in values.
     /// </summary>
-    /// <returns>A string representation of the <see cref="Shape"/>.</returns>
-    public override string ToString()
+    /// <param name="other"><see cref="Shape"/> instance to compare with.</param>
+    /// <returns><c>true</c> if instances are equal, <c>false</c> otherwise.</returns>
+    public bool Equals(Shape? other)
     {
-        return $"{{{string.Join(",", this)}}}";
-    }
-
-    /// <inheritdoc/>
-    public unsafe int IndexOf(long item)
-    {
-        for (int i = 0; i < _shape.rank; ++i)
-        {
-            if (_shape.dims[i] == item)
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    void IList<long>.Insert(int index, long item) => throw new NotSupportedException();
-
-    void IList<long>.RemoveAt(int index) => throw new NotSupportedException();
-
-    void ICollection<long>.Add(long item) => throw new NotSupportedException();
-
-    void ICollection<long>.Clear() => throw new NotSupportedException();
-
-    /// <inheritdoc/>
-    public unsafe bool Contains(long item)
-    {
-        for (long i = 0; i < _shape.rank; ++i)
-        {
-            if (_shape.dims[i] == item)
-            {
-                return true;
-            }
-        }
+        if (other is not null)
+            return Dimensions.SequenceEqual(other.Dimensions);
         return false;
     }
 
-    /// <inheritdoc/>
-    public void CopyTo(long[] array, int arrayIndex)
+    /// <summary>
+    /// Compares this instance with an object type and determines whether they are equal in values.
+    /// </summary>
+    /// <param name="obj">The object to compare to.</param>
+    /// <returns><c>true</c> if the objects are equal, <c>false</c> otherwise.</returns>
+    public override bool Equals(object? obj)
     {
-        int r = Count;
-        for (int i = 0; i < r; ++i)
+        return obj switch
         {
-            array[arrayIndex + i] = this[i];
-        }
+            Shape shape => Equals(shape),
+            _ => false,
+        };
     }
 
-    bool ICollection<long>.Remove(long item) => throw new NotSupportedException();
+    /// <summary>
+    /// Checks whether two <see cref="Shape"/> instances are equal in values.
+    /// </summary>
+    /// <param name="a">First <see cref="Shape"/> instance.</param>
+    /// <param name="b">Second <see cref="Shape"/> instance.</param>
+    /// <returns><c>true</c> if instances are equal, <c>false</c> otherwise.</returns>
+    public static bool operator ==(Shape a, Shape b) => a.Equals(b);
 
-    /// <inheritdoc/>
-    public IEnumerator<long> GetEnumerator()
+    /// <summary>
+    /// Checks whether two <see cref="Shape"/> instances are not equal in values.
+    /// </summary>
+    /// <param name="a">First <see cref="Shape"/> instance.</param>
+    /// <param name="b">Second <see cref="Shape"/> instance.</param>
+    /// <returns><c>true</c> if instances are not equal, <c>false</c> otherwise.</returns>
+    public static bool operator !=(Shape a, Shape b) => !a.Equals(b);
+
+    /// <summary>
+    /// Serves as a hash function for <see cref="Shape"/> instance.
+    /// </summary>
+    /// <returns>A hash code for this instance.</returns>
+    public override int GetHashCode()
     {
-        int r = Count;
-        for (int i = 0; i < r; ++i)
+        HashCode hashCode = new();
+
+        foreach (long item in Dimensions)
         {
-            yield return this[i];
+            hashCode.Add(item);
         }
+
+        return hashCode.ToHashCode();
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    /// <inheritdoc/>
-    protected unsafe override void ReleaseCore()
+    /// <summary>
+    /// Returns a string that represents <see cref="Shape"/> instance.
+    /// </summary>
+    /// <returns>A string that represents <see cref="Shape"/> instance.</returns>
+    public override string ToString()
     {
-        GC.RemoveMemoryPressure(sizeof(long) * Count);
-        fixed (ov_shape_t* ptr = &_shape)
-        {
-            ov_shape_free(ptr); // will set _shape.dims to null
-        }
+        return $"{{{string.Join(",", Dimensions)}}}";
     }
+
+    /// <summary>
+    /// Locks the instance of the <see cref="Shape"/> class and returns an instance of <see cref="NativeShapeWrapper"/>.
+    /// </summary>
+    /// <returns>An instance of <see cref="NativeShapeWrapper"/>.</returns>
+    public NativeShapeWrapper Lock() => new NativeShapeWrapper(this);
 }

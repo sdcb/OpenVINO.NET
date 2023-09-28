@@ -12,13 +12,13 @@ using static Sdcb.OpenVINO.Natives.NativeMethods;
 /// </remarks>
 /// <param name="Min">The minimum value of the dimension.</param>
 /// <param name="Max">The maximum value of the dimension.</param>
-public record struct Dimension(long Min, long Max)
+public readonly record struct Dimension(long Min, long Max)
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Dimension"/> struct with the provided static value.
     /// </summary>
     /// <param name="staticValue">The static value to set both <see cref="Min"/> and <see cref="Max"/> to.</param>
-    public Dimension(int staticValue) : this(staticValue, staticValue)
+    public Dimension(long staticValue) : this(staticValue, staticValue)
     {
     }
 
@@ -31,12 +31,29 @@ public record struct Dimension(long Min, long Max)
     /// Indicates whether the dimension is dynamic or not.
     /// </summary>
     /// <returns><c>true</c> if the dimension is dynamic, <c>false</c> otherwise.</returns>
-    public readonly bool IsDynamic => ov_dimension_is_dynamic(this);
+    public readonly bool IsDynamic => Min != Max || Max <= 0;
 
     /// <summary>
     /// Convert to <see cref="ov_dimension"/>
     /// </summary>
     public static implicit operator ov_dimension(Dimension dimension) => new() { min = dimension.Min, max = dimension.Max };
+
+    /// <summary>
+    /// Gets a string representation of the <see cref="Dimension"/>.
+    /// </summary>
+    /// <returns>A string representation of the <see cref="Dimension"/>.</returns>
+    public readonly override string ToString()
+    {
+        if (IsDynamic)
+        {
+            if (Min == -1 && Max == -1) return "?";
+            return $"{Min}..{Max}";
+        }
+        else
+        {
+            return Min.ToString();
+        }
+    }
 }
 
 /// <summary>
@@ -47,7 +64,7 @@ public record struct Dimension(long Min, long Max)
 /// </remarks>
 /// <param name="Min">The minimum value of the rank.</param>
 /// <param name="Max">The maximum value of the rank.</param>
-public record struct Rank(long Min, long Max)
+public readonly record struct Rank(long Min, long Max)
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Rank"/> struct with the provided static value.
@@ -66,10 +83,27 @@ public record struct Rank(long Min, long Max)
     /// Indicates whether the dimension is dynamic or not.
     /// </summary>
     /// <returns><c>true</c> if the dimension is dynamic, <c>false</c> otherwise.</returns>
-    public readonly bool IsDynamic => ov_rank_is_dynamic(this);
+    public readonly bool IsDynamic => Min != Max || Max <= 0;
 
     /// <summary>
     /// Convert to <see cref="ov_dimension"/>
     /// </summary>
     public static implicit operator ov_dimension(Rank rank) => new() { min = rank.Min, max = rank.Max };
+
+    /// <summary>
+    /// Gets a string representation of the <see cref="Rank"/>.
+    /// </summary>
+    /// <returns>A string representation of the <see cref="Rank"/>.</returns>
+    public readonly override string ToString()
+    {
+        if (IsDynamic)
+        {
+            if (Min == -1 && Max == -1) return "?";
+            return $"{Min}..{Max}";
+        }
+        else
+        {
+            return Min.ToString();
+        }
+    }
 }

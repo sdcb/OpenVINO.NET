@@ -19,6 +19,35 @@ public class Tensor : CppPtrObject
     {
     }
 
+    /// <summary>
+    /// Gets or sets the shape of the tensor.
+    /// </summary>
+    public unsafe Shape Shape
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            ov_shape_t nshape;
+            try
+            {
+                OpenVINOException.ThrowIfFailed(ov_tensor_get_shape((ov_tensor*)Handle, &nshape));
+                return new Shape(nshape);
+            }
+            finally
+            {
+                ov_shape_free(&nshape);
+            }
+        }
+        set
+        {
+            ThrowIfDisposed();
+
+            using NativeShapeWrapper locked = value.Lock();
+            OpenVINOException.ThrowIfFailed(ov_tensor_set_shape((ov_tensor*)Handle, locked.Shape));
+        }
+    }
+
     /// <inheritdoc/>
     protected unsafe override void ReleaseCore()
     {

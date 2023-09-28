@@ -1,74 +1,76 @@
-﻿using Sdcb.OpenVINO.Natives;
-using System;
-using System.Linq;
+﻿using System;
 
 namespace Sdcb.OpenVINO;
 
-using static Sdcb.OpenVINO.Natives.NativeMethods;
-
 /// <summary>
-/// Represents partial shape.
+/// Represents a partial shape.
 /// </summary>
-public class PartialShape : CppObject
+public class PartialShape
 {
-    ov_partial_shape _shape;
+    /// <summary>
+    /// The rank of the partial shape.
+    /// </summary>
+    public Rank Rank { get; }
 
     /// <summary>
-    /// Constructs a new instance of dynamic rank <see cref="PartialShape"/>.
+    /// An array of dimensions that describe the partial shape.
     /// </summary>
-    public unsafe PartialShape(Rank rank, params Dimension[] dims) : base(owned: true)
+    public Dimension[] Dimensions { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PartialShape"/> class that represents a dynamic rank.
+    /// </summary>
+    /// <param name="rank">The rank of the partial shape.</param>
+    /// <param name="dimensions">An array of dimensions that describe the partial shape.</param>
+    public unsafe PartialShape(Rank rank, params Dimension[] dimensions)
     {
-        fixed (ov_dimension* dimsPtr = dims.Select(x => (ov_dimension)x).ToArray())
-        fixed (ov_partial_shape* shapePtr = &_shape)
+        Rank = rank;
+        if (rank.IsDynamic)
         {
-            OpenVINOException.ThrowIfFailed(ov_partial_shape_create_dynamic(rank, dimsPtr, shapePtr));
+            Dimensions = Array.Empty<Dimension>();
+        }
+        else
+        {
+            if (rank.Min != dimensions.Length)
+            {
+                throw new ArgumentException($"The number of dimensions provided {dimensions.Length} does not match the expected rank {rank.Min}.");
+            }
+            Dimensions = dimensions;
         }
     }
 
     /// <summary>
-    /// Constructs a new instance of dynamic dimension <see cref="PartialShape"/>.
+    /// Initializes a new instance of the <see cref="PartialShape"/> class that represents a dynamic dimension.
     /// </summary>
-    public unsafe PartialShape(params Dimension[] dims) : base(owned: true)
+    /// <param name="dims">An array of dimensions that describe the partial shape.</param>
+    public unsafe PartialShape(params Dimension[] dims)
     {
-        fixed (ov_dimension* ptr = dims.Select(x => (ov_dimension)x).ToArray())
-        fixed (ov_partial_shape* shapePtr = &_shape)
-        {
-            OpenVINOException.ThrowIfFailed(ov_partial_shape_create(dims.Length, ptr, shapePtr));
-        }
+        Rank = new(dims.Length);
+        Dimensions = dims;
     }
 
     /// <summary>
-    /// Constructs a new instance of static dimension <see cref="PartialShape"/>.
+    /// Initializes a new instance of the <see cref="PartialShape"/> class that represents a static dimension.
     /// </summary>
-    public unsafe PartialShape(params long[] dims) : base(owned: true)
+    /// <param name="dims">An array of dimensions that describe the partial shape.</param>
+    public unsafe PartialShape(params long[] dims)
     {
-        fixed (long* dimsPtr = dims)
-        fixed (ov_partial_shape* shapePtr = &_shape)
+        Rank = new(dims.Length);
+        Dimensions = new Dimension[dims.Length];
+        for (int i = 0; i < dims.Length; i++)
         {
-            OpenVINOException.ThrowIfFailed(ov_partial_shape_create_static(dims.Length, dimsPtr, shapePtr));
+            Dimensions[i] = new(dims[i]);
         }
     }
 
-    /// <inheritdoc/>
-    public unsafe override bool Disposed => _shape.dims == null;
-
-    /// <inheritdoc />
-    protected unsafe override void ReleaseCore()
-    {
-        fixed (ov_partial_shape* ptr = &_shape)
-        {
-            ov_partial_shape_free(ptr);
-            ptr->dims = null;
-        }
-    }
 
     /// <summary>
-    /// Returns the string representation of the <see cref="PartialShape"/> object.
+    /// Overrides the <see cref="object.ToString"/> method to return the <see cref="PartialShape"/> as a string.
     /// </summary>
-    /// <returns>The string representation of the <see cref="PartialShape"/> object.</returns>
-    public unsafe override string ToString()
+    /// <returns>A string representation of the <see cref="PartialShape"/>, including all dimensions.</returns>
+    public override string ToString()
     {
-        byte* strPtr = ov_partial_shape_to_string(_shape);
-        return StringUtils.UTF8PtrToString((IntPtr)strPtr)!;
+        if (Rank.IsDynamic) return Rank.ToString();
+        return $"{{{String.Join(",", Dimensions)}}}";
     }
 }
