@@ -14,12 +14,47 @@ using static NativeMethods;
 public class InferRequest : CppPtrObject
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="InferRequest"/> class with an IntPtr handle and an optional owned parameter.
+    /// Initializes a new instance of the <see cref="InferRequest"/> class with an pointer and an optional owned parameter.
     /// </summary>
-    /// <param name="handle">The IntPtr handle for the Inference Request object.</param>
+    /// <param name="ptr">The pointer for the existing <see cref="ov_infer_request"/> object.</param>
     /// <param name="owned">A boolean indicating whether the underlying object is owned (default is true).</param>
-    public InferRequest(IntPtr handle, bool owned = true) : base(handle, owned)
+    public unsafe InferRequest(ov_infer_request* ptr, bool owned = true) : base((IntPtr)ptr, owned)
     {
+        Inputs = new InputTensorIndexer(ptr);
+        Outputs = new OutputTensorIndexer(ptr);
+    }
+
+    /// <summary>
+    /// Gets an indexer to access input tensors for the inference request.
+    /// </summary>
+    public TensorIndexer Inputs { get; }
+
+    /// <summary>
+    /// Gets an indexer to access output tensors for the inference request.
+    /// </summary>
+    public TensorIndexer Outputs { get; }
+
+    /// <summary>
+    /// Gets the tensor associated with the given IO port of the inference request.
+    /// </summary>
+    /// <param name="port">The input/output port for which to retrieve the tensor.</param>
+    /// <returns>A newly created <see cref="Tensor"/> object that represents the tensor at the given input/output port.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the given IO port is null.</exception>
+    public unsafe Tensor GetTensorByPort(IOPort port)
+    {
+        if (port == null) throw new ArgumentNullException(nameof(port));
+
+        ov_tensor* tensor;
+
+        if (port.IsConst)
+        {
+            OpenVINOException.ThrowIfFailed(ov_infer_request_get_tensor_by_const_port((ov_infer_request*)Handle, (ov_output_const_port*)port.DangerousGetHandle(), &tensor));
+        }
+        else
+        {
+            OpenVINOException.ThrowIfFailed(ov_infer_request_get_tensor_by_port((ov_infer_request*)Handle, (ov_output_port*)port.DangerousGetHandle(), &tensor));
+        }
+        return new Tensor(tensor, owned: true);
     }
 
     /// <summary>

@@ -20,20 +20,20 @@ public class OVCore : CppPtrObject
     {
     }
 
-    private unsafe static IntPtr CreateHandle()
+    private unsafe static ov_core* CreateHandle()
     {
         ov_core* core;
         OpenVINOException.ThrowIfFailed(ov_core_create(&core));
-        return (IntPtr)core;
+        return core;
     }
 
     /// <summary>
     /// Initializes a new instance of the OVCore class using an existing handle.
     /// </summary>
-    /// <param name="handle">The existing handle to use.</param>
+    /// <param name="ptr">The existing <see cref="ov_core"/> pointer to use.</param>
     /// <param name="owned">Determines if the OVCore instance controls the lifespan of the handle.</param>
     /// <exception cref="ArgumentNullException">Thrown when handle is null.</exception>
-    public OVCore(IntPtr handle, bool owned) : base(handle, owned)
+    public unsafe OVCore(ov_core* ptr, bool owned) : base((IntPtr)ptr, owned)
     {
     }
 
@@ -140,7 +140,7 @@ public class OVCore : CppPtrObject
                 OpenVINOException.ThrowIfFailed(ov_core_read_model((ov_core*)Handle, modelPathPtr, binPathPtr, &model));
             }
         }
-        return new Model((IntPtr)model, owned: true);
+        return new Model(model, owned: true);
     }
 
     /// <summary>
@@ -212,6 +212,6 @@ public class OVCore : CppPtrObject
         {
             OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory((ov_core*)Handle, modelDataPtr, (ov_tensor*)weights?.DangerousGetHandle(), &model));
         }
-        return new Model((IntPtr)model, owned: true);
+        return new Model(model, owned: true);
     }
 }

@@ -13,9 +13,9 @@ public class Model : CppPtrObject
     /// <summary>
     /// Initializes a new instance of the <see cref="Model"/> class.
     /// </summary>
-    /// <param name="handle">The handle to the native resource.</param>
+    /// <param name="ptr">The pointer to the existing <see cref="ov_model"/>.</param>
     /// <param name="owned">If set to <c>true</c> the instance owns the handle.</param>
-    public unsafe Model(IntPtr handle, bool owned = true) : base(handle, owned)
+    public unsafe Model(ov_model* ptr, bool owned = true) : base((IntPtr)ptr, owned)
     {
         Inputs = new InputPortIndexer((ov_model*)Handle);
         Outputs = new OutputPortIndexer((ov_model*)Handle);
@@ -24,12 +24,12 @@ public class Model : CppPtrObject
     /// <summary>
     /// Provides an indexer over the input nodes in the model.
     /// </summary>
-    public unsafe IPortIndexer Inputs { get; }
+    public unsafe PortIndexer Inputs { get; }
 
     /// <summary>
     /// Provides an indexer over the output nodes in the model.
     /// </summary>
-    public unsafe IPortIndexer Outputs { get; }
+    public unsafe PortIndexer Outputs { get; }
 
     /// <summary>
     /// Gets the friendly name of the model.

@@ -30,19 +30,19 @@ public class CompiledModel : CppPtrObject
         {
             ov_model* model;
             OpenVINOException.ThrowIfFailed(ov_compiled_model_get_runtime_model((ov_compiled_model*)Handle, &model));
-            return new Model((IntPtr)model, owned: true);
+            return new Model(model, owned: true);
         }
     }
 
     /// <summary>
     /// Provides an indexer over the input nodes in the model.
     /// </summary>
-    public unsafe IPortIndexer Inputs { get; }
+    public unsafe PortIndexer Inputs { get; }
 
     /// <summary>
     /// Provides an indexer over the output nodes in the model.
     /// </summary>
-    public unsafe IPortIndexer Outputs { get; }
+    public unsafe PortIndexer Outputs { get; }
 
     /// <summary>
     /// Creates an <see cref="InferRequest"/> object which is used to infer outputs from inputs in an OpenVINO <see cref="CompiledModel"/>.
@@ -53,7 +53,7 @@ public class CompiledModel : CppPtrObject
         ov_infer_request* req;
         OpenVINOException.ThrowIfFailed(ov_compiled_model_create_infer_request((ov_compiled_model*)Handle, &req));
 
-        return new InferRequest((IntPtr)req, owned: true);
+        return new InferRequest(req, owned: true);
     }
 
     /// <summary>

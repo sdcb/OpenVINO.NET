@@ -14,9 +14,9 @@ public class Tensor : CppPtrObject
     /// <summary>
     /// Initializes a new instance of the <see cref="Tensor"/> class.
     /// </summary>
-    /// <param name="handle">The handle to the tensor.</param>
+    /// <param name="ptr">The handle to the tensor.</param>
     /// <param name="owned">Whether the handle is owned by this instance.</param>
-    public Tensor(IntPtr handle, bool owned = true) : base(handle, owned)
+    public unsafe Tensor(ov_tensor* ptr, bool owned = true) : base((IntPtr)ptr, owned)
     {
     }
 
@@ -81,7 +81,7 @@ public class Tensor : CppPtrObject
             handle.Free();
         }
 
-        return new Tensor((IntPtr)tensor);
+        return new Tensor(tensor);
     }
 
     /// <summary>
