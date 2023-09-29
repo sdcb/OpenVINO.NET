@@ -18,7 +18,7 @@ public class Model : CppPtrObject
     public unsafe Model(IntPtr handle, bool owned = true) : base(handle, owned)
     {
         Inputs = new InputPortIndexer((ov_model*)Handle);
-        Output = new OutputPortIndexer((ov_model*)Handle);
+        Outputs = new OutputPortIndexer((ov_model*)Handle);
     }
 
     /// <summary>
@@ -29,7 +29,7 @@ public class Model : CppPtrObject
     /// <summary>
     /// Provides an indexer over the output nodes in the model.
     /// </summary>
-    public unsafe IPortIndexer Output { get; }
+    public unsafe IPortIndexer Outputs { get; }
 
     /// <summary>
     /// Gets the friendly name of the model.

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Sdcb.OpenVINO.Natives;
 
 namespace Sdcb.OpenVINO;
@@ -17,8 +15,10 @@ public class CompiledModel : CppPtrObject
     /// </summary>
     /// <param name="handle">The pointer to the compiled model.</param>
     /// <param name="owned">True if the object should be disposed of when it is no longer needed; otherwise, false.</param>
-    public CompiledModel(IntPtr handle, bool owned = true) : base(handle, owned)
+    public unsafe CompiledModel(IntPtr handle, bool owned = true) : base(handle, owned)
     {
+        Inputs = new CompiledInputPortIndexer((ov_compiled_model*)handle);
+        Outputs = new CompiledOutputPortIndexer((ov_compiled_model*)handle);
     }
 
     /// <summary>
@@ -32,6 +32,28 @@ public class CompiledModel : CppPtrObject
             OpenVINOException.ThrowIfFailed(ov_compiled_model_get_runtime_model((ov_compiled_model*)Handle, &model));
             return new Model((IntPtr)model, owned: true);
         }
+    }
+
+    /// <summary>
+    /// Provides an indexer over the input nodes in the model.
+    /// </summary>
+    public unsafe IPortIndexer Inputs { get; }
+
+    /// <summary>
+    /// Provides an indexer over the output nodes in the model.
+    /// </summary>
+    public unsafe IPortIndexer Outputs { get; }
+
+    /// <summary>
+    /// Creates an <see cref="InferRequest"/> object which is used to infer outputs from inputs in an OpenVINO <see cref="CompiledModel"/>.
+    /// </summary>
+    /// <returns>An instance of <see cref="InferRequest"/> which is used to infer outputs from inputs in a OpenVINO <see cref="CompiledModel"/>.</returns>
+    public unsafe InferRequest CreateInferRequest()
+    {
+        ov_infer_request* req;
+        OpenVINOException.ThrowIfFailed(ov_compiled_model_create_infer_request((ov_compiled_model*)Handle, &req));
+
+        return new InferRequest((IntPtr)req, owned: true);
     }
 
     /// <summary>

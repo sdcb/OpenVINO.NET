@@ -22,8 +22,8 @@ public class OVModelTest
         Assert.NotNull(m);
         Assert.NotEmpty(m.Inputs);
         Assert.NotNull(m.Inputs.Primary);
-        Assert.NotEmpty(m.Output);
-        Assert.NotNull(m.Output.Primary);
+        Assert.NotEmpty(m.Outputs);
+        Assert.NotNull(m.Outputs.Primary);
         Assert.NotNull(m.FriendlyName);
     }
 

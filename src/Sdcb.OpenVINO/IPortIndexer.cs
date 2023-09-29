@@ -161,3 +161,137 @@ internal unsafe class OutputPortIndexer : IPortIndexer
         return GetEnumerator();
     }
 }
+
+internal unsafe class CompiledInputPortIndexer : IPortIndexer
+{
+    private readonly ov_compiled_model* model;
+
+    public CompiledInputPortIndexer(ov_compiled_model* model)
+    {
+        this.model = model;
+    }
+
+    public IOPort Primary
+    {
+        get
+        {
+            ov_output_const_port* port;
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_input(model, &port));
+            return new IOPort(port);
+        }
+    }
+
+    public IOPort this[int i]
+    {
+        get
+        {
+            ov_output_const_port* port;
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_input_by_index(model, i, &port));
+            return new IOPort(port);
+        }
+    }
+
+    public IOPort this[string name]
+    {
+        get
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(name);
+            fixed (byte* pBytes = bytes)
+            {
+                ov_output_const_port* port;
+                OpenVINOException.ThrowIfFailed(ov_compiled_model_input_by_name(model, pBytes, &port));
+                return new IOPort(port);
+            }
+        }
+    }
+
+    public int Count
+    {
+        get
+        {
+            nint size;
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_inputs_size(model, &size));
+            return (int)size;
+        }
+    }
+
+    public IEnumerator<IOPort> GetEnumerator()
+    {
+        for (int i = 0; i < Count; i++)
+        {
+            yield return this[i];
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}
+
+internal unsafe class CompiledOutputPortIndexer : IPortIndexer
+{
+    private readonly ov_compiled_model* model;
+
+    public CompiledOutputPortIndexer(ov_compiled_model* model)
+    {
+        this.model = model;
+    }
+
+    public IOPort Primary
+    {
+        get
+        {
+            ov_output_const_port* port;
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_output(model, &port));
+            return new IOPort(port);
+        }
+    }
+
+    public IOPort this[int i]
+    {
+        get
+        {
+            ov_output_const_port* port;
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_output_by_index(model, (nint)i, &port));
+            return new IOPort(port);
+        }
+    }
+
+    public IOPort this[string name]
+    {
+        get
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(name);
+            fixed (byte* pBytes = bytes)
+            {
+                ov_output_const_port* port;
+                OpenVINOException.ThrowIfFailed(ov_compiled_model_output_by_name(model, pBytes, &port));
+                return new IOPort(port);
+            }
+        }
+    }
+
+    public int Count
+    {
+        get
+        {
+            nint size;
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_outputs_size(model, &size));
+            return (int)size;
+        }
+    }
+
+    public IEnumerator<IOPort> GetEnumerator()
+    {
+        for (int i = 0; i < Count; i++)
+        {
+            yield return this[i];
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}
