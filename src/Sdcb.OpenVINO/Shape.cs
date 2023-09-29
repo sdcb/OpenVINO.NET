@@ -12,12 +12,17 @@ namespace Sdcb.OpenVINO;
 public class Shape : IEquatable<Shape>
 {
     /// <summary>
+    /// The rank of the shape.
+    /// </summary>
+    public int Rank => Dimensions.Length;
+
+    /// <summary>
     /// Gets or sets the dimensions of the shape.
     /// </summary>
     /// <remarks>
     /// The dimensions of the shape are represented as a one-dimensional array of 64-bit signed integers.
     /// </remarks>
-    public long[] Dimensions { get; set; }
+    public long[] Dimensions { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Shape"/> class with an OpenVINO shape <see cref="ov_shape_t"/>.
@@ -42,7 +47,7 @@ public class Shape : IEquatable<Shape>
     }
 
     /// <summary>
-    /// Compares this instance with an object of the same type and determines whether they are equal in values.
+    /// Compares this <see cref="Shape"/> with an object of the same type and determines whether they are equal in values.
     /// </summary>
     /// <param name="other"><see cref="Shape"/> instance to compare with.</param>
     /// <returns><c>true</c> if instances are equal, <c>false</c> otherwise.</returns>
@@ -54,7 +59,7 @@ public class Shape : IEquatable<Shape>
     }
 
     /// <summary>
-    /// Compares this instance with an object type and determines whether they are equal in values.
+    /// Compares this <see cref="Shape"/> with an object type and determines whether they are equal in values.
     /// </summary>
     /// <param name="obj">The object to compare to.</param>
     /// <returns><c>true</c> if the objects are equal, <c>false</c> otherwise.</returns>
@@ -112,5 +117,5 @@ public class Shape : IEquatable<Shape>
     /// Locks the instance of the <see cref="Shape"/> class and returns an instance of <see cref="NativeShapeWrapper"/>.
     /// </summary>
     /// <returns>An instance of <see cref="NativeShapeWrapper"/>.</returns>
-    public NativeShapeWrapper Lock() => new NativeShapeWrapper(this);
+    public NativeShapeWrapper Lock() => new(this);
 }

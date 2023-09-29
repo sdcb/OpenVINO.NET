@@ -39,6 +39,16 @@ public readonly record struct Dimension(long Min, long Max)
     public static implicit operator ov_dimension(Dimension dimension) => new() { min = dimension.Min, max = dimension.Max };
 
     /// <summary>
+    /// Convert from <see cref="ov_dimension"/>
+    /// </summary>
+    public static implicit operator Dimension(ov_dimension rank) => new() { Min = rank.min, Max = rank.max };
+
+    /// <summary>
+    /// Convert from <see cref="ov_dimension"/>
+    /// </summary>
+    public static implicit operator Dimension(long rank) => new(rank);
+
+    /// <summary>
     /// Gets a string representation of the <see cref="Dimension"/>.
     /// </summary>
     /// <returns>A string representation of the <see cref="Dimension"/>.</returns>
@@ -91,6 +101,11 @@ public readonly record struct Rank(long Min, long Max)
     public static implicit operator ov_dimension(Rank rank) => new() { min = rank.Min, max = rank.Max };
 
     /// <summary>
+    /// Convert from <see cref="ov_dimension"/>
+    /// </summary>
+    public static implicit operator Rank(ov_dimension rank) => new() { Min = rank.min, Max = rank.max };
+
+    /// <summary>
     /// Gets a string representation of the <see cref="Rank"/>.
     /// </summary>
     /// <returns>A string representation of the <see cref="Rank"/>.</returns>
@@ -98,10 +113,9 @@ public readonly record struct Rank(long Min, long Max)
     {
         if (IsDynamic)
         {
-            if (Min == -1 && Max == -1) return "?";
-            return $"{Min}..{Max}";
+            return "?";
         }
-        else
+        else // IsStatic
         {
             return Min.ToString();
         }

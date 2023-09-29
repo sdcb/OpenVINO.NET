@@ -25,7 +25,7 @@ public readonly ref struct NativeShapeWrapper
     public unsafe NativeShapeWrapper(Shape shape)
     {
         _arrayGCHandle = GCHandle.Alloc(shape.Dimensions, GCHandleType.Pinned);
-        Shape.rank = shape.Count;
+        Shape.rank = shape.Dimensions.Length;
         Shape.dims = (long*)_arrayGCHandle.AddrOfPinnedObject();
     }
 
