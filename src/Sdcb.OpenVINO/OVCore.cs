@@ -1,7 +1,6 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
 
 using static Sdcb.OpenVINO.Natives.NativeMethods;
@@ -142,6 +141,59 @@ public class OVCore : CppPtrObject
             }
         }
         return new Model((IntPtr)model, owned: true);
+    }
+
+    /// <summary>
+    /// <para>Reads a model and creates a compiled model from the IR/ONNX/PDPD file.</para>
+    /// <para>This can be more efficient than using the ov_core_read_model_from_XXX + ov_core_compile_model flow,</para>
+    /// <para>especially for cases when caching is enabled and a cached model is available.</para>
+    /// </summary>
+    /// <param name="modelPath">Path to a model.</param>
+    /// <param name="deviceName">Name of a device to load a model to.</param>
+    /// <returns>The <see cref="Model"/> that read from specific path.</returns>
+    /// <exception cref="ObjectDisposedException" />
+    /// <exception cref="OpenVINOException" />
+    public unsafe CompiledModel CompileModel(string modelPath, string deviceName = "CPU")
+    {
+        ThrowIfDisposed();
+        if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
+
+        ov_compiled_model* model;
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            fixed (char* modelPathPtr = modelPath)
+            fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+            {
+                OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, 0, &model, IntPtr.Zero));
+            }
+        }
+        else
+        {
+            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(modelPath))
+            fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+            {
+                OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, 0, &model, IntPtr.Zero));
+            }
+        }
+        return new CompiledModel((IntPtr)model, owned: true);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="CompiledModel"/> from a source <see cref="Model"/> object.
+    /// </summary>
+    /// <param name="model">A Model object acquired from <see cref="ReadModel(byte[], Tensor?)"/>. This is the source model object from which the compiled model is created. </param>
+    /// <param name="deviceName">Name of a device to load the model to. The default value is "CPU"</param>
+    /// <returns>Returns an instance of the <see cref="CompiledModel"/> class.</returns>
+    /// <exception cref="OpenVINOException">Throws an exception if compilation of the model fails or if the Handle is null.</exception>
+
+    public unsafe CompiledModel CompileModel(Model model, string deviceName = "CPU")
+    {
+        ov_compiled_model* cmodel;
+        fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+        {
+            OpenVINOException.ThrowIfFailed(ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, 0, &cmodel, IntPtr.Zero));
+        }
+        return new CompiledModel((IntPtr)cmodel, owned: true);
     }
 
     /// <summary>Reads models from IR / ONNX / PDPD / TF / TFLite formats.</summary>

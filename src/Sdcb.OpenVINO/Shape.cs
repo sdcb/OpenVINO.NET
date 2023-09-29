@@ -25,6 +25,14 @@ public class Shape : IEquatable<Shape>
     public long[] Dimensions { get; }
 
     /// <summary>
+    /// Gets the total number of elements in the shape.
+    /// </summary>
+    /// <remarks>
+    /// Computed as the product of all the dimensions of the shape.
+    /// </remarks>
+    public long ElementCount => Dimensions.Aggregate(1L, (a, b) => a * b);
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Shape"/> class with an OpenVINO shape <see cref="ov_shape_t"/>.
     /// </summary>
     /// <param name="shape">The OpenVINO <see cref="ov_shape_t"/> to initialize the <see cref="Shape"/> with.</param>

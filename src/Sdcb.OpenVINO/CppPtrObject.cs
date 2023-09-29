@@ -23,6 +23,8 @@ public abstract class CppPtrObject : CppObject
     /// <param name="owned">If set to <c>true</c> the instance owns the handle.</param>
     public CppPtrObject(IntPtr handle, bool owned = true) : base(owned)
     {
+        if (handle == IntPtr.Zero) throw new ArgumentNullException(nameof(handle));
+
         Handle = handle;
     }
 

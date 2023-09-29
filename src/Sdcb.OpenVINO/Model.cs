@@ -31,6 +31,23 @@ public class Model : CppPtrObject
     /// </summary>
     public unsafe IPortIndexer Output { get; }
 
+    /// <summary>
+    /// Gets the friendly name of the model.
+    /// </summary>
+    /// <returns>The friendly name of the model as a string.</returns>
+    public unsafe string FriendlyName
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            byte* friendlyName;
+            OpenVINOException.ThrowIfFailed(ov_model_get_friendly_name((ov_model*)Handle, &friendlyName));
+
+            return StringUtils.UTF8PtrToString((IntPtr)friendlyName)!;
+        }
+    }
+
     /// <inheritdoc/>
     protected unsafe override void ReleaseCore()
     {
