@@ -1,5 +1,6 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
+using System.Reflection;
 
 namespace Sdcb.OpenVINO;
 
@@ -20,14 +21,14 @@ public abstract class TensorIndexer
     /// <summary>
     /// Gets the primary tensor.
     /// </summary>
-    public abstract Tensor Primary { get; }
+    public abstract Tensor Primary { get; set; }
 
     /// <summary>
     /// Indexes into the tensor data with the specified index.
     /// </summary>
     /// <param name="index">The index into the tensor data.</param>
     /// <returns>The tensor data indexed by the specified index.</returns>
-    public abstract Tensor this[int index] { get; }
+    public abstract Tensor this[int index] { get; set; }
 
     internal unsafe void ThrowIfDisposed()
     {
@@ -52,6 +53,11 @@ internal class InputTensorIndexer : TensorIndexer
 
             return new Tensor(tensor, owned: true);
         }
+        set
+        {
+            ThrowIfDisposed();
+            OpenVINOException.ThrowIfFailed(ov_infer_request_set_input_tensor_by_index(_req, index, (ov_tensor*)value.DangerousGetHandle()));
+        }
     }
 
     public unsafe override Tensor Primary
@@ -64,6 +70,11 @@ internal class InputTensorIndexer : TensorIndexer
             OpenVINOException.ThrowIfFailed(ov_infer_request_get_input_tensor(_req, &tensor));
 
             return new Tensor(tensor, owned: true);
+        }
+        set
+        {
+            ThrowIfDisposed();
+            OpenVINOException.ThrowIfFailed(ov_infer_request_set_input_tensor(_req, (ov_tensor*)value.DangerousGetHandle()));
         }
     }
 }
@@ -85,6 +96,11 @@ internal class OutputTensorIndexer : TensorIndexer
 
             return new Tensor(tensor, owned: true);
         }
+        set
+        {
+            ThrowIfDisposed();
+            OpenVINOException.ThrowIfFailed(ov_infer_request_set_output_tensor_by_index(_req, index, (ov_tensor*)value.DangerousGetHandle()));
+        }
     }
 
     public unsafe override Tensor Primary
@@ -97,6 +113,11 @@ internal class OutputTensorIndexer : TensorIndexer
             OpenVINOException.ThrowIfFailed(ov_infer_request_get_output_tensor(_req, &tensor));
 
             return new Tensor(tensor, owned: true);
+        }
+        set
+        {
+            ThrowIfDisposed();
+            OpenVINOException.ThrowIfFailed(ov_infer_request_set_input_tensor(_req, (ov_tensor*)value.DangerousGetHandle()));
         }
     }
 }
