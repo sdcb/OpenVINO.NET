@@ -46,7 +46,7 @@ public class Tensor : CppPtrObject
     /// <exception cref="ArgumentException">Thrown if the input array does not have enough elements to fill the desired shape.</exception>
     /// <exception cref="NotSupportedException">Thrown if the type of the input data cannot be converted to a <see cref="Tensor"/> object.</exception>
 
-    public static unsafe Tensor From<T>(T[] array, Shape shape) where T : struct
+    public static unsafe Tensor FromArray<T>(T[] array, Shape shape) where T : unmanaged
     {
         if (array.Length < shape.ElementCount)
         {
@@ -56,12 +56,12 @@ public class Tensor : CppPtrObject
         Type t = typeof(T);
         TypeCode code = Type.GetTypeCode(t);
         ov_element_type_e type = code switch
-        { 
-            TypeCode.Byte or TypeCode.SByte => ov_element_type_e.U8, 
+        {
+            TypeCode.Byte or TypeCode.SByte => ov_element_type_e.U8,
             TypeCode.Int16 or TypeCode.UInt16 => ov_element_type_e.U16,
             TypeCode.Int32 or TypeCode.UInt32 => ov_element_type_e.U32,
             TypeCode.Int64 or TypeCode.UInt64 => ov_element_type_e.U64,
-            TypeCode.Single => ov_element_type_e.F32, 
+            TypeCode.Single => ov_element_type_e.F32,
             TypeCode.Double => ov_element_type_e.F64,
 #if NET6_0_OR_GREATER
             var _ when t == typeof(Half) => ov_element_type_e.F16,
@@ -82,6 +82,52 @@ public class Tensor : CppPtrObject
         }
 
         return new Tensor(tensor);
+    }
+
+    /// <summary>
+    /// Creates a tensor from the provided data.
+    /// </summary>
+    /// <param name="data">A read-only span of bytes that represents the data for the tensor.</param>
+    /// <param name="shape">A shape representing the dimensions of the tensor.</param>
+    /// <param name="rawType">An element type that specifies the type of data that the tensor will hold. Default is U8.</param>
+    /// <returns>A new Tensor containing the provided data.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when an unsupported type is provided.</exception>
+    /// <exception cref="ArgumentException">Thrown when the size of the input array is less than the required minimum size for the shape.</exception>
+    public static unsafe Tensor FromRaw(ReadOnlySpan<byte> data, Shape shape, ov_element_type_e rawType = ov_element_type_e.U8)
+    {
+        double unitSize = rawType switch
+        {
+            ov_element_type_e.U8 => 1,
+            ov_element_type_e.F32 => 4,
+            ov_element_type_e.BOOLEAN => 1,
+            ov_element_type_e.BF16 => 2,
+            ov_element_type_e.F16 => 2,
+            ov_element_type_e.F64 => 8,
+            ov_element_type_e.I4 => 0.5, // 4 bits, 0.5 bytes
+            ov_element_type_e.I8 => 1,
+            ov_element_type_e.I16 => 2,
+            ov_element_type_e.I32 => 4,
+            ov_element_type_e.I64 => 8,
+            ov_element_type_e.U1 => 0.125, // 1 bit, 0.125 bytes
+            ov_element_type_e.U4 => 0.5, // 4 bits, 0.5 bytes
+            ov_element_type_e.U16 => 2,
+            ov_element_type_e.U32 => 4,
+            ov_element_type_e.U64 => 8,
+            _ => throw new InvalidOperationException($"Unsupported type: {rawType}")
+        };
+
+        if (data.Length / unitSize < shape.ElementCount)
+        {
+            throw new ArgumentException($"The input array must have at least {shape.ElementCount} elements, but only {data.Length / unitSize} elements were found.");
+        }
+
+        fixed (byte* dataPtr = data)
+        {
+            ov_tensor* tensor;
+            using NativeShapeWrapper l = shape.Lock();
+            OpenVINOException.ThrowIfFailed(ov_tensor_create_from_host_ptr(rawType, l.Shape, dataPtr, &tensor));
+            return new Tensor(tensor, owned: true);
+        }
     }
 
     /// <summary>
@@ -127,11 +173,11 @@ public class Tensor : CppPtrObject
             return byteSize;
         }
     }
-    
+
     /// <summary>
     /// Gets the size of the tensor in elements.
     /// </summary>
-    public unsafe long Size    
+    public unsafe long Size
     {
         get
         {
@@ -155,9 +201,53 @@ public class Tensor : CppPtrObject
 
             ov_element_type_e type;
             OpenVINOException.ThrowIfFailed(ov_tensor_get_element_type((ov_tensor*)Handle, &type));
-         
+
             return type;
         }
+    }
+
+    /// <summary>
+    /// This method retrieves the data pointer from an OpenVINO tensor. 
+    /// It initiates the process in an unsafe context, which allows for direct memory manipulation.
+    /// </summary>
+    /// <remarks>
+    /// This method is considered dangerous because it exposes a raw pointer, potentially leading to memory leaks or corruption if not handled correctly. 
+    /// The method will throw an exception if the object it's being called on has been disposed.
+    /// </remarks>
+    /// <returns>
+    /// The method returns an IntPtr that points to the tensor data. 
+    /// </returns>
+    /// <exception cref="System.ObjectDisposedException">Thrown when the method is invoked on a disposed object.</exception>
+    /// <exception cref="OpenVINOException">Thrown when the tensor data retrieval fails.</exception>
+    public unsafe IntPtr DangerousGetDataPtr()
+    {
+        ThrowIfDisposed();
+
+        void* data;
+        OpenVINOException.ThrowIfFailed(ov_tensor_data((ov_tensor*)Handle, &data));
+
+        return (IntPtr)data;
+    }
+
+    /// <summary>
+    /// Retrieves the tensor data and presents it as a <see cref="Span{T}"/> of unmanaged type T.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of items in the <see cref="Span{T}"/>. T must be unmanaged.
+    /// </typeparam>
+    /// <remarks>
+    /// This method is considered potentially dangerous because it involves direct memory manipulation via the <see cref="DangerousGetDataPtr"/> method.
+    /// It wraps the retrieved pointer in a <see cref="Span{T}"/> providing a safe and bounds-checked mechanism for accessing the memory.
+    /// </remarks>
+    /// <returns>
+    /// A <see cref="Span{T}"/> representing the tensor data in memory.
+    /// </returns>
+    /// <exception cref="System.OverflowException">Thrown if ByteSize/sizeof(T) results in a value too large for an int.</exception>
+    /// <exception cref="System.ObjectDisposedException">Thrown when the method is invoked on a disposed object.</exception>
+    /// <exception cref="OpenVINOException">Thrown when the tensor data retrieval from <see cref="DangerousGetDataPtr"/> fails.</exception>
+    public unsafe Span<T> GetData<T>() where T : unmanaged
+    {
+        return new Span<T>((void*)DangerousGetDataPtr(), (int)(ByteSize / sizeof(T)));
     }
 
     /// <inheritdoc/>
