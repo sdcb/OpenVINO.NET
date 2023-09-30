@@ -60,30 +60,32 @@ public class InferRequest : CppPtrObject
     /// <summary>
     /// Executes synchronous inference on the inference request.
     /// </summary>
-    public unsafe void Infer()
+    public unsafe void Run()
     {
         OpenVINOException.ThrowIfFailed(ov_infer_request_infer((ov_infer_request*)Handle));
     }
 
     /// <summary>
-    /// Executes asynchronous inference on the inference request.
+    /// <para>Executes asynchronous inference on the inference request.</para>
+    /// NOTE: This function contains some unstable and hacky mechanisms that may potentially lead to crashes in your program.
+    /// Use it with caution and make sure you understand the risks before invoking this function.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous inference operation.</returns>
-    public unsafe Task InferAsync(CancellationToken cancellationToken = default)
+    public unsafe Task RunAsync(CancellationToken cancellationToken = default)
     {
         if (cancellationToken.IsCancellationRequested)
         {
-            throw new OperationCanceledException($"{nameof(cancellationToken)} cancellation requested.");
+            throw new TaskCanceledException($"{nameof(cancellationToken)} cancellation requested.");
         }
 
         TaskCompletionSource<int> tcs = new();
 
-        GCHandle gch = GCHandle.Alloc(tcs);
-
         ov_callback_t cb = new()
         {
-            args = GCHandle.ToIntPtr(gch).ToPointer(),
-            callback_func = &InferCallback
+            callback_func = (delegate*<void*, void>)Marshal.GetFunctionPointerForDelegate((void* ptr) =>
+            {
+                tcs.TrySetResult(0);
+            })
         };
 
         OpenVINOException.ThrowIfFailed(ov_infer_request_set_callback((ov_infer_request*)Handle, &cb));
@@ -98,23 +100,9 @@ public class InferRequest : CppPtrObject
         });
 
         OpenVINOException.ThrowIfFailed(ov_infer_request_start_async((ov_infer_request*)Handle));
+        Thread.Sleep(50); // will crask if not sleep, sleep time might need to be adjusted
 
         return tcs.Task;
-    }
-
-    private static unsafe void InferCallback(void* ptr)
-    {
-        GCHandle gch = GCHandle.FromIntPtr((IntPtr)ptr);
-
-        try
-        {
-            TaskCompletionSource<int> tcs = (TaskCompletionSource<int>)gch.Target!;
-            tcs.TrySetResult(0);
-        }
-        finally
-        {
-            gch.Free();
-        }
     }
 
     /// <summary>

@@ -35,6 +35,83 @@ public class IOPort : CppPtrObject
     /// </summary>
     public bool IsConst { get; }
 
+    /// <summary>
+    /// Gets the name of the IOPort instance.
+    /// </summary>
+    public unsafe string Name
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            byte* namePtr;
+            OpenVINOException.ThrowIfFailed(ov_port_get_any_name((ov_output_const_port*)Handle, &namePtr));
+            return StringUtils.UTF8PtrToString((IntPtr)namePtr)!;
+        }
+    }
+
+    /// <summary>
+    /// Gets the shape of the IOPort instance.
+    /// </summary>
+    public unsafe Shape Shape
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            ov_shape_t shape;
+            try
+            {
+                OpenVINOException.ThrowIfFailed(IsConst ?
+                    ov_const_port_get_shape((ov_output_const_port*)Handle, &shape) :
+                    ov_port_get_shape((ov_output_port*)Handle, &shape));
+                return new Shape(shape);
+            }
+            finally
+            {
+                ov_shape_free(&shape);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the partial shape of the IOPort instance.
+    /// </summary>
+    public unsafe PartialShape PartialShape
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            ov_partial_shape shape = default;
+            try
+            {
+                OpenVINOException.ThrowIfFailed(ov_port_get_partial_shape((ov_output_const_port*)Handle, &shape));
+                return new PartialShape(shape);
+            }
+            finally
+            {
+                ov_partial_shape_free(&shape);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the element type of the IOPort instance. 
+    /// </summary>
+    public unsafe ov_element_type_e ElementType
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            ov_element_type_e elementType;
+            OpenVINOException.ThrowIfFailed(ov_port_get_element_type((ov_output_const_port*)Handle, &elementType));
+
+            return elementType;
+        }
+    }
+
     /// <inheritdoc/>
     protected unsafe override void ReleaseCore()
     {
