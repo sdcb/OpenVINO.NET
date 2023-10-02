@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Sdcb.OpenVINO.Natives;
 
 namespace Sdcb.OpenVINO;
@@ -54,6 +57,68 @@ public class CompiledModel : CppPtrObject
         OpenVINOException.ThrowIfFailed(ov_compiled_model_create_infer_request((ov_compiled_model*)Handle, &req));
 
         return new InferRequest(req, owned: true);
+    }
+
+    /// <summary>
+    /// Gets the properties and their respective values.
+    /// </summary>
+    /// <remarks>
+    /// The properties are retrieved as a space-separated string, split into individual keys, 
+    /// and then converted into a dictionary where each key is mapped to its corresponding value.
+    /// </remarks>
+    /// <returns>
+    /// A dictionary where the keys are property names and the values are the corresponding property values.
+    /// </returns>
+    public unsafe Dictionary<string, string> Properties => GetProperty("SUPPORTED_PROPERTIES")
+        .Split(' ')
+        .ToDictionary(k => k, GetProperty);
+
+
+    /// <summary>
+    /// Sets a property with the provided key and value.
+    /// </summary>
+    /// <param name="key">The key of the property to set.</param>
+    /// <param name="value">The value to set for the property.</param>
+    /// <exception cref="ObjectDisposedException">Thrown when the underlying model is disposed.</exception>
+    public unsafe void SetProperty(string key, string value)
+    {
+        ThrowIfDisposed();
+
+        fixed (byte* keyPtr = Encoding.UTF8.GetBytes(key + '\0'))
+        fixed (byte* valuePtr = Encoding.UTF8.GetBytes(value + '\0'))
+        {
+            IntPtr* variadic = stackalloc IntPtr[2];
+            variadic[0] = (IntPtr)keyPtr;
+            variadic[1] = (IntPtr)valuePtr;
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_set_property((ov_compiled_model*)Handle, (IntPtr)variadic));
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a property value based on the provided key.
+    /// </summary>
+    /// <param name="key">The key of the property to retrieve.</param>
+    /// <returns>
+    /// The value of the property as a string.
+    /// </returns>
+    /// <exception cref="ObjectDisposedException">Thrown when the underlying model is disposed.</exception>
+    public unsafe string GetProperty(string key)
+    {
+        ThrowIfDisposed();
+
+        byte* valuePtr;
+        fixed (byte* keyPtr = Encoding.UTF8.GetBytes(key + '\0'))
+        {
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_get_property((ov_compiled_model*)Handle, keyPtr, &valuePtr));
+            try
+            {
+                return StringUtils.UTF8PtrToString((IntPtr)valuePtr)!;
+            }
+            finally
+            {
+                ov_free(valuePtr);
+            }
+        }
     }
 
     /// <summary>

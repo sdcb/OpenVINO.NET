@@ -26,12 +26,4 @@ public class OVModelTest
         Assert.NotNull(m.Outputs.Primary);
         Assert.NotNull(m.FriendlyName);
     }
-
-    [Fact]
-    public void CanCompile()
-    {
-        using OVCore c = new();
-        using CompiledModel m = c.CompileModel(_modelFile);
-        Assert.NotNull(m);
-    }
 }

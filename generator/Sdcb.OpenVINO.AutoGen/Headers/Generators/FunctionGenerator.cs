@@ -42,7 +42,7 @@ internal class FunctionGenerator
         string? group = tags.Group;
         string headerFile = ((TranslationUnit)func.OriginalNamespace).FileName;
 
-        w.WriteLine($"[DllImport(Dll), CSourceInfo(\"{headerFile}\", {func.LineNumberStart}, {func.LineNumberEnd}, \"{group}\")]");
+        w.WriteLine($"[DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo(\"{headerFile}\", {func.LineNumberStart}, {func.LineNumberEnd}, \"{group}\")]");
         w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams)});");
         return new GeneratedUnit(func.Name, group, func.LineNumberStart, func.LineNumberEnd, headerFile, w.Lines);
     }
