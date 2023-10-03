@@ -1,6 +1,4 @@
 ﻿using CppSharp.AST;
-using System.Security;
-using System.Text;
 
 namespace Sdcb.OpenVINO.AutoGen.Headers.Generators;
 
@@ -31,7 +29,7 @@ internal class FunctionGenerator
             .ToList();
         if (func.IsVariadic)
         {
-            realParams.Add(new("IntPtr", "variadic"));
+            realParams.Add(RealFuncParam.Variadic);
         }
 
         DoxygenTags tags = DoxygenTags.Parse(func.Comment.Text);
@@ -54,5 +52,9 @@ public record RealFuncParam(string Type, string NameUnescaped)
 
     public static explicit operator RealFuncParam(Parameter p) => new(CSharpUtils.TypeTransform(p.QualifiedType.Type), p.Name);
 
-    public override string ToString() => $"{Type} {Name}";
+    public static RealFuncParam Variadic { get; } = new("__arglist", "");
+
+    public bool IsVariadic => Type == Variadic.Type;
+
+    public override string ToString() => IsVariadic ? Variadic.Type : $"{Type} {Name}";
 }

@@ -87,10 +87,7 @@ public class CompiledModel : CppPtrObject
         fixed (byte* keyPtr = Encoding.UTF8.GetBytes(key + '\0'))
         fixed (byte* valuePtr = Encoding.UTF8.GetBytes(value + '\0'))
         {
-            IntPtr* variadic = stackalloc IntPtr[2];
-            variadic[0] = (IntPtr)keyPtr;
-            variadic[1] = (IntPtr)valuePtr;
-            OpenVINOException.ThrowIfFailed(ov_compiled_model_set_property((ov_compiled_model*)Handle, (IntPtr)variadic));
+            OpenVINOException.ThrowIfFailed(ov_compiled_model_set_property((ov_compiled_model*)Handle, __arglist(keyPtr, valuePtr)));
         }
     }
 

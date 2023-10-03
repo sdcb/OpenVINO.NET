@@ -28,6 +28,17 @@ public class CompiledModelTest
         Assert.NotNull(m);
     }
 
+    //[Fact]
+    //public void CanCompileWithProps()
+    //{
+    //    using OVCore c = new();
+    //    using CompiledModel m = c.CompileModel(_modelFile, properties: new Dictionary<string, string>
+    //    {
+    //        ["INFERENCE_NUM_THREADS"] = "1",
+    //    });
+    //    Assert.NotNull(m);
+    //}
+
     [Fact]
     public void CanGetAllSupportedProp()
     {

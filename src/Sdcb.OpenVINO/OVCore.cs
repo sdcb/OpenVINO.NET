@@ -1,6 +1,7 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 using static Sdcb.OpenVINO.Natives.NativeMethods;
@@ -67,6 +68,52 @@ public class OVCore : CppPtrObject
         }
     }
 
+    /// <summary>Sets properties for a device, acceptable keys can be found in ov_property_key_xxx.</summary>
+    /// <param name="deviceName">Name of a device.</param>
+    /// <param name="key">The key of the property to set.</param>
+    /// <param name="value">The value to set for the property.</param>
+    /// <exception cref="ObjectDisposedException">Thrown when the underlying model is disposed.</exception>
+    public unsafe void SetDeviceProperty(string deviceName, string key, string value)
+    {
+        ThrowIfDisposed();
+
+        fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName + '\0'))
+        fixed (byte* keyPtr = Encoding.UTF8.GetBytes(key + '\0'))
+        fixed (byte* valuePtr = Encoding.UTF8.GetBytes(value + '\0'))
+        {
+            OpenVINOException.ThrowIfFailed(ov_core_set_property((ov_core*)Handle, deviceNamePtr, __arglist(keyPtr, valuePtr)));
+        }
+    }
+
+    /// <summary>
+    /// <para>Gets properties related to device behaviour.</para>
+    /// <para>The method extracts information that can be set via the <see cref="SetDeviceProperty"/> method.</para>
+    /// </summary>
+    /// <param name="deviceName"> Name of a device to get a property value.</param>
+    /// <param name="key">The key of the property to retrieve.</param>
+    /// <returns>
+    /// The value of the property as a string.
+    /// </returns>
+    /// <exception cref="ObjectDisposedException">Thrown when the underlying model is disposed.</exception>
+    public unsafe string GetProperty(string deviceName, string key)
+    {
+        ThrowIfDisposed();
+
+        byte* valuePtr;
+        fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName + '\0'))
+        fixed (byte* keyPtr = Encoding.UTF8.GetBytes(key + '\0'))
+        {
+            OpenVINOException.ThrowIfFailed(ov_core_get_property((ov_core*)Handle, deviceNamePtr, keyPtr, &valuePtr));
+            try
+            {
+                return StringUtils.UTF8PtrToString((IntPtr)valuePtr)!;
+            }
+            finally
+            {
+                ov_free(valuePtr);
+            }
+        }
+    }
 
     /// <summary>
     /// Retrieves a dictionary of OpenVINO device versions based on the device names.
@@ -150,32 +197,80 @@ public class OVCore : CppPtrObject
     /// </summary>
     /// <param name="modelPath">Path to a model.</param>
     /// <param name="deviceName">Name of a device to load a model to.</param>
+    /// <param name="properties">Properties to configure the <see cref="CompiledModel"/></param>
     /// <returns>The <see cref="Model"/> that read from specific path.</returns>
     /// <exception cref="ObjectDisposedException" />
     /// <exception cref="OpenVINOException" />
-    public unsafe CompiledModel CompileModel(string modelPath, string deviceName = "CPU")
+    public unsafe CompiledModel CompileModel(string modelPath, string deviceName = "CPU", Dictionary<string, string>? properties = null)
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
 
-        ov_compiled_model* model;
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        properties ??= new();
+        GCHandle[] gchs = new GCHandle[properties.Count * 2];
+        try
         {
-            fixed (char* modelPathPtr = modelPath)
-            fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+            IntPtr* variadic = stackalloc IntPtr[properties.Count * 2 + 1];
+
             {
-                OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, 0, &model, IntPtr.Zero));
+                // convert properties to variadic
+                int i = 0;
+                foreach (KeyValuePair<string, string> kvp in properties)
+                {
+                    GCHandle keyGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Key + '\0'), GCHandleType.Pinned);
+                    variadic[i] = keyGch.AddrOfPinnedObject();
+                    gchs[i] = keyGch;
+
+                    GCHandle valueGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Value + '\0'), GCHandleType.Pinned);
+                    variadic[i + 1] = valueGch.AddrOfPinnedObject();
+                    gchs[i + 1] = valueGch;
+
+                    i += 2;
+                }
+                variadic[i] = IntPtr.Zero;
+            }
+
+            ov_compiled_model* model;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                fixed (char* modelPathPtr = modelPath)
+                fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+                {
+                    OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file_unicode(
+                        (ov_core*)Handle,
+                        modelPathPtr,
+                        deviceNamePtr,
+                        properties.Count * 2,
+                        &model, 
+                        __arglist()));
+                }
+            }
+            else
+            {
+                fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(modelPath))
+                fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+                {
+                    OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file(
+                        (ov_core*)Handle,
+                        modelPathPtr,
+                        deviceNamePtr,
+                        properties.Count * 2,
+                        &model,
+                        __arglist()));
+                }
+            }
+            return new CompiledModel((IntPtr)model, owned: true);
+        }
+        finally
+        {
+            foreach (GCHandle gch in gchs)
+            {
+                if (gch.IsAllocated)
+                {
+                    gch.Free();
+                }
             }
         }
-        else
-        {
-            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(modelPath))
-            fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
-            {
-                OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, 0, &model, IntPtr.Zero));
-            }
-        }
-        return new CompiledModel((IntPtr)model, owned: true);
     }
 
     /// <summary>
@@ -183,17 +278,55 @@ public class OVCore : CppPtrObject
     /// </summary>
     /// <param name="model">A Model object acquired from <see cref="ReadModel(byte[], Tensor?)"/>. This is the source model object from which the compiled model is created. </param>
     /// <param name="deviceName">Name of a device to load the model to. The default value is "CPU"</param>
+    /// <param name="properties">Properties to configure the <see cref="CompiledModel"/></param>
     /// <returns>Returns an instance of the <see cref="CompiledModel"/> class.</returns>
     /// <exception cref="OpenVINOException">Throws an exception if compilation of the model fails or if the Handle is null.</exception>
 
-    public unsafe CompiledModel CompileModel(Model model, string deviceName = "CPU")
+    public unsafe CompiledModel CompileModel(Model model, string deviceName = "CPU", Dictionary<string, string>? properties = null)
     {
-        ov_compiled_model* cmodel;
-        fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+        properties ??= new();
+        GCHandle[] gCHandles = new GCHandle[properties.Count * 2];
+        try
         {
-            OpenVINOException.ThrowIfFailed(ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, 0, &cmodel, IntPtr.Zero));
+            IntPtr* variadic = stackalloc IntPtr[properties.Count * 2];
+            {
+                // convert properties to variadic
+                int i = 0;
+                foreach (KeyValuePair<string, string> kvp in properties)
+                {
+                    GCHandle keyGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Key + '\0'), GCHandleType.Pinned);
+                    variadic[i++] = keyGch.AddrOfPinnedObject();
+
+                    GCHandle valueGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Value + '\0'), GCHandleType.Pinned);
+                    variadic[i++] = valueGch.AddrOfPinnedObject();
+                }
+            }
+
+            ov_compiled_model* cmodel;
+            fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
+            {
+                OpenVINOException.ThrowIfFailed(
+                    ov_core_compile_model(
+                        (ov_core*)Handle,
+                        (ov_model*)model.DangerousGetHandle(),
+                        deviceNamePtr,
+                        properties.Count * 2,
+                        &cmodel,
+                        __arglist()));
+            }
+            return new CompiledModel((IntPtr)cmodel, owned: true);
         }
-        return new CompiledModel((IntPtr)cmodel, owned: true);
+        finally
+        {
+            foreach (GCHandle gch in gCHandles)
+            {
+                if (gch.IsAllocated)
+                {
+                    gch.Free();
+                }
+            }
+        }
+
     }
 
     /// <summary>Reads models from IR / ONNX / PDPD / TF / TFLite formats.</summary>

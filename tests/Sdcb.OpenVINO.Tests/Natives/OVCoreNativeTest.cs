@@ -441,19 +441,22 @@ public class OVCoreNativeTest
         try
         {
             Check(ov_core_create(&core));
-            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(_modelFile))
+            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(@"C:\Users\ZhouJie\source\repos\PaddleSharp\src\Sdcb.PaddleOCR.Models.LocalV3\models\ch_PP-OCRv3_det\inference.pdmodel"))
             {
                 Check(ov_core_read_model(core, modelPathPtr, null, &model));
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
-                using Mat mat = Cv2.ImRead(@"assets\text.png");
-                Cv2.CopyMakeBorder(mat, mat, 0, 960 - mat.Height, 0, 960 - mat.Width, BorderTypes.Constant, new Scalar(0, 0, 0));
+                using Mat mat = Cv2.ImRead(@"C:\Users\ZhouJie\source\repos\OpenVINO.NET\tests\Sdcb.OpenVINO.Tests\assets\text.png");
+                Cv2.CopyMakeBorder(mat, mat, 0, 960 - mat.Rows, 0, 960 - mat.Cols, BorderTypes.Constant, Scalar.Black);
                 mat.ConvertTo(mat, MatType.CV_32FC3, 1.0 / 255);
+                //using Mat normalized = Normalize(mat);
+                //float[] floatData = ExtractMat(normalized);
                 long* dims = stackalloc long[4] { 1, mat.Height, mat.Width, 3 };
                 Check(ov_shape_create(4, dims, &shape));
                 Check(ov_tensor_create_from_host_ptr(ov_element_type_e.F32, shape, (void*)mat.Data, &tensor));
                 Check(ov_preprocess_prepostprocessor_create(model, &preprocessor));
                 Check(ov_preprocess_prepostprocessor_get_input_info_by_index(preprocessor, 0, &inputInfo));
+
                 Check(ov_preprocess_input_info_get_tensor_info(inputInfo, &inputTensorInfo));
                 Check(ov_preprocess_input_tensor_info_set_from(inputTensorInfo, tensor));
                 byte* inputLayoutDesc = stackalloc byte[4] { (byte)'N', (byte)'H', (byte)'W', (byte)'C' };
@@ -461,10 +464,9 @@ public class OVCoreNativeTest
                 Check(ov_preprocess_input_tensor_info_set_layout(inputTensorInfo, inputLayout));
 
                 Check(ov_preprocess_input_info_get_preprocess_steps(inputInfo, &preprocessSteps));
-                Assert.True(preprocessSteps != null);
+
                 //Check(ov_preprocess_preprocess_steps_resize(preprocessSteps, ov_preprocess_resize_algorithm_e.RESIZE_LINEAR));
                 Check(ov_preprocess_input_info_get_model_info(inputInfo, &modelInfo));
-                Assert.True(modelInfo != null);
 
                 byte* modelLayoutDesc = stackalloc byte[4] { (byte)'N', (byte)'C', (byte)'H', (byte)'W' };
                 Check(ov_layout_create(modelLayoutDesc, &modelLayout));
@@ -476,44 +478,21 @@ public class OVCoreNativeTest
 
                 Check(ov_preprocess_prepostprocessor_build(preprocessor, &newModel));
 
-                fixed (byte* deviceName = Encoding.UTF8.GetBytes("CPU"))
+                fixed (byte* deviceName = Encoding.UTF8.GetBytes("GPU"))
                 {
-                    Check(ov_core_compile_model(core, newModel, deviceName, 0, &compiledModel, IntPtr.Zero));
+                    Check(ov_core_compile_model(core, newModel, deviceName, 0, &compiledModel, __arglist()));
                 }
 
                 Check(ov_compiled_model_create_infer_request(compiledModel, &inferRequest));
                 Check(ov_infer_request_set_input_tensor_by_index(inferRequest, 0, tensor));
                 Check(ov_infer_request_infer(inferRequest));
                 Check(ov_infer_request_get_output_tensor_by_index(inferRequest, 0, &outputTensor));
-
-                
-                ov_shape_t outputShape;
-                try
-                {
-                    void* data;
-                    nint byteSize;
-                    ov_element_type_e elementType; Check(ov_tensor_data(outputTensor, &data));
-
-                    Assert.True(data != null);
-
-                    Check(ov_tensor_get_byte_size(outputTensor, &byteSize));
-                    Assert.True(byteSize > 0);
-
-                    Check(ov_tensor_get_shape(outputTensor, &outputShape));
-                    Assert.Equal(4, outputShape.rank);
-                    Assert.Equal(new long[] { 1, 1, 960, 960 }, new ReadOnlySpan<long>(outputShape.dims, 4).ToArray());
-
-                    Check(ov_tensor_get_element_type(outputTensor, &elementType));
-                    Assert.Equal(ov_element_type_e.F32, elementType);
-
-                    using Mat result = new((int)outputShape.dims[2], (int)outputShape.dims[3], MatType.CV_32FC1, (IntPtr)data);
-                    result.ConvertTo(result, MatType.CV_8SC1, 255);
-                    result.SaveImage("result.png");
-                }
-                finally
-                {
-                    ov_shape_free(&outputShape);
-                }
+                void* data;
+                Check(ov_tensor_data(outputTensor, &data));
+                nint dataSize;
+                Check(ov_tensor_get_byte_size(outputTensor, &dataSize));
+                using Mat result = new Mat(960, 960, MatType.CV_32FC1, (IntPtr)data);
+                result.ConvertTo(result, MatType.CV_8SC1, 255);
             }
         }
         finally

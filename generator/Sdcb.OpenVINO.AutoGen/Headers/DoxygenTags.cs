@@ -31,10 +31,21 @@ public class DoxygenTags
         DoxygenTag[] paramTags = Params;
         for (int i = 0; i < paramTags.Length; i++)
         {
-            DoxygenTag tag = paramTags[i];
-            foreach (string line in ToComment(tag.Comment, $"param name=\"{funcParams[i].NameUnescaped}\"", "param"))
+            if (funcParams[i].IsVariadic)
             {
-                yield return line;
+                DoxygenTag tag = paramTags[i];
+                foreach (string line in ToComment(tag.Comment, "remarks"))
+                {
+                    yield return line;
+                }
+            }
+            else
+            {
+                DoxygenTag tag = paramTags[i];
+                foreach (string line in ToComment(tag.Comment, $"param name=\"{funcParams[i].NameUnescaped}\"", "param"))
+                {
+                    yield return line;
+                }
             }
         }
     }

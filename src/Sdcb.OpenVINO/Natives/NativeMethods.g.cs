@@ -107,13 +107,13 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Sets properties for a device, acceptable keys can be found in ov_property_key_xxx.</summary>
     /// <param name="compiled_model">A pointer to the ov_compiled_model_t.</param>
-    /// <param name="variadic">
+    /// <remarks>
     /// <para>variadic paramaters The format is &lt;char *property_key, char* property_value&gt;.</para>
     /// <para>Supported property key please see ov_property.h.</para>
-    /// </param>
+    /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_compiled_model.h", 148, 149, "ov_compiled_model_c_api")]
-    public static extern ov_status_e ov_compiled_model_set_property(ov_compiled_model* compiled_model, IntPtr variadic);
+    public static extern ov_status_e ov_compiled_model_set_property(ov_compiled_model* compiled_model, __arglist);
     
 
     /// <summary>Gets properties for current compiled model.</summary>
@@ -270,14 +270,14 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Name of a device to load a model to.</param>
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">
+    /// <remarks>
     /// <para>property paramater: Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
     /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
-    /// </param>
+    /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 206, 212, "ov_core_c_api")]
-    public static extern ov_status_e ov_core_compile_model(ov_core* core, ov_model* model, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
-    
+    public static extern ov_status_e ov_core_compile_model(ov_core* core, ov_model* model, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, __arglist);
+
 
     /// <summary>
     /// <para>Reads a model and creates a compiled model from the IR/ONNX/PDPD file.</para>
@@ -289,13 +289,13 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Name of a device to load a model to.</param>
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">
+    /// <remarks>
     /// <para>Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
     /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
-    /// </param>
+    /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 228, 234, "ov_core_c_api")]
-    public static extern ov_status_e ov_core_compile_model_from_file(ov_core* core, byte* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
+    public static extern ov_status_e ov_core_compile_model_from_file(ov_core* core, byte* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, __arglist);
     
 
     /// <summary>
@@ -308,25 +308,25 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Name of a device to load a model to.</param>
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">
+    /// <remarks>
     /// <para>Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
     /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
-    /// </param>
+    /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 251, 257, "ov_core_c_api")]
-    public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, char* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
+    public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, char* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, __arglist);
     
 
     /// <summary>Sets properties for a device, acceptable keys can be found in ov_property_key_xxx.</summary>
     /// <param name="core">A pointer to the ie_core_t instance.</param>
     /// <param name="device_name">Name of a device.</param>
-    /// <param name="variadic">
+    /// <remarks>
     /// <para>variadic paramaters The format is &lt;char* property_key, char* property_value&gt;.</para>
     /// <para>Supported property key please see ov_property.h.</para>
-    /// </param>
+    /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 270, 271, "ov_core_c_api")]
-    public static extern ov_status_e ov_core_set_property(ov_core* core, byte* device_name, IntPtr variadic);
+    public static extern ov_status_e ov_core_set_property(ov_core* core, byte* device_name, __arglist);
     
 
     /// <summary>
@@ -398,10 +398,10 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Device name to identify a plugin.</param>
     /// <param name="context_args_size">How many property args will be for this remote context creation.</param>
     /// <param name="context">A pointer to the newly created remote context.</param>
-    /// <param name="variadic">variadic parmameters Actual context property parameter for remote context</param>
+    /// <remarks>variadic parmameters Actual context property parameter for remote context</remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 355, 360, "ov_core_c_api")]
-    public static extern ov_status_e ov_core_create_context(ov_core* core, byte* device_name, nint context_args_size, ov_remote_context** context, IntPtr variadic);
+    public static extern ov_status_e ov_core_create_context(ov_core* core, byte* device_name, nint context_args_size, ov_remote_context** context, __arglist);
     
 
     /// <summary>Creates a compiled model from a source model within a specified remote context.</summary>
@@ -410,10 +410,10 @@ public static unsafe partial class NativeMethods
     /// <param name="context">A pointer to the newly created remote context.</param>
     /// <param name="property_args_size">How many args will be for this compiled model.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
-    /// <param name="variadic">variadic parmameters Actual property parameter for remote context</param>
+    /// <remarks>variadic parmameters Actual property parameter for remote context</remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 373, 379, "ov_core_c_api")]
-    public static extern ov_status_e ov_core_compile_model_with_context(ov_core* core, ov_model* model, ov_remote_context* context, nint property_args_size, ov_compiled_model** compiled_model, IntPtr variadic);
+    public static extern ov_status_e ov_core_compile_model_with_context(ov_core* core, ov_model* model, ov_remote_context* context, nint property_args_size, ov_compiled_model** compiled_model, __arglist);
     
 
     /// <summary>Gets a pointer to default (plugin-supplied) shared context object for the specified accelerator device.</summary>
@@ -1121,10 +1121,10 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t.</param>
     /// <param name="colorFormat">The enumerate of colorFormat</param>
     /// <param name="sub_names_size">The size of sub_names</param>
-    /// <param name="variadic">variadic params sub_names Optional list of sub-names assigned for each plane (e.g. &quot;Y&quot;, &quot;UV&quot;).</param>
+    /// <remarks>variadic params sub_names Optional list of sub-names assigned for each plane (e.g. &quot;Y&quot;, &quot;UV&quot;).</remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 299, 304, "ov_prepostprocess_c_api")]
-    public static extern ov_status_e ov_preprocess_input_tensor_info_set_color_format_with_subname(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_color_format_e colorFormat, nint sub_names_size, IntPtr variadic);
+    public static extern ov_status_e ov_preprocess_input_tensor_info_set_color_format_with_subname(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_color_format_e colorFormat, nint sub_names_size, __arglist);
     
 
     /// <summary>Set ov_preprocess_input_tensor_info_t spatial_static_shape.</summary>
@@ -1277,10 +1277,10 @@ public static unsafe partial class NativeMethods
     /// <param name="shape">Defines the shape of the tensor.</param>
     /// <param name="object_args_size">Size of the low-level tensor object parameters.</param>
     /// <param name="remote_tensor">Pointer to returned ov_tensor_t that contains remote tensor instance.</param>
-    /// <param name="variadic">variadic params Contains low-level tensor object parameters.</param>
+    /// <remarks>variadic params Contains low-level tensor object parameters.</remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_remote_context.h", 31, 37, "ov_remote_context_c_api")]
-    public static extern ov_status_e ov_remote_context_create_tensor(ov_remote_context* context, ov_element_type_e type, ov_shape_t shape, nint object_args_size, ov_tensor** remote_tensor, IntPtr variadic);
+    public static extern ov_status_e ov_remote_context_create_tensor(ov_remote_context* context, ov_element_type_e type, ov_shape_t shape, nint object_args_size, ov_tensor** remote_tensor, __arglist);
     
 
     /// <summary>Returns name of a device on which underlying object is allocated.</summary>
