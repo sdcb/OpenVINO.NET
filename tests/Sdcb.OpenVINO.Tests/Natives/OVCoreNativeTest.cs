@@ -441,12 +441,12 @@ public class OVCoreNativeTest
         try
         {
             Check(ov_core_create(&core));
-            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(@"C:\Users\ZhouJie\source\repos\PaddleSharp\src\Sdcb.PaddleOCR.Models.LocalV3\models\ch_PP-OCRv3_det\inference.pdmodel"))
+            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(_modelFile))
             {
                 Check(ov_core_read_model(core, modelPathPtr, null, &model));
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
-                using Mat mat = Cv2.ImRead(@"C:\Users\ZhouJie\source\repos\OpenVINO.NET\tests\Sdcb.OpenVINO.Tests\assets\text.png");
+                using Mat mat = Cv2.ImRead(@"assets\text.png");
                 Cv2.CopyMakeBorder(mat, mat, 0, 960 - mat.Rows, 0, 960 - mat.Cols, BorderTypes.Constant, Scalar.Black);
                 mat.ConvertTo(mat, MatType.CV_32FC3, 1.0 / 255);
                 //using Mat normalized = Normalize(mat);
