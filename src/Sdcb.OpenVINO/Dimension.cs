@@ -56,7 +56,7 @@ public readonly record struct Dimension(long Min, long Max)
     {
         if (IsDynamic)
         {
-            if (Min == -1 && Max == -1) return "?";
+            if (Min == -1 || Max == -1) return "?";
             return $"{Min}..{Max}";
         }
         else

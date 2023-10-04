@@ -90,4 +90,11 @@ public class PartialShapeTest
         Assert.Equal(3, ps.Dimensions[2].Max);
         Assert.Equal(4, ps.Dimensions[3].Max);
     }
+
+    [Fact]
+    public void ToStringTest()
+    {
+        PartialShape ps = new (new Dimension(0, -1), 3, new Dimension(0, -1), new Dimension(0, -1));
+        Assert.Equal("{?,3,?,?}", ps.ToString());
+    }
 }
