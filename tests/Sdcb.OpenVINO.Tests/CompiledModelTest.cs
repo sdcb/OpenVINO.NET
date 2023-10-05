@@ -1,10 +1,4 @@
-﻿using Sdcb.OpenVINO.Natives;
-using Sdcb.OpenVINO.Tests.Natives;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Sdcb.OpenVINO.Tests.Natives;
 using Xunit.Abstractions;
 
 namespace Sdcb.OpenVINO.Tests;
@@ -28,16 +22,34 @@ public class CompiledModelTest
         Assert.NotNull(m);
     }
 
-    //[Fact]
-    //public void CanCompileWithProps()
-    //{
-    //    using OVCore c = new();
-    //    using CompiledModel m = c.CompileModel(_modelFile, properties: new Dictionary<string, string>
-    //    {
-    //        ["INFERENCE_NUM_THREADS"] = "1",
-    //    });
-    //    Assert.NotNull(m);
-    //}
+    [Fact]
+    public void CanCompileWithProps()
+    {
+        using OVCore c = new();
+        using CompiledModel m = c.CompileModel(_modelFile, properties: new Dictionary<string, string>
+        {
+            ["INFERENCE_NUM_THREADS"] = "4",
+            ["NUM_STREAMS"] = "2",
+        });
+        Assert.NotNull(m);
+        Assert.Equal("4", m.Properties["INFERENCE_NUM_THREADS"]);
+        Assert.Equal("2", m.Properties["NUM_STREAMS"]);
+    }
+
+    [Fact]
+    public void CanCompileExistingModelWithProps()
+    {
+        using OVCore c = new();
+        using Model rawModel = c.ReadModel(_modelFile);
+        using CompiledModel m = c.CompileModel(rawModel, properties: new Dictionary<string, string>
+        {
+            ["INFERENCE_NUM_THREADS"] = "4",
+            ["NUM_STREAMS"] = "2",
+        });
+        Assert.NotNull(m);
+        Assert.Equal("4", m.Properties["INFERENCE_NUM_THREADS"]);
+        Assert.Equal("2", m.Properties["NUM_STREAMS"]);
+    }
 
     [Fact]
     public void CanGetAllSupportedProp()
@@ -55,7 +67,6 @@ public class CompiledModelTest
     {
         using OVCore c = new();
         using CompiledModel m = c.CompileModel(_modelFile);
-        OpenVINOException ex = Assert.Throws<OpenVINOException>(() => m.GetProperty("not-exists"));
-        Assert.Equal(ov_status_e.GENERAL_ERROR, ex.Status);
+        KeyNotFoundException ex = Assert.Throws<KeyNotFoundException>(() => m.Properties["not-exists"]);
     }
 }

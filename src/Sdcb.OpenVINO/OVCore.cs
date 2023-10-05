@@ -210,7 +210,7 @@ public class OVCore : CppPtrObject
         GCHandle[] gchs = new GCHandle[properties.Count * 2];
         try
         {
-            IntPtr* variadic = stackalloc IntPtr[properties.Count * 2 + 1];
+            IntPtr* v = stackalloc IntPtr[properties.Count * 2 + 1];
 
             {
                 // convert properties to variadic
@@ -218,16 +218,16 @@ public class OVCore : CppPtrObject
                 foreach (KeyValuePair<string, string> kvp in properties)
                 {
                     GCHandle keyGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Key + '\0'), GCHandleType.Pinned);
-                    variadic[i] = keyGch.AddrOfPinnedObject();
+                    v[i] = keyGch.AddrOfPinnedObject();
                     gchs[i] = keyGch;
 
                     GCHandle valueGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Value + '\0'), GCHandleType.Pinned);
-                    variadic[i + 1] = valueGch.AddrOfPinnedObject();
+                    v[i + 1] = valueGch.AddrOfPinnedObject();
                     gchs[i + 1] = valueGch;
 
                     i += 2;
                 }
-                variadic[i] = IntPtr.Zero;
+                v[i] = IntPtr.Zero;
             }
 
             ov_compiled_model* model;
@@ -236,13 +236,18 @@ public class OVCore : CppPtrObject
                 fixed (char* modelPathPtr = modelPath)
                 fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
                 {
-                    OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file_unicode(
-                        (ov_core*)Handle,
-                        modelPathPtr,
-                        deviceNamePtr,
-                        properties.Count * 2,
-                        &model, 
-                        __arglist()));
+                    OpenVINOException.ThrowIfFailed(properties.Count switch
+                    {
+                        0 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist()),
+                        1 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1])),
+                        2 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3])),
+                        3 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5])),
+                        4 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7])),
+                        5 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9])),
+                        6 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11])),
+                        7 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13])),
+                        _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 7 not supported, provided: {properties.Count}")
+                    });
                 }
             }
             else
@@ -250,13 +255,18 @@ public class OVCore : CppPtrObject
                 fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(modelPath))
                 fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
                 {
-                    OpenVINOException.ThrowIfFailed(ov_core_compile_model_from_file(
-                        (ov_core*)Handle,
-                        modelPathPtr,
-                        deviceNamePtr,
-                        properties.Count * 2,
-                        &model,
-                        __arglist()));
+                    OpenVINOException.ThrowIfFailed(properties.Count switch
+                    {
+                        0 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist()),
+                        1 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1])),
+                        2 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3])),
+                        3 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5])),
+                        4 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7])),
+                        5 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9])),
+                        6 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11])),
+                        7 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13])),
+                        _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 7 not supported, provided: {properties.Count}")
+                    });
                 }
             }
             return new CompiledModel((IntPtr)model, owned: true);
@@ -288,31 +298,35 @@ public class OVCore : CppPtrObject
         GCHandle[] gCHandles = new GCHandle[properties.Count * 2];
         try
         {
-            IntPtr* variadic = stackalloc IntPtr[properties.Count * 2];
+            IntPtr* v = stackalloc IntPtr[properties.Count * 2];
             {
                 // convert properties to variadic
                 int i = 0;
                 foreach (KeyValuePair<string, string> kvp in properties)
                 {
                     GCHandle keyGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Key + '\0'), GCHandleType.Pinned);
-                    variadic[i++] = keyGch.AddrOfPinnedObject();
+                    v[i++] = keyGch.AddrOfPinnedObject();
 
                     GCHandle valueGch = GCHandle.Alloc(Encoding.UTF8.GetBytes(kvp.Value + '\0'), GCHandleType.Pinned);
-                    variadic[i++] = valueGch.AddrOfPinnedObject();
+                    v[i++] = valueGch.AddrOfPinnedObject();
                 }
             }
 
             ov_compiled_model* cmodel;
             fixed (byte* deviceNamePtr = Encoding.UTF8.GetBytes(deviceName))
             {
-                OpenVINOException.ThrowIfFailed(
-                    ov_core_compile_model(
-                        (ov_core*)Handle,
-                        (ov_model*)model.DangerousGetHandle(),
-                        deviceNamePtr,
-                        properties.Count * 2,
-                        &cmodel,
-                        __arglist()));
+                OpenVINOException.ThrowIfFailed(properties.Count switch
+                {
+                    0 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist()),
+                    1 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist(v[0], v[1])),
+                    2 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist(v[0], v[1], v[2], v[3])),
+                    3 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist(v[0], v[1], v[2], v[3], v[4], v[5])),
+                    4 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7])),
+                    5 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9])),
+                    6 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11])),
+                    7 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, __arglist(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13])),
+                    _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 7 not supported, provided: {properties.Count}")
+                });
             }
             return new CompiledModel((IntPtr)cmodel, owned: true);
         }

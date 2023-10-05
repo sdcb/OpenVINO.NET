@@ -42,6 +42,6 @@ public class OpenVINOException : Exception
     {
         byte* errorInfoPtr = ov_get_error_info(e);
         string? errorInfo = Marshal.PtrToStringAnsi((IntPtr)errorInfoPtr);
-        return errorInfo;
+        return $"{errorInfo}({(int)e})";
     }
 }
