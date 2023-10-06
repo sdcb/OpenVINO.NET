@@ -184,7 +184,7 @@ public class OVCoreNativeTest
         ov_tensor* tensor = null;
         try
         {
-            using Mat mat = Cv2.ImRead(@"assets\text.png");
+            using Mat mat = Cv2.ImRead(@"./assets/text.png");
             long* dims = stackalloc long[4] { 1, mat.Height, mat.Width, 3 };
             Check(ov_shape_create(4, dims, &shape));
             Check(ov_tensor_create_from_host_ptr(ov_element_type_e.U8, shape, (void*)mat.Data, &tensor));
@@ -232,7 +232,7 @@ public class OVCoreNativeTest
                 Check(ov_core_read_model(core, modelPathPtr, null, &model));
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
-                using Mat mat = Cv2.ImRead(@"assets\text.png");
+                using Mat mat = Cv2.ImRead(@"./assets/text.png");
                 long* dims = stackalloc long[4] { 1, mat.Height, mat.Width, 3 };
                 Check(ov_shape_create(4, dims, &shape));
                 Check(ov_tensor_create_from_host_ptr(ov_element_type_e.U8, shape, (void*)mat.Data, &tensor));
@@ -268,12 +268,12 @@ public class OVCoreNativeTest
         try
         {
             Check(ov_core_create(&core));
-            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(_modelFile))
+            fixed (byte* modelPathPtr = Encoding.UTF8.GetBytes(_modelFile + '\0'))
             {
                 Check(ov_core_read_model(core, modelPathPtr, null, &model));
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
-                using Mat mat = Cv2.ImRead(@"assets\text.png");
+                using Mat mat = Cv2.ImRead(@"./assets/text.png");
                 long* dims = stackalloc long[4] { 1, mat.Height, mat.Width, 3 };
                 Check(ov_shape_create(4, dims, &shape));
                 Check(ov_tensor_create_from_host_ptr(ov_element_type_e.U8, shape, (void*)mat.Data, &tensor));
@@ -317,7 +317,7 @@ public class OVCoreNativeTest
                 Check(ov_core_read_model(core, modelPathPtr, null, &model));
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
-                using Mat mat = Cv2.ImRead(@"assets\text.png");
+                using Mat mat = Cv2.ImRead(@"./assets/text.png");
                 long* dims = stackalloc long[4] { 1, mat.Height, mat.Width, 3 };
                 Check(ov_shape_create(4, dims, &shape));
                 Check(ov_tensor_create_from_host_ptr(ov_element_type_e.U8, shape, (void*)mat.Data, &tensor));
@@ -388,7 +388,7 @@ public class OVCoreNativeTest
                 Check(ov_core_read_model(core, modelPathPtr, null, &model));
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
-                using Mat mat = Cv2.ImRead(@"assets\text.png");
+                using Mat mat = Cv2.ImRead(@"./assets/text.png");
                 long* dims = stackalloc long[4] { 1, mat.Height, mat.Width, 3 };
                 Check(ov_shape_create(4, dims, &shape));
                 Check(ov_tensor_create_from_host_ptr(ov_element_type_e.U8, shape, (void*)mat.Data, &tensor));
@@ -415,7 +415,7 @@ public class OVCoreNativeTest
         }
     }
 
-    [Fact(Skip = "for reason unknown, ov_core_compile_model will break.")]
+    [Fact]
     public unsafe void PreprocessSteps()
     {
         ov_core* core = null;
@@ -446,7 +446,7 @@ public class OVCoreNativeTest
                 Check(ov_core_read_model(core, modelPathPtr, null, &model));
                 Check(ov_model_const_output(model, &outputPort));
                 Check(ov_model_const_input(model, &inputPort));
-                using Mat mat = Cv2.ImRead(@"assets\text.png");
+                using Mat mat = Cv2.ImRead(@"./assets/text.png");
                 Cv2.CopyMakeBorder(mat, mat, 0, 960 - mat.Rows, 0, 960 - mat.Cols, BorderTypes.Constant, Scalar.Black);
                 mat.ConvertTo(mat, MatType.CV_32FC3, 1.0 / 255);
                 //using Mat normalized = Normalize(mat);
@@ -480,7 +480,7 @@ public class OVCoreNativeTest
 
                 fixed (byte* deviceName = Encoding.UTF8.GetBytes("CPU"))
                 {
-                    Check(ov_core_compile_model(core, newModel, deviceName, 0, &compiledModel, __arglist()));
+                    Check(ov_core_compile_model(core, newModel, deviceName, 0, &compiledModel));
                 }
 
                 Check(ov_compiled_model_create_infer_request(compiledModel, &inferRequest));

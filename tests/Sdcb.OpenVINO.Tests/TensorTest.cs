@@ -5,9 +5,17 @@ namespace Sdcb.OpenVINO.Tests;
 public class TensorTest
 {
     [Fact]
-    public void CreateFromArray()
+    public void CreateFromFloatArray()
     {
         using Tensor tensor = Tensor.FromArray(new float[960 * 960 * 3], new Shape(960, 960, 3));
+        Assert.Equal(ov_element_type_e.F32, tensor.ElementType);
+    }
+
+    [Fact]
+    public void CreateFromByteArray()
+    {
+        using Tensor tensor = Tensor.FromArray(new byte[960 * 960 * 3], new Shape(960, 960, 3));
+        Assert.Equal(ov_element_type_e.U8, tensor.ElementType);
     }
 
     [Fact]

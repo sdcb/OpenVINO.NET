@@ -41,7 +41,17 @@ internal class FunctionGenerator
         string headerFile = ((TranslationUnit)func.OriginalNamespace).FileName;
 
         w.WriteLine($"[DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo(\"{headerFile}\", {func.LineNumberStart}, {func.LineNumberEnd}, \"{group}\")]");
-        w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams)});");
+        w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams.Where(x => !x.IsVariadic))});");
+
+        if (func.IsVariadic)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                w.Write($"[DllImport(Dll, EntryPoint = nameof({func.Name}), CallingConvention = CallingConvention.Cdecl)] ");
+                string variadics = string.Join(", ", Enumerable.Range(0, i + 1).Select(x => $"IntPtr varg{x * 2 + 1}, IntPtr varg{x * 2 + 2}"));
+                w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams.Where(x => !x.IsVariadic))}, {variadics});");
+            }
+        }
         return new GeneratedUnit(func.Name, group, func.LineNumberStart, func.LineNumberEnd, headerFile, w.Lines);
     }
 }

@@ -38,7 +38,7 @@ internal unsafe class CompiledModelProperties : IDictionary<string, string>
             fixed (byte* keyPtr = Encoding.UTF8.GetBytes(key + '\0'))
             fixed (byte* valuePtr = Encoding.UTF8.GetBytes(value + '\0'))
             {
-                OpenVINOException.ThrowIfFailed(ov_compiled_model_set_property(_ptr, __arglist(keyPtr, valuePtr)));
+                OpenVINOException.ThrowIfFailed(ov_compiled_model_set_property(_ptr, (IntPtr)keyPtr, (IntPtr)valuePtr));
             }
         }
     }

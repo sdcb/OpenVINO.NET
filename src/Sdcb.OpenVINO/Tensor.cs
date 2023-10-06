@@ -57,10 +57,18 @@ public class Tensor : CppPtrObject
         TypeCode code = Type.GetTypeCode(t);
         ov_element_type_e type = code switch
         {
-            TypeCode.Byte or TypeCode.SByte => ov_element_type_e.U8,
-            TypeCode.Int16 or TypeCode.UInt16 => ov_element_type_e.U16,
-            TypeCode.Int32 or TypeCode.UInt32 => ov_element_type_e.U32,
-            TypeCode.Int64 or TypeCode.UInt64 => ov_element_type_e.U64,
+            TypeCode.Byte => ov_element_type_e.U8,
+            TypeCode.SByte => ov_element_type_e.I8,
+
+            TypeCode.Int16 => ov_element_type_e.I16,
+            TypeCode.UInt16 => ov_element_type_e.U16,
+
+            TypeCode.Int32 => ov_element_type_e.I32,
+            TypeCode.UInt32 => ov_element_type_e.U32,
+
+            TypeCode.Int64 => ov_element_type_e.I64,
+            TypeCode.UInt64 => ov_element_type_e.U64,
+
             TypeCode.Single => ov_element_type_e.F32,
             TypeCode.Double => ov_element_type_e.F64,
 #if NET6_0_OR_GREATER
