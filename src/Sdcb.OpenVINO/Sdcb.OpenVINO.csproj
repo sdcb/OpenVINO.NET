@@ -12,6 +12,9 @@
     <PackageIcon>icon.png</PackageIcon>
     <Description>High quality .NET wrapper for OpenVINO™ toolkit.</Description>
     <PackageTags>OpenVINO;sdcb;AI;linqpad-samples</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/sdcb/OpenVINO.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sdcb/OpenVINO.NET.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <LangVersion>11</LangVersion>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/sdcb/OpenVINO.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sdcb/OpenVINO.NET.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Sdcb;AI;OpenVINO;OCR;PaddleOCR;linqpad-samples</PackageTags>
+    <Description>Multilingual PaddleOCR toolkits based on OpenVINO</Description>
+    <Authors>sdcb</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <PackageReference Include="PolySharp" Version="1.13.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Sdcb.OpenVINO" Version="0.2.4" Condition="'$(Configuration)' != 'Debug'" />
+    <ProjectReference Include="..\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'" />
+  </ItemGroup>
+
+</Project>
