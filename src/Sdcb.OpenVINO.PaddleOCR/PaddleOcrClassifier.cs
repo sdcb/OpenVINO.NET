@@ -9,7 +9,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrClassifier : IDisposable
 {
-    private readonly PaddlePredictor _p;
+    private readonly InferRequest _p;
 
     /// <summary>
     /// Rotation threshold value used to determine if the image should be rotated.
@@ -19,7 +19,7 @@ public class PaddleOcrClassifier : IDisposable
     /// <summary>
     /// The OcrShape used for the model.
     /// </summary>
-    public OcrShape Shape { get; init; } = ClassificationModel.DefaultShape;
+    public PartialShape Shape { get; init; } = ClassificationModel.DefaultShape;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PaddleOcrClassifier"/> class with a specified model and configuration.
@@ -29,8 +29,8 @@ public class PaddleOcrClassifier : IDisposable
     public PaddleOcrClassifier(ClassificationModel model, Action<PaddleConfig>? configure = null)
     {
         Shape = model.Shape;
-        PaddleConfig c = model.CreateConfig();
-        model.ConfigureDevice(c, configure);
+        PaddleConfig c = model.CreateOVModel();
+        model.ConfigureModel(c, configure);
 
         _p = c.CreatePredictor();
     }

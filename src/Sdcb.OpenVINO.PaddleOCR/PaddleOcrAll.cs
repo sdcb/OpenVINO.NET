@@ -62,12 +62,12 @@ public class PaddleOcrAll : IDisposable
         Action<PaddleConfig>? classifierDevice = null,
         Action<PaddleConfig>? recognizerDevice = null)
     {
-        Detector = new PaddleOcrDetector(model.DetectionModel, detectorDevice ?? model.DetectionModel.DefaultDevice);
+        Detector = new PaddleOcrDetector(model.DetectionModel, detectorDevice ?? model.DetectionModel.DefaultDeviceOptions);
         if (model.ClassificationModel != null)
         {
-            Classifier = new PaddleOcrClassifier(model.ClassificationModel, classifierDevice ?? model.ClassificationModel.DefaultDevice);
+            Classifier = new PaddleOcrClassifier(model.ClassificationModel, classifierDevice ?? model.ClassificationModel.DefaultDeviceOptions);
         }
-        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, recognizerDevice ?? model.RecognizationModel.DefaultDevice);
+        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, recognizerDevice ?? model.RecognizationModel.DefaultDeviceOptions);
     }
 
     /// <summary>

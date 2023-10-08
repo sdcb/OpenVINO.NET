@@ -18,7 +18,7 @@ public abstract class DetectionModel : OcrBaseModel
     }
 
     /// <inheritdoc/>
-    public override Action<PaddleConfig> DefaultDevice => Version switch
+    public override Action<PaddleConfig> DefaultDeviceOptions => Version switch
     {
         ModelVersion.V4 => PaddleDevice.Onnx(),
         _ => PaddleDevice.Mkldnn(),

@@ -29,11 +29,6 @@ public abstract class ClassificationModel : OcrBaseModel
     }
 
     /// <summary>
-    /// Gets the default device for the classification model.
-    /// </summary>
-    public override Action<PaddleConfig> DefaultDevice => PaddleDevice.Mkldnn();
-
-    /// <summary>
     /// Creates a ClassificationModel object from the specified directory path.
     /// </summary>
     /// <param name="directoryPath">The path to the directory containing the model files</param>

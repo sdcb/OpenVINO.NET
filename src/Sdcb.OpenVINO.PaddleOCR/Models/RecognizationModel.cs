@@ -55,16 +55,16 @@ public abstract class RecognizationModel : OcrBaseModel
     /// <summary>
     /// Gets the default device for the classification model.
     /// </summary>
-    public override Action<PaddleConfig> DefaultDevice => Version switch
+    public override Action<PaddleConfig> DefaultDeviceOptions => Version switch
     {
         ModelVersion.V2 => PaddleDevice.Mkldnn(),
         _ => PaddleDevice.Onnx(),
     };
 
     /// <inheritdoc/>
-    public override void ConfigureDevice(PaddleConfig config, Action<PaddleConfig>? configure = null)
+    public override void ConfigureModel(PaddleConfig config, Action<PaddleConfig>? configure = null)
     {
-        base.ConfigureDevice(config, configure);
+        base.ConfigureModel(config, configure);
         if (config.MkldnnEnabled)
         {
             if (Version == ModelVersion.V3 || Version == ModelVersion.V4)

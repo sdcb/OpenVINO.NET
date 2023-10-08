@@ -1,5 +1,4 @@
-﻿using Sdcb.PaddleInference;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace Sdcb.OpenVINO.PaddleOCR.Models.Details;
@@ -31,14 +30,8 @@ public class FileRecognizationModel : RecognizationModel
         _labels = File.ReadAllLines(labelFilePath);
     }
 
-    /// <summary>
-    /// Overrides the function in <see cref="RecognizationModel"/> to create the configuration for the model.
-    /// </summary>
-    /// <returns>The configuration for the model.</returns>
-    public override PaddleConfig CreateConfig()
-    {
-        return PaddleConfig.FromModelDir(DirectoryPath);
-    }
+    /// <inheritdoc/>
+    public override Model CreateOVModel(OVCore core) => ReadDirectoryInferenceModel(core, DirectoryPath);
 
     /// <summary>
     /// Returns the label string for the given index.

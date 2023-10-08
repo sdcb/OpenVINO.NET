@@ -1,4 +1,6 @@
-﻿namespace Sdcb.OpenVINO.PaddleOCR.Models.Details;
+﻿using System.IO;
+
+namespace Sdcb.OpenVINO.PaddleOCR.Models.Details;
 
 /// <summary>
 /// File classification model.
@@ -24,5 +26,5 @@ public class FileClassificationModel : ClassificationModel
     public override PartialShape Shape => DefaultShape;
 
     /// <inheritdoc/>
-    public override PaddleConfig CreateConfig() => PaddleConfig.FromModelDir(DirectoryPath);
+    public override Model CreateOVModel(OVCore core) => ReadDirectoryInferenceModel(core, DirectoryPath);
 }

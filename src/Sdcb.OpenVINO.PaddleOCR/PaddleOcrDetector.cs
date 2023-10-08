@@ -12,8 +12,8 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrDetector : IDisposable
 {
-    /// <summary>Holds an instance of the PaddlePredictor class.</summary>
-    readonly PaddlePredictor _p;
+    /// <summary>Holds an instance of the InferRequest class.</summary>
+    readonly InferRequest _p;
 
     /// <summary>Gets or sets the maximum size for resizing the input image.</summary>
     public int? MaxSize { get; set; } = 1536;
@@ -37,11 +37,11 @@ public class PaddleOcrDetector : IDisposable
     /// Initializes a new instance of the PaddleOcrDetector class with the provided DetectionModel and PaddleConfig.
     /// </summary>
     /// <param name="model">The DetectionModel to use.</param>
-    /// <param name="configure">The device and configure of the PaddleConfig, pass null to using model's DefaultDevice.</param>
-    public PaddleOcrDetector(DetectionModel model, Action<PaddleConfig>? configure = null)
+    /// <param name="options">The device and configure of the PaddleConfig, pass null to using model's DefaultDevice.</param>
+    public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null)
     {
-        PaddleConfig c = model.CreateConfig();
-        model.ConfigureDevice(c, configure);
+        PaddleConfig c = model.CreateOVModel();
+        model.ConfigureDevice(c, options);
 
         _p = c.CreatePredictor();
     }

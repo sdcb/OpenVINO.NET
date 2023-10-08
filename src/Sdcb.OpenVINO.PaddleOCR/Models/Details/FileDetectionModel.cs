@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Linq/src/System/Linq/FileDetectionModel.cs
 
+using System.IO;
+
 namespace Sdcb.OpenVINO.PaddleOCR.Models.Details;
 
 /// <summary>
@@ -24,9 +26,6 @@ public class FileDetectionModel : DetectionModel
         DirectoryPath = directoryPath;
     }
 
-    /// <summary>
-    /// Creates a PaddleConfig object using the model directory path.
-    /// </summary>
-    /// <returns>A <see cref="PaddleConfig"/> object created using <see cref="DirectoryPath"/>.</returns>
-    public override PaddleConfig CreateConfig() => PaddleConfig.FromModelDir(DirectoryPath);
+    /// <inheritdoc/>
+    public override Model CreateOVModel(OVCore core) => ReadDirectoryInferenceModel(core, DirectoryPath);
 }
