@@ -11,7 +11,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrTableRecognizer : IDisposable
 {
-    readonly PaddlePredictor _p;
+    readonly InferRequest _p;
 
     /// <summary>
     /// Gets or sets the maximum edge size.
@@ -26,34 +26,13 @@ public class PaddleOcrTableRecognizer : IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="PaddleOcrTableRecognizer"/> class.
     /// </summary>
-    /// <param name="model">The table recognition model.</param>
-    /// <param name="configure">The action to configure Paddle device.</param>
-    public PaddleOcrTableRecognizer(TableRecognitionModel model, Action<PaddleConfig>? configure = null) : this(model, 
-        model.CreateConfig().Apply(configure ?? PaddleDevice.Mkldnn()).CreatePredictor())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PaddleOcrTableRecognizer"/> class from directory path and label path.
-    /// </summary>
-    /// <param name="directoryPath">The directory path.</param>
-    /// <param name="labelPath">The label path.</param>
-    /// <param name="configure">The action to configure Paddle device.</param>
-    public PaddleOcrTableRecognizer(string directoryPath, string labelPath, Action<PaddleConfig>? configure = null) : this(TableRecognitionModel.FromDirectory(directoryPath, labelPath), configure)
-    {
-    }
-
-    private PaddleOcrTableRecognizer(TableRecognitionModel model, PaddlePredictor predictor)
+    /// <param name="model">The TableRecognitionModel to use for recognition.</param>
+    /// <param name="deviceOptions">The optional DeviceOptions to use for inference.</param>
+    public PaddleOcrTableRecognizer(TableRecognitionModel model, DeviceOptions? deviceOptions = null)
     {
         Model = model;
-        _p = predictor;
+        _p = model.CreateInferRequest(deviceOptions);
     }
-
-    /// <summary>
-    /// Clones a new <see cref="PaddleOcrTableRecognizer"/> instance.
-    /// </summary>
-    /// <returns>A new instance of the <see cref="PaddleOcrTableRecognizer"/> class.</returns>
-    public PaddleOcrTableRecognizer Clone() => new(Model, _p.Clone());
 
     /// <summary>
     /// Disposes the PaddleOCR table recognizer.
@@ -83,24 +62,20 @@ public class PaddleOcrTableRecognizer : IDisposable
         Size rawSize = src.Size();
         float[] inputData = TablePreprocess(src);
 
-        using (PaddleTensor input = _p.GetInputTensor(_p.InputNames[0]))
+        using (Tensor input = Tensor.FromArray(inputData, new Shape(1, 3, MaxEdgeSize, MaxEdgeSize)))
         {
-            input.Shape = new[] { 1, 3, MaxEdgeSize, MaxEdgeSize };
-            input.SetData(inputData);
-        }
-        if (!_p.Run())
-        {
-            throw new Exception("PaddlePredictor(Table) run failed.");
+            _p.Inputs.Primary = input;
         }
 
-        string[] outputNames = _p.OutputNames;
-        using (PaddleTensor output0 = _p.GetOutputTensor(outputNames[0]))
-        using (PaddleTensor output1 = _p.GetOutputTensor(outputNames[1]))
+        _p.Run();
+
+        using (Tensor output0 = _p.Outputs[0])
+        using (Tensor output1 = _p.Outputs[1])
         {
-            float[] locations = output0.GetData<float>();
-            int[] locationShape = output0.Shape;
-            float[] structures = output1.GetData<float>();
-            int[] structureShape = output1.Shape;
+            Span<float> locations = output0.GetData<float>();
+            Shape locationShape = output0.Shape;
+            Span<float> structures = output1.GetData<float>();
+            Shape structureShape = output1.Shape;
 
             return TablePostProcessor(locations, locationShape, structures, structureShape, rawSize, Model.GetLabelByIndex);
         }
@@ -179,8 +154,8 @@ public class PaddleOcrTableRecognizer : IDisposable
     }
 
     private static TableDetectionResult TablePostProcessor(
-        float[] locations, int[] locationShape,
-        float[] structures, int[] structureShape,
+        Span<float> locations, Shape locationShape,
+        Span<float> structures, Shape structureShape,
         Size rawSize,
         Func<int, string> labelAccessor)
     {
@@ -189,15 +164,14 @@ public class PaddleOcrTableRecognizer : IDisposable
         List<string> recHtmlTags = new();
         List<TableCellBox> recBoxes = new();
 
-        ReadOnlySpan<float> structureSpan = structures.AsSpan();
-        for (int stepIndex = 0; stepIndex < structureShape[1]; ++stepIndex)
+        for (int stepIndex = 0; stepIndex < structureShape.Dimensions[1]; ++stepIndex)
         {
             List<int> recBox = new();
             string htmlTag;
             // html tag
             {
-                int stepStartIndex = stepIndex * structureShape[2];
-                (int charIndex, float charScore) = ArgMax(structureSpan[stepStartIndex..(stepStartIndex + structureShape[2])]);
+                int stepStartIndex = stepIndex * (int)structureShape.Dimensions[2];
+                (int charIndex, float charScore) = ArgMax(structures[stepStartIndex..(stepStartIndex + (int)structureShape.Dimensions[2])]);
                 htmlTag = labelAccessor(charIndex);
                 if (stepIndex > 0 && htmlTag == TableRecognitionModelConsts.LastLabel)
                 {
@@ -215,9 +189,9 @@ public class PaddleOcrTableRecognizer : IDisposable
             // box
             if (htmlTag == "<td>" || htmlTag == "<td" || htmlTag == "<td></td>")
             {
-                for (int pointIndex = 0; pointIndex < locationShape[2]; pointIndex++)
+                for (int pointIndex = 0; pointIndex < locationShape.Dimensions[2]; pointIndex++)
                 {
-                    int stepStartIndex = stepIndex * locationShape[2] + pointIndex;
+                    int stepStartIndex = stepIndex * (int)locationShape.Dimensions[2] + pointIndex;
                     float point = locations[stepStartIndex];
                     if (pointIndex % 2 == 0)
                     {

@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a version of the OCR model.
 /// </summary>
-public enum ModelVersion
+public enum OCRModelVersion
 {
     /// <summary>
     /// Version 2 of the OCR model.

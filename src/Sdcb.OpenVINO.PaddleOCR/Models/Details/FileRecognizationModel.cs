@@ -24,7 +24,7 @@ public class FileRecognizationModel : RecognizationModel
     /// <param name="directoryPath">The directory path for the model.</param>
     /// <param name="labelFilePath">The path for the label file.</param>
     /// <param name="version">The version of the model.</param>
-    public FileRecognizationModel(string directoryPath, string labelFilePath, ModelVersion version) : base(version)
+    public FileRecognizationModel(string directoryPath, string labelFilePath, OCRModelVersion version) : base(version)
     {
         DirectoryPath = directoryPath;
         _labels = File.ReadAllLines(labelFilePath);

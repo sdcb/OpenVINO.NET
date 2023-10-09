@@ -40,44 +40,7 @@ public class PaddleOcrDetector : IDisposable
     /// <param name="options">The device and configure of the PaddleConfig, pass null to using model's DefaultDevice.</param>
     public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null)
     {
-        PaddleConfig c = model.CreateOVModel();
-        model.ConfigureDevice(c, options);
-
-        _p = c.CreatePredictor();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the PaddleOcrDetector class with the provided PaddleConfig.
-    /// </summary>
-    /// <param name="config">The PaddleConfig to use.</param>
-    public PaddleOcrDetector(PaddleConfig config) : this(config.CreatePredictor())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the PaddleOcrDetector class with the provided PaddlePredictor.
-    /// </summary>
-    /// <param name="predictor">The PaddlePredictor to use.</param>
-    public PaddleOcrDetector(PaddlePredictor predictor)
-    {
-        _p = predictor;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the PaddleOcrDetector class with model directory path.
-    /// </summary>
-    /// <param name="modelDir">The path of directory containing model files.</param>
-    public PaddleOcrDetector(string modelDir) : this(PaddleConfig.FromModelDir(modelDir))
-    {
-    }
-
-    /// <summary>
-    /// Clones the current PaddleOcrDetector instance.
-    /// </summary>
-    /// <returns>A new PaddleOcrDetector instance with the same configuration.</returns>
-    public PaddleOcrDetector Clone()
-    {
-        return new PaddleOcrDetector(_p.Clone());
+        _p = model.CreateInferRequest(options);
     }
 
     /// <summary>
@@ -195,24 +158,19 @@ public class PaddleOcrDetector : IDisposable
         }
 
         using (Mat _ = normalized)
-        using (PaddleTensor input = _p.GetInputTensor(_p.InputNames[0]))
+        using (Tensor input = Tensor.FromArray(ExtractMat(normalized), new Shape(1, 3, normalized.Rows, normalized.Cols)))
         {
-            input.Shape = new[] { 1, 3, normalized.Rows, normalized.Cols };
-            float[] data = ExtractMat(normalized);
-            input.SetData(data);
+            _p.Inputs.Primary = input;
         }
 
-        if (!_p.Run())
-        {
-            throw new Exception("PaddlePredictor(Detector) run failed.");
-        }
+        _p.Run();
 
-        using (PaddleTensor output = _p.GetOutputTensor(_p.OutputNames[0]))
+        using (Tensor output = _p.Outputs.Primary)
         {
-            float[] data = output.GetData<float>();
-            int[] shape = output.Shape;
+            Span<float> data = output.GetData<float>();
+            NCHW shape = output.Shape.ToNCHW();
 
-            return new Mat(shape[2], shape[3], MatType.CV_32FC1, data);
+            return new Mat(shape.Height, shape.Width, MatType.CV_32FC1, data.ToArray());
         }
     }
 

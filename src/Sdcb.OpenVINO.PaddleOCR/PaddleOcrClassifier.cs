@@ -19,56 +19,18 @@ public class PaddleOcrClassifier : IDisposable
     /// <summary>
     /// The OcrShape used for the model.
     /// </summary>
-    public PartialShape Shape { get; init; } = ClassificationModel.DefaultShape;
+    public NCHW Shape { get; init; } = ClassificationModel.DefaultShape;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PaddleOcrClassifier"/> class with a specified model and configuration.
     /// </summary>
     /// <param name="model">The <see cref="ClassificationModel"/> to use.</param>
-    /// <param name="configure">The device and configure of the PaddleConfig, pass null to using model's DefaultDevice.</param>
-    public PaddleOcrClassifier(ClassificationModel model, Action<PaddleConfig>? configure = null)
+    /// <param name="device">The device the inference request, pass null to using model's DefaultDevice.</param>
+    public PaddleOcrClassifier(ClassificationModel model, DeviceOptions? device = null)
     {
         Shape = model.Shape;
-        PaddleConfig c = model.CreateOVModel();
-        model.ConfigureModel(c, configure);
-
-        _p = c.CreatePredictor();
+        _p = model.CreateInferRequest(device);
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PaddleOcrClassifier"/> class with a specified configuration.
-    /// </summary>
-    /// <param name="config">A <see cref="PaddleConfig"/> object used to create the PaddlePredictor.</param>
-    public PaddleOcrClassifier(PaddleConfig config) : this(config.CreatePredictor())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PaddleOcrClassifier"/> class with a specified predictor.
-    /// </summary>
-    /// <param name="predictor">The <see cref="PaddlePredictor"/> to use.</param>
-    public PaddleOcrClassifier(PaddlePredictor predictor)
-    {
-        _p = predictor;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PaddleOcrClassifier"/> class with a specified model directory.
-    /// </summary>
-    /// <param name="modelDir">The model directory.</param>
-    public PaddleOcrClassifier(string modelDir) : this(PaddleConfig.FromModelDir(modelDir))
-    {
-    }
-
-    /// <summary>
-    /// Creates and returns a new instance of the <see cref="PaddleOcrClassifier"/> class.
-    /// </summary>
-    /// <returns>A new instance of the <see cref="PaddleOcrClassifier"/> class.</returns>
-    public PaddleOcrClassifier Clone() => new(_p.Clone())
-    {
-        RotateThreshold = RotateThreshold,
-        Shape = Shape,
-    };
 
     /// <summary>
     /// Releases all resources used by the <see cref="PaddleOcrClassifier"/> object.
@@ -97,20 +59,16 @@ public class PaddleOcrClassifier : IDisposable
         using Mat resized = ResizePadding(src, Shape);
         using Mat normalized = Normalize(resized);
 
-        using (PaddleTensor input = _p.GetInputTensor(_p.InputNames[0]))
+        using (Tensor input = Tensor.FromArray(PaddleOcrDetector.ExtractMat(normalized), new Shape(1, 3, normalized.Rows, normalized.Cols)))
         {
-            input.Shape = new[] { 1, 3, normalized.Rows, normalized.Cols };
-            float[] data = PaddleOcrDetector.ExtractMat(normalized);
-            input.SetData(data);
-        }
-        if (!_p.Run())
-        {
-            throw new Exception("PaddlePredictor(Classifier) run failed.");
+            _p.Inputs.Primary = input;
         }
 
-        using (PaddleTensor output = _p.GetOutputTensor(_p.OutputNames[0]))
+        _p.Run();
+
+        using (Tensor output = _p.Outputs.Primary)
         {
-            float[] softmax = output.GetData<float>();
+            Span<float> softmax = output.GetData<float>();
             float score = 0;
             int label = 0;
             for (int i = 0; i < softmax.Length; ++i)
@@ -156,7 +114,7 @@ public class PaddleOcrClassifier : IDisposable
         }
     }
 
-    private static Mat ResizePadding(Mat src, OcrShape shape)
+    private static Mat ResizePadding(Mat src, NCHW shape)
     {
         Size srcSize = src.Size();
         using Mat roi = srcSize.Width / srcSize.Height > shape.Width / shape.Height ?

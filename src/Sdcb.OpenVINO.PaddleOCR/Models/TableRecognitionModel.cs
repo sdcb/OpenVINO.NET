@@ -1,5 +1,4 @@
-﻿using Sdcb.PaddleInference;
-using Sdcb.OpenVINO.PaddleOCR.Models.Details;
+﻿using Sdcb.OpenVINO.PaddleOCR.Models.Details;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models;
 /// <summary>
 /// Abstract class for table recognition models.
 /// </summary>
-public abstract class TableRecognitionModel
+public abstract class TableRecognitionModel : BaseModel
 {
     /// <summary>
     /// Read-only list that contains the recognized text labels.
@@ -50,12 +49,6 @@ public abstract class TableRecognitionModel
     }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="PaddleConfig"/> class.
-    /// </summary>
-    /// <returns>Returns an instance of the <see cref="PaddleConfig"/> class.</returns>
-    public abstract PaddleConfig CreateConfig();
-
-    /// <summary>
     /// Creates a new instance of the <see cref="FileTableRecognizationModel"/> class from a specified directory path and label path.
     /// </summary>
     /// <param name="directoryPath">The directory path.</param>
@@ -78,10 +71,4 @@ public abstract class TableRecognitionModel
             _ => throw new ArgumentOutOfRangeException(nameof(i), i, $"Index(given i={i}) must be in range [0, {Labels.Count + 1}], labelFilePath not matching table recognition model?"),
         };
     }
-
-    /// <summary>
-    /// Configures the <see cref="PaddleConfig"/> instance and its properties.
-    /// </summary>
-    /// <param name="config">The instance of the <see cref="PaddleConfig"/> class to configure.</param>
-    protected virtual void ConfigPostProcess(PaddleConfig config) { }
 }

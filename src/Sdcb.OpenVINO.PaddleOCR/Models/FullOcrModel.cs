@@ -55,7 +55,7 @@ public class FullOcrModel
     /// <param name="version">The OCR model version.</param>
     /// <returns>A new instance of <see cref="FullOcrModel"/>.</returns>
     [Obsolete("This method is deprecated, use 'FromDirectory(string detectionModelDir, string classificationModelDir, string recognitionModelDir, string labelFilePath, ModelVersion version)' instead.")]
-    public static FullOcrModel FromDirectory(string modelFolderPath, string labelFilePath, ModelVersion version)
+    public static FullOcrModel FromDirectory(string modelFolderPath, string labelFilePath, OCRModelVersion version)
     {
         return new FullOcrModel(
             DetectionModel.FromDirectory(Path.Combine(modelFolderPath, "det"), version),
@@ -73,7 +73,7 @@ public class FullOcrModel
     /// <param name="version">The OCR model version.</param>
     /// <returns>A new instance of <see cref="FullOcrModel"/>.</returns>
     [Obsolete("This method is deprecated, use 'FromDirectory(string detectionModelPath, string classificationModelPath, string recognitionModelPath, string labelFilePath, ModelVersion version)' instead.")]
-    public static FullOcrModel FromDirectory(string detectionModelDir, string classificationModelDir, string recognitionModelDir, string labelFilePath, ModelVersion version)
+    public static FullOcrModel FromDirectory(string detectionModelDir, string classificationModelDir, string recognitionModelDir, string labelFilePath, OCRModelVersion version)
     {
         return new FullOcrModel(
             DetectionModel.FromDirectory(detectionModelDir, version),

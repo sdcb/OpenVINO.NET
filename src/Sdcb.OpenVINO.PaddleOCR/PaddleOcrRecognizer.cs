@@ -12,7 +12,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrRecognizer : IDisposable
 {
-    private readonly PaddlePredictor _p;
+    private readonly InferRequest _p;
 
     /// <summary>
     /// Recognization model being used for OCR.
@@ -23,32 +23,12 @@ public class PaddleOcrRecognizer : IDisposable
     /// Constructor for creating a new instance of the <see cref="PaddleOcrRecognizer"/> class using a specified model and a callback configuration.
     /// </summary>
     /// <param name="model">The RecognizationModel object.</param>
-    /// <param name="configure">The device and configure of the <see cref="PaddleConfig"/>, pass null to using model's <see cref="RecognizationModel.DefaultDeviceOptions"/>.</param>
-    public PaddleOcrRecognizer(RecognizationModel model, Action<PaddleConfig>? configure = null)
+    /// <param name="deviceOptions">The device of the inference request, pass null to using model's <see cref="BaseModel.DefaultDeviceOptions"/>.</param>
+    public PaddleOcrRecognizer(RecognizationModel model, DeviceOptions? deviceOptions = null)
     {
         Model = model;
-        PaddleConfig c = model.CreateOVModel();
-        model.ConfigureModel(c, configure);
-
-        _p = c.CreatePredictor();
+        _p = model.CreateInferRequest(deviceOptions);
     }
-
-    /// <summary>
-    /// Constructor for creating a new instance of the <see cref="PaddleOcrRecognizer"/> class using a model and an existing predictor.
-    /// </summary>
-    /// <param name="model">The RecognizationModel object.</param>
-    /// <param name="predictor">The Paddle OCR predictor.</param>
-    public PaddleOcrRecognizer(RecognizationModel model, PaddlePredictor predictor)
-    {
-        Model = model;
-        _p = predictor;
-    }
-
-    /// <summary>
-    /// Creates a new <see cref="PaddleOcrRecognizer"/> instance that is a copy of the current instance.
-    /// </summary>
-    /// <returns>A copy of the current <see cref="PaddleOcrRecognizer"/> instance.</returns>
-    public PaddleOcrRecognizer Clone() => new(Model, _p.Clone());
 
     /// <summary>
     /// Releases all resources used by the current instance of the <see cref="PaddleOcrRecognizer"/> class.
@@ -130,12 +110,10 @@ public class PaddleOcrRecognizer : IDisposable
                 })
                 .ToArray();
 
-            using (PaddleTensor input = _p.GetInputTensor(_p.InputNames[0]))
+            int channel = normalizeds[0].Channels();
+            using (Tensor input = Tensor.FromArray(ExtractMat(normalizeds, channel, modelHeight, maxWidth), new Shape(normalizeds.Length, channel, modelHeight, maxWidth)))
             {
-                int channel = normalizeds[0].Channels();
-                input.Shape = new[] { normalizeds.Length, channel, modelHeight, maxWidth };
-                float[] data = ExtractMat(normalizeds, channel, modelHeight, maxWidth);
-                input.SetData(data);
+                _p.Inputs.Primary = input;
             }
         }
         finally
@@ -146,25 +124,21 @@ public class PaddleOcrRecognizer : IDisposable
             }
         }
 
-        if (!_p.Run())
-        {
-            throw new Exception($"PaddlePredictor(Recognizer) run failed.");
-        }
+        _p.Run();
 
-        using (PaddleTensor output = _p.GetOutputTensor(_p.OutputNames[0]))
+        using (Tensor output = _p.Outputs.Primary)
         {
-            float[] data = output.GetData<float>();
-            int[] shape = output.Shape;
+            Span<float> data = output.GetData<float>();
+            IntPtr dataPtr = output.DangerousGetDataPtr();
+            Shape shape = output.Shape;
 
             GCHandle dataHandle = default;
             try
             {
-                dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                IntPtr dataPtr = dataHandle.AddrOfPinnedObject();
-                int labelCount = shape[2];
-                int charCount = shape[1];
+                int labelCount = (int)shape.Dimensions[2];
+                int charCount = (int)shape.Dimensions[1];
 
-                return Enumerable.Range(0, shape[0])
+                return Enumerable.Range(0, (int)shape.Dimensions[0])
                     .Select(i =>
                     {
                         StringBuilder sb = new();

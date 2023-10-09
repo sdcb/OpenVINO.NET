@@ -17,13 +17,13 @@ public class FileClassificationModel : ClassificationModel
     /// </summary>
     /// <param name="directoryPath">The directory path for the model.</param>
     /// <param name="version">The version of the classification model.</param>
-    public FileClassificationModel(string directoryPath, ModelVersion version) : base(version)
+    public FileClassificationModel(string directoryPath, OCRModelVersion version) : base(version)
     {
         DirectoryPath = directoryPath;
     }
 
     /// <inheritdoc/>
-    public override PartialShape Shape => DefaultShape;
+    public override NCHW Shape => DefaultShape;
 
     /// <inheritdoc/>
     public override Model CreateOVModel(OVCore core) => ReadDirectoryInferenceModel(core, DirectoryPath);

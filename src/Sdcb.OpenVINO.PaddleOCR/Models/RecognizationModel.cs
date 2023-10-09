@@ -1,5 +1,4 @@
-﻿using Sdcb.PaddleInference;
-using Sdcb.PaddleOCR.Models.Details;
+﻿using Sdcb.OpenVINO.PaddleOCR.Models.Details;
 using System;
 using System.Collections.Generic;
 
@@ -14,7 +13,7 @@ public abstract class RecognizationModel : OcrBaseModel
     /// Constructor for initializing an instance of the <see cref="RecognizationModel"/> class.
     /// </summary>
     /// <param name="version">The version of recognition model.</param>
-    public RecognizationModel(ModelVersion version) : base(version)
+    public RecognizationModel(OCRModelVersion version) : base(version)
     {
     }
 
@@ -44,39 +43,13 @@ public abstract class RecognizationModel : OcrBaseModel
     /// <summary>
     /// Get the OcrShape of recognition model.
     /// </summary>
-    public virtual OcrShape Shape => Version switch
+    public virtual NCHW Shape => Version switch
     {
-        ModelVersion.V2 => new(3, 320, 32),
-        ModelVersion.V3 => new(3, 320, 48),
-        ModelVersion.V4 => new(3, 320, 48),
+        OCRModelVersion.V2 => new(-1, 3, 32, 320),
+        OCRModelVersion.V3 => new(-1, 3, 48, 320),
+        OCRModelVersion.V4 => new(-1, 3, 48, 320),
         _ => throw new ArgumentOutOfRangeException($"Unknown OCR model version: {Version}."),
     };
-
-    /// <summary>
-    /// Gets the default device for the classification model.
-    /// </summary>
-    public override Action<PaddleConfig> DefaultDeviceOptions => Version switch
-    {
-        ModelVersion.V2 => PaddleDevice.Mkldnn(),
-        _ => PaddleDevice.Onnx(),
-    };
-
-    /// <inheritdoc/>
-    public override void ConfigureModel(PaddleConfig config, Action<PaddleConfig>? configure = null)
-    {
-        base.ConfigureModel(config, configure);
-        if (config.MkldnnEnabled)
-        {
-            if (Version == ModelVersion.V3 || Version == ModelVersion.V4)
-            {
-                config.DeletePass("matmul_transpose_reshape_fuse_pass");
-
-                // https://github.com/PaddlePaddle/Paddle/issues/55290#issuecomment-1629924892
-                config.DeletePass("fc_mkldnn_pass");
-                config.DeletePass("fc_act_mkldnn_fuse_pass");
-            }
-        }
-    }
 
     /// <summary>
     /// Create the RecognizationModel object with the specified directory path, label path and model version.
@@ -85,5 +58,5 @@ public abstract class RecognizationModel : OcrBaseModel
     /// <param name="labelPath">The label path of recognition model.</param>
     /// <param name="version">The version of recognition model.</param>
     /// <returns>The RecognizationModel object created with the specified directory path, label path and model version.</returns>
-    public static RecognizationModel FromDirectory(string directoryPath, string labelPath, ModelVersion version) => new FileRecognizationModel(directoryPath, labelPath, version);
+    public static RecognizationModel FromDirectory(string directoryPath, string labelPath, OCRModelVersion version) => new FileRecognizationModel(directoryPath, labelPath, version);
 }

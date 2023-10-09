@@ -40,7 +40,7 @@ public class PaddleOcrAll : IDisposable
     /// </summary>
     /// <param name="model">The full OCR model containing detection, classification, and recognition models.</param>
     /// <param name="device">The device configuration for running det, cls and rec models.</param>
-    public PaddleOcrAll(FullOcrModel model, Action<PaddleConfig> device)
+    public PaddleOcrAll(FullOcrModel model, DeviceOptions device)
     {
         Detector = new PaddleOcrDetector(model.DetectionModel, device);
         if (model.ClassificationModel != null)
@@ -54,48 +54,20 @@ public class PaddleOcrAll : IDisposable
     /// Initializes a new instance of the <see cref="PaddleOcrAll"/> class with the specified PaddlePaddle models and device configurations for each model.
     /// </summary>
     /// <param name="model">The full OCR model containing detection, classification, and recognition models.</param>
-    /// <param name="detectorDevice">The device configuration for running the detection model, default: Onnx.</param>
-    /// <param name="classifierDevice">The device configuration for running the classification model, default: Mkldnn.</param>
-    /// <param name="recognizerDevice">The device configuration for running the recognition model, default: Onnx.</param>
+    /// <param name="detectorDevice">The device configuration for running the detection model.</param>
+    /// <param name="classifierDevice">The device configuration for running the classification model.</param>
+    /// <param name="recognizerDevice">The device configuration for running the recognition model.</param>
     public PaddleOcrAll(FullOcrModel model,
-        Action<PaddleConfig>? detectorDevice = null,
-        Action<PaddleConfig>? classifierDevice = null,
-        Action<PaddleConfig>? recognizerDevice = null)
+        DeviceOptions? detectorDevice = null,
+        DeviceOptions? classifierDevice = null,
+        DeviceOptions? recognizerDevice = null)
     {
-        Detector = new PaddleOcrDetector(model.DetectionModel, detectorDevice ?? model.DetectionModel.DefaultDeviceOptions);
+        Detector = new PaddleOcrDetector(model.DetectionModel, detectorDevice);
         if (model.ClassificationModel != null)
         {
-            Classifier = new PaddleOcrClassifier(model.ClassificationModel, classifierDevice ?? model.ClassificationModel.DefaultDeviceOptions);
+            Classifier = new PaddleOcrClassifier(model.ClassificationModel, classifierDevice);
         }
-        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, recognizerDevice ?? model.RecognizationModel.DefaultDeviceOptions);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PaddleOcrAll"/> class with the specified model path, label file path, model version and configure action.
-    /// </summary>
-    /// <param name="modelPath">Path to the model.</param>
-    /// <param name="labelFilePath">Path to the label file.</param>
-    /// <param name="version">Version of the model.</param>
-    /// <param name="configure">Configure action for PaddleConfig.</param>
-    [Obsolete("use PaddleOcrAll(PaddleOcrDetector detector, PaddleOcrClassifier? classifier, PaddleOcrRecognizer recognizer)")]
-    public PaddleOcrAll(string modelPath, string labelFilePath, ModelVersion version, Action<PaddleConfig> configure)
-        : this(FullOcrModel.FromDirectory(modelPath, labelFilePath, version), configure)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PaddleOcrAll"/> class with the detection, classification, recognition model directories, label file path, model version and the configure action.
-    /// </summary>
-    /// <param name="detectionModelDir">Path to the detection model directory.</param>
-    /// <param name="classificationModelDir">Path to the classification model directory.</param>
-    /// <param name="recognitionModelDir">Path to the recognition model directory.</param>
-    /// <param name="labelFilePath">Path to the label file.</param>
-    /// <param name="version">Version of the model.</param>
-    /// <param name="configure">Configure action for PaddleConfig.</param>
-    [Obsolete("use PaddleOcrAll(PaddleOcrDetector detector, PaddleOcrClassifier? classifier, PaddleOcrRecognizer recognizer)")]
-    public PaddleOcrAll(string detectionModelDir, string classificationModelDir, string recognitionModelDir, string labelFilePath, ModelVersion version, Action<PaddleConfig> configure)
-        : this(FullOcrModel.FromDirectory(detectionModelDir, classificationModelDir, recognitionModelDir, labelFilePath, version), configure)
-    {
+        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, recognizerDevice);
     }
 
     /// <summary>
@@ -109,19 +81,6 @@ public class PaddleOcrAll : IDisposable
         Detector = detector;
         Classifier = classifier;
         Recognizer = recognizer;
-    }
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="PaddleOcrAll"/> class that is a deep copy of the current instance.
-    /// </summary>
-    /// <returns>A new instance of the <see cref="PaddleOcrAll"/> class that is a deep copy of the current instance.</returns>
-    public PaddleOcrAll Clone()
-    {
-        return new PaddleOcrAll(Detector.Clone(), Classifier?.Clone(), Recognizer.Clone())
-        {
-            AllowRotateDetection = AllowRotateDetection,
-            Enable180Classification = Enable180Classification,
-        };
     }
 
     /// <summary>

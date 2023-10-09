@@ -1,5 +1,4 @@
-﻿using Sdcb.PaddleInference;
-using System.IO;
+﻿using System.IO;
 
 namespace Sdcb.OpenVINO.PaddleOCR.Models.Details;
 
@@ -28,12 +27,6 @@ public class FileTableRecognizationModel : TableRecognitionModel
         LabelFilePath = labelFilePath;
     }
 
-    /// <summary>
-    /// Returns a <see cref="PaddleConfig"/> instance created from the model directory path.
-    /// </summary>
-    /// <returns>A <see cref="PaddleConfig"/> instance that can be used for inference.</returns>
-    public override PaddleConfig CreateConfig()
-    {
-        return PaddleConfig.FromModelDir(DirectoryPath);
-    }
+    /// <inheritdoc/>
+    public override Model CreateOVModel(OVCore core) => ReadDirectoryInferenceModel(core, DirectoryPath);
 }
