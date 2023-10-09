@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PaddleOCR", "PaddleOCR", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.PaddleOCR", "projects\PaddleOCR\Sdcb.OpenVINO.PaddleOCR\Sdcb.OpenVINO.PaddleOCR.csproj", "{9C0656FC-017D-485F-8F4C-18B018C15E35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.PaddleOCR.Tests", "projects\PaddleOCR\Sdcb.OpenVINO.PaddleOCR.Tests\Sdcb.OpenVINO.PaddleOCR.Tests.csproj", "{920A7881-AB99-497B-A995-A6AD29360767}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{9C0656FC-017D-485F-8F4C-18B018C15E35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0656FC-017D-485F-8F4C-18B018C15E35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0656FC-017D-485F-8F4C-18B018C15E35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{920A7881-AB99-497B-A995-A6AD29360767}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{920A7881-AB99-497B-A995-A6AD29360767}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{920A7881-AB99-497B-A995-A6AD29360767}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{920A7881-AB99-497B-A995-A6AD29360767}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{C5A2B816-CA4A-4938-8A30-3ED5C55834CF} = {CF0B0CBC-EA90-486E-A006-50B76FE5C628}
 		{A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0} = {7E36D0ED-32C9-412A-A120-2272113062AD}
 		{9C0656FC-017D-485F-8F4C-18B018C15E35} = {A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0}
+		{920A7881-AB99-497B-A995-A6AD29360767} = {A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E5CE293-BD62-4ACF-B872-285B8C995E38}
