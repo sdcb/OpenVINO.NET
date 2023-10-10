@@ -1,7 +1,7 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
 
-namespace Sdcb.OpenVINO.PaddleOCR;
+namespace Sdcb.OpenVINO;
 
 using static NativeMethods;
 

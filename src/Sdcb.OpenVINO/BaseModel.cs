@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Sdcb.OpenVINO.PaddleOCR;
+namespace Sdcb.OpenVINO;
 
 /// <summary>
 /// Represents an abstract base class for all models.
@@ -37,7 +37,7 @@ public abstract class BaseModel
         Action<CompiledModel>? compiledModelCallback = null)
     {
         options ??= DefaultDeviceOptions;
-        using OVCore core = options.CreateCore();
+        using OVCore core = options.CreateOVCore();
 
         using Model m = CreateOVModel(core);
         readModelCallback?.Invoke(m);

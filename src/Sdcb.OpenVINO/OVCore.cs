@@ -246,7 +246,10 @@ public class OVCore : CppPtrObject
                         5 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]),
                         6 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11]),
                         7 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13]),
-                        _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 7 not supported, provided: {properties.Count}")
+                        8 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]),
+                        9 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17]),
+                        10 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17], v[18], v[19]),
+                        _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 10 not supported, provided: {properties.Count}")
                     });
                 }
             }
@@ -265,7 +268,10 @@ public class OVCore : CppPtrObject
                         5 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]),
                         6 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11]),
                         7 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13]),
-                        _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 7 not supported, provided: {properties.Count}")
+                        8 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]),
+                        9 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17]),
+                        10 => ov_core_compile_model_from_file((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17], v[18], v[19]),
+                        _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 10 not supported, provided: {properties.Count}")
                     });
                 }
             }
@@ -325,7 +331,10 @@ public class OVCore : CppPtrObject
                     5 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]),
                     6 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11]),
                     7 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13]),
-                    _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 7 not supported, provided: {properties.Count}")
+                    8 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]),
+                    9 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17]),
+                    10 => ov_core_compile_model((ov_core*)Handle, (ov_model*)model.DangerousGetHandle(), deviceNamePtr, properties.Count * 2, &cmodel, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17], v[18], v[19]),
+                    _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 10 not supported, provided: {properties.Count}")
                 });
             }
             return new CompiledModel((IntPtr)cmodel, owned: true);

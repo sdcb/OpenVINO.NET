@@ -132,10 +132,10 @@ public class PaddleOcrRecognizer : IDisposable
             IntPtr dataPtr = output.DangerousGetDataPtr();
             Shape shape = output.Shape;
 
-            int labelCount = (int)shape.Dimensions[2];
-            int charCount = (int)shape.Dimensions[1];
+            int labelCount = shape[2];
+            int charCount = shape[1];
 
-            return Enumerable.Range(0, (int)shape.Dimensions[0])
+            return Enumerable.Range(0, shape[0])
                 .Select(i =>
                 {
                     StringBuilder sb = new();

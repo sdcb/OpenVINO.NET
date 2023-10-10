@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Sdcb.OpenVINO.PaddleOCR;
+namespace Sdcb.OpenVINO;
 
 /// <summary>
 /// Represents the NCHW (Number of Batches, Channels, Height, Width) format.
 /// This is commonly used in convolutional neural networks.
 /// </summary>
-public readonly record struct NCHW(int NumberOfBatches, int Channels, int Height, int Width)
+public readonly record struct NCHW(int NumberOfBatches, int Channels, int Height, int Width) : IEquatable<NCHW>
 {
     /// <summary>
     /// Converts the NCHW object to a Shape object.
@@ -14,7 +14,7 @@ public readonly record struct NCHW(int NumberOfBatches, int Channels, int Height
     /// <returns>
     /// A <see cref="Shape"/> object with dimensions corresponding to the properties of the current NCHW object.
     /// </returns>
-    public readonly Shape ToShape() => new Shape(NumberOfBatches, Channels, Height, Width);
+    public readonly Shape ToShape() => new(NumberOfBatches, Channels, Height, Width);
 
     /// <summary>
     /// Converts a Shape object to an NCHW object.
@@ -35,8 +35,19 @@ public readonly record struct NCHW(int NumberOfBatches, int Channels, int Height
             throw new ArgumentException("Shape must have a rank of 4 to be converted to NCHW.", nameof(shape));
         }
 
-        return new NCHW((int)shape.Dimensions[0], (int)shape.Dimensions[1], (int)shape.Dimensions[2], (int)shape.Dimensions[3]);
+        return new NCHW(shape[0], shape[1], shape[2], shape[3]);
     }
+
+    /// <summary>
+    /// Implicitly converts an <see cref="NCHW"/> object to a <see cref="Shape"/> object.
+    /// </summary>
+    /// <param name="me">
+    /// The <see cref="NCHW"/> object to be converted.
+    /// </param>
+    /// <returns>
+    /// A <see cref="Shape"/> object with dimensions corresponding to the properties of the current NCHW object.
+    /// </returns>
+    public static implicit operator Shape(NCHW me) => me.ToShape();
 
     /// <summary>
     /// Returns a string that represents the current NCHW object.

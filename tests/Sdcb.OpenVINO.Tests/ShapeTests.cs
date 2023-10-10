@@ -59,9 +59,9 @@ public class ShapeTests
         PartialShape s = new(1, 2, 3, 4);
         Shape ps = (Shape)s;
         Assert.Equal(4, ps.Rank);
-        Assert.Equal(1, ps.Dimensions[0]);
+        Assert.Equal(1, ps[0]);
         Assert.Equal(2, ps.Dimensions[1]);
-        Assert.Equal(3, ps.Dimensions[2]);
+        Assert.Equal(3, ps[2]);
         Assert.Equal(4, ps.Dimensions[3]);
     }
 

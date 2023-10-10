@@ -29,10 +29,7 @@ public class PaddleOcrClassifier : IDisposable
     public PaddleOcrClassifier(ClassificationModel model, DeviceOptions? device = null)
     {
         Shape = model.Shape;
-        _p = model.CreateInferRequest(device, readModelCallback: model =>
-        {
-            model.ReshapePrimaryInput(new PartialShape(Dimension.Dynamic, 3, Shape.Height, Shape.Width));
-        });
+        _p = model.CreateInferRequest(device);
     }
 
     /// <summary>

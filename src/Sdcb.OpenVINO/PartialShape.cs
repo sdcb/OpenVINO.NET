@@ -8,7 +8,7 @@ namespace Sdcb.OpenVINO;
 /// <summary>
 /// Represents a partial shape.
 /// </summary>
-public class PartialShape : IEquatable<PartialShape>
+public readonly struct PartialShape : IEquatable<PartialShape>
 {
     /// <summary>
     /// The rank of the partial shape.
@@ -29,6 +29,18 @@ public class PartialShape : IEquatable<PartialShape>
     /// </remarks>
     /// <returns>True if the <see cref="PartialShape"/> object is dynamic, false otherwise.</returns>
     public bool IsDynamic => Rank.IsDynamic || Dimensions.Any(x => x.IsDynamic);
+
+    /// <summary>
+    /// Gets or sets the dimension at the specified index.
+    /// </summary>
+    /// <param name="dimensionsIndex">The index of the dimension to get or set.</param>
+    /// <returns>The dimension at the specified index.</returns>
+    /// <exception cref="IndexOutOfRangeException">Thrown if the index is out of range.</exception>
+    public Dimension this[int dimensionsIndex]
+    {
+        get => Dimensions[dimensionsIndex];
+        set => Dimensions[dimensionsIndex] = value;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PartialShape"/> class with the specified openvino <see cref="ov_partial_shape"/>.
@@ -91,7 +103,7 @@ public class PartialShape : IEquatable<PartialShape>
     /// Initializes a new instance of the <see cref="PartialShape"/> class that represents a static dimension.
     /// </summary>
     /// <param name="dims">An array of dimensions that describe the partial shape.</param>
-    public unsafe PartialShape(params long[] dims)
+    public unsafe PartialShape(params int[] dims)
     {
         Rank = new(dims.Length);
         Dimensions = new Dimension[dims.Length];
@@ -111,11 +123,9 @@ public class PartialShape : IEquatable<PartialShape>
     /// </summary>
     /// <param name="other">A <see cref="PartialShape"/> object to compare with this <see cref="PartialShape"/> object.</param>
     /// <returns>True if the two objects are equal, false otherwise.</returns>
-    public bool Equals(PartialShape? other)
+    public bool Equals(PartialShape other)
     {
-        if (other is not null)
-            return Rank == other.Rank && Dimensions.SequenceEqual(other.Dimensions);
-        return false;
+        return Rank == other.Rank && Dimensions.SequenceEqual(other.Dimensions);
     }
 
     /// <summary>
@@ -172,7 +182,7 @@ public class PartialShape : IEquatable<PartialShape>
     /// Overrides the <see cref="object.ToString"/> method to return the <see cref="PartialShape"/> as a string.
     /// </summary>
     /// <returns>A string representation of the <see cref="PartialShape"/>, including all dimensions.</returns>
-    public override string ToString()
+    public override readonly string ToString()
     {
         if (Rank.IsDynamic) return Rank.ToString();
         return $"{{{string.Join(",", Dimensions)}}}";
@@ -209,10 +219,10 @@ public class PartialShape : IEquatable<PartialShape>
     /// <returns>The <see cref="PartialShape"/> object that was created from the <see cref="Shape"/> object.</returns>
     public static implicit operator PartialShape(Shape shape)
     {
-        Dimension[] ds = new Dimension[shape.Dimensions.Length];
+        Dimension[] ds = new Dimension[shape.Rank];
         for (int i = 0; i < ds.Length; ++i)
         {
-            ds[i] = new Dimension(shape.Dimensions[i]);
+            ds[i] = new Dimension(shape[i]);
         }
         return new PartialShape(ds);
     }

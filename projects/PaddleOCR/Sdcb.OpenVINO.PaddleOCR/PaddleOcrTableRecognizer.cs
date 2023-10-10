@@ -164,14 +164,14 @@ public class PaddleOcrTableRecognizer : IDisposable
         List<string> recHtmlTags = new();
         List<TableCellBox> recBoxes = new();
 
-        for (int stepIndex = 0; stepIndex < structureShape.Dimensions[1]; ++stepIndex)
+        for (int stepIndex = 0; stepIndex < structureShape[1]; ++stepIndex)
         {
             List<int> recBox = new();
             string htmlTag;
             // html tag
             {
-                int stepStartIndex = stepIndex * (int)structureShape.Dimensions[2];
-                (int charIndex, float charScore) = ArgMax(structures[stepStartIndex..(stepStartIndex + (int)structureShape.Dimensions[2])]);
+                int stepStartIndex = stepIndex * structureShape[2];
+                (int charIndex, float charScore) = ArgMax(structures[stepStartIndex..(stepStartIndex + structureShape[2])]);
                 htmlTag = labelAccessor(charIndex);
                 if (stepIndex > 0 && htmlTag == TableRecognitionModelConsts.LastLabel)
                 {
@@ -189,9 +189,9 @@ public class PaddleOcrTableRecognizer : IDisposable
             // box
             if (htmlTag == "<td>" || htmlTag == "<td" || htmlTag == "<td></td>")
             {
-                for (int pointIndex = 0; pointIndex < locationShape.Dimensions[2]; pointIndex++)
+                for (int pointIndex = 0; pointIndex < locationShape[2]; pointIndex++)
                 {
-                    int stepStartIndex = stepIndex * (int)locationShape.Dimensions[2] + pointIndex;
+                    int stepStartIndex = stepIndex * locationShape[2] + pointIndex;
                     float point = locations[stepStartIndex];
                     if (pointIndex % 2 == 0)
                     {

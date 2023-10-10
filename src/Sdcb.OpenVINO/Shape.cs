@@ -1,7 +1,5 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Sdcb.OpenVINO;
@@ -9,7 +7,7 @@ namespace Sdcb.OpenVINO;
 /// <summary>
 /// Represents a shape with managed memory and allows manipulation of each element.
 /// </summary>
-public class Shape : IEquatable<Shape>
+public readonly struct Shape : IEquatable<Shape>
 {
     /// <summary>
     /// The rank of the shape.
@@ -31,6 +29,18 @@ public class Shape : IEquatable<Shape>
     /// Computed as the product of all the dimensions of the shape.
     /// </remarks>
     public long ElementCount => Dimensions.Aggregate(1L, (a, b) => a * b);
+
+    /// <summary>
+    /// Gets or sets the value of the shape at the specified index.
+    /// </summary>
+    /// <param name="elementIndex">The index of the shape element.</param>
+    /// <returns>The value of the shape element at the specified index.</returns>
+    /// <exception cref="IndexOutOfRangeException">Thrown when the specified index is out of range.</exception>
+    public int this[int elementIndex]
+    {
+        get => (int)Dimensions[elementIndex];
+        set => Dimensions[elementIndex] = value;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Shape"/> class with an OpenVINO shape <see cref="ov_shape_t"/>.
@@ -59,11 +69,9 @@ public class Shape : IEquatable<Shape>
     /// </summary>
     /// <param name="other"><see cref="Shape"/> instance to compare with.</param>
     /// <returns><c>true</c> if instances are equal, <c>false</c> otherwise.</returns>
-    public bool Equals(Shape? other)
+    public bool Equals(Shape other)
     {
-        if (other is not null)
-            return Dimensions.SequenceEqual(other.Dimensions);
-        return false;
+        return Dimensions.SequenceEqual(other.Dimensions);
     }
 
     /// <summary>
@@ -126,4 +134,10 @@ public class Shape : IEquatable<Shape>
     /// </summary>
     /// <returns>An instance of <see cref="NativeShapeWrapper"/>.</returns>
     public NativeShapeWrapper Lock() => new(this);
+
+    /// <summary>
+    /// Converts the input shape to NCHW format.
+    /// </summary>
+    /// <returns>The converted shape in NCHW format.</returns>
+    public NCHW ToNCHW() => NCHW.FromShape(this);
 }

@@ -45,7 +45,7 @@ internal class FunctionGenerator
 
         if (func.IsVariadic)
         {
-            for (int i = 0; i < 7; ++i)
+            for (int i = 0; i < 10; ++i)
             {
                 w.Write($"[DllImport(Dll, EntryPoint = nameof({func.Name}), CallingConvention = CallingConvention.Cdecl)] ");
                 string variadics = string.Join(", ", Enumerable.Range(0, i + 1).Select(x => $"IntPtr varg{x * 2 + 1}, IntPtr varg{x * 2 + 2}"));

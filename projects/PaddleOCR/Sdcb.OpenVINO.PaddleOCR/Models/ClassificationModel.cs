@@ -35,4 +35,10 @@ public abstract class ClassificationModel : OcrBaseModel
     /// <param name="version">The version of the classification model.</param>
     /// <returns>a new ClassificationModel object</returns>
     public static ClassificationModel FromDirectory(string directoryPath, ModelVersion version = ModelVersion.V2) => new FileClassificationModel(directoryPath, version);
+
+    /// <inheritdoc/>
+    public override void AfterReadModel(Model model)
+    {
+        model.ReshapePrimaryInput(new PartialShape(Dimension.Dynamic, 3, Shape.Height, Shape.Width));
+    }
 }
