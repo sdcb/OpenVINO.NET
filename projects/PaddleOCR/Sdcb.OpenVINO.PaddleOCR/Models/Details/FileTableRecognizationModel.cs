@@ -28,5 +28,5 @@ public class FileTableRecognizationModel : TableRecognitionModel
     }
 
     /// <inheritdoc/>
-    public override Model CreateOVModel(OVCore core) => ReadDirectoryInferenceModel(core, DirectoryPath);
+    public override Model CreateOVModel(OVCore core) => core.ReadDirectoryPaddleModel(DirectoryPath);
 }

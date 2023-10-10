@@ -13,7 +13,7 @@ public abstract class DetectionModel : OcrBaseModel
     /// Constructor for initializing an instance of the <see cref="DetectionModel"/> class.
     /// </summary>
     /// <param name="version">The version of detection model.</param>
-    public DetectionModel(OCRModelVersion version) : base(version)
+    public DetectionModel(ModelVersion version) : base(version)
     {
     }
 
@@ -23,5 +23,5 @@ public abstract class DetectionModel : OcrBaseModel
     /// <param name="directoryPath">The directory path where model files are located.</param>
     /// <param name="version">The version of detection model.</param>
     /// <returns>An instance of the DetectionModel class.</returns>
-    public static DetectionModel FromDirectory(string directoryPath, OCRModelVersion version) => new FileDetectionModel(directoryPath, version);
+    public static DetectionModel FromDirectory(string directoryPath, ModelVersion version) => new FileDetectionModel(directoryPath, version);
 }

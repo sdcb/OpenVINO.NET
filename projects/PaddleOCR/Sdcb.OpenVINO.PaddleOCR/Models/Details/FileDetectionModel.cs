@@ -21,11 +21,11 @@ public class FileDetectionModel : DetectionModel
     /// </summary>
     /// <param name="directoryPath">The directory path containing the model files.</param>
     /// <param name="version">The version of detection model.</param>
-    public FileDetectionModel(string directoryPath, OCRModelVersion version) : base(version)
+    public FileDetectionModel(string directoryPath, ModelVersion version) : base(version)
     {
         DirectoryPath = directoryPath;
     }
 
     /// <inheritdoc/>
-    public override Model CreateOVModel(OVCore core) => ReadDirectoryInferenceModel(core, DirectoryPath);
+    public override Model CreateOVModel(OVCore core) => core.ReadDirectoryPaddleModel(DirectoryPath);
 }

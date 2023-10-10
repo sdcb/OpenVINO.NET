@@ -13,7 +13,7 @@ public abstract class RecognizationModel : OcrBaseModel
     /// Constructor for initializing an instance of the <see cref="RecognizationModel"/> class.
     /// </summary>
     /// <param name="version">The version of recognition model.</param>
-    public RecognizationModel(OCRModelVersion version) : base(version)
+    public RecognizationModel(ModelVersion version) : base(version)
     {
     }
 
@@ -45,9 +45,9 @@ public abstract class RecognizationModel : OcrBaseModel
     /// </summary>
     public virtual NCHW Shape => Version switch
     {
-        OCRModelVersion.V2 => new(-1, 3, 32, 320),
-        OCRModelVersion.V3 => new(-1, 3, 48, 320),
-        OCRModelVersion.V4 => new(-1, 3, 48, 320),
+        ModelVersion.V2 => new(-1, 3, 32, 320),
+        ModelVersion.V3 => new(-1, 3, 48, 320),
+        ModelVersion.V4 => new(-1, 3, 48, 320),
         _ => throw new ArgumentOutOfRangeException($"Unknown OCR model version: {Version}."),
     };
 
@@ -58,5 +58,5 @@ public abstract class RecognizationModel : OcrBaseModel
     /// <param name="labelPath">The label path of recognition model.</param>
     /// <param name="version">The version of recognition model.</param>
     /// <returns>The RecognizationModel object created with the specified directory path, label path and model version.</returns>
-    public static RecognizationModel FromDirectory(string directoryPath, string labelPath, OCRModelVersion version) => new FileRecognizationModel(directoryPath, labelPath, version);
+    public static RecognizationModel FromDirectory(string directoryPath, string labelPath, ModelVersion version) => new FileRecognizationModel(directoryPath, labelPath, version);
 }

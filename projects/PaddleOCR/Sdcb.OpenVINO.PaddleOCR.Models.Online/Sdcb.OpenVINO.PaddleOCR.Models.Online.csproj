@@ -30,13 +30,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <PackageReference Include="Sdcb.PaddleOCR.Models.Shared" Version="2.7.0.1" />
+    <PackageReference Include="SharpCompress" Version="0.34.1" />
     <PackageReference Include="PolySharp" Version="1.13.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sdcb.OpenVINO" Version="0.2.4" Condition="'$(Configuration)' != 'Debug'" />
-    <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sdcb.OpenVINO.PaddleOCR\Sdcb.OpenVINO.PaddleOCR.csproj" />
   </ItemGroup>
 
 </Project>

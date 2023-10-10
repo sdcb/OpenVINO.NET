@@ -15,7 +15,7 @@ public abstract class OcrBaseModel : BaseModel
     /// Constructor for initializing an instance of the <see cref="OcrBaseModel"/> class.
     /// </summary>
     /// <param name="version">The version of model.</param>
-    public OcrBaseModel(OCRModelVersion version)
+    public OcrBaseModel(ModelVersion version)
     {
         Version = version;
     }
@@ -23,5 +23,5 @@ public abstract class OcrBaseModel : BaseModel
     /// <summary>
     /// Gets the version of the OCR model.
     /// </summary>
-    public OCRModelVersion Version { get; }
+    public ModelVersion Version { get; }
 }

@@ -58,18 +58,4 @@ public abstract class BaseModel
     /// The device options include the device name and properties to be used during inference.
     /// </remarks>
     public DeviceOptions DefaultDeviceOptions { get; init; } = new DeviceOptions();
-
-    /// <summary>
-    /// Reads the inference model from a directory path and returns the <see cref="Model"/> instance.
-    /// </summary>
-    /// <remarks>
-    /// The purpose of this method is to read the inference model from the directory path and return the pre-trained inference model wrapped in a <see cref="Model"/> object.
-    /// </remarks>
-    /// <param name="core">The OpenVINO Core used for reading the model.</param>
-    /// <param name="directoryPath">The directory path where the inference model is located.</param>
-    /// <returns>Returns a <see cref="Model"/> instance.</returns>
-    public static Model ReadDirectoryInferenceModel(OVCore core, string directoryPath)
-    {
-        return core.ReadModel(Path.Combine(directoryPath, "inference.pdmodel"));
-    }
 }
