@@ -175,7 +175,7 @@ public class PaddleOcrDetector : IDisposable
 
         _p.Run();
 
-        using (Tensor output = _p.Outputs.Primary)
+        using (Tensor output = _p.Outputs[0])
         {
             Span<float> data = output.GetData<float>();
             NCHW shape = output.Shape.ToNCHW();

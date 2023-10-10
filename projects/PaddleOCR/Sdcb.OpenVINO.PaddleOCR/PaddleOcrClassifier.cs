@@ -29,7 +29,10 @@ public class PaddleOcrClassifier : IDisposable
     public PaddleOcrClassifier(ClassificationModel model, DeviceOptions? device = null)
     {
         Shape = model.Shape;
-        _p = model.CreateInferRequest(device);
+        _p = model.CreateInferRequest(device, readModelCallback: model =>
+        {
+            model.ReshapePrimaryInput(new PartialShape(Dimension.Dynamic, 3, Shape.Height, Shape.Width));
+        });
     }
 
     /// <summary>
@@ -117,11 +120,14 @@ public class PaddleOcrClassifier : IDisposable
     private static Mat ResizePadding(Mat src, NCHW shape)
     {
         Size srcSize = src.Size();
-        using Mat roi = srcSize.Width / srcSize.Height > shape.Width / shape.Height ?
-            src[0, srcSize.Height, 0, (int)Math.Floor(1.0 * srcSize.Height * shape.Width / shape.Height)] :
+        double whRatio = 1.0 * shape.Width / shape.Height;
+        using Mat roi = 1.0 * srcSize.Width / srcSize.Height > whRatio ?
+            src[0, srcSize.Height, 0, (int)Math.Floor(1.0 * srcSize.Height * whRatio)] :
             src.Clone();
+
         double scaleRate = 1.0 * shape.Height / srcSize.Height;
         Mat resized = roi.Resize(new Size(Math.Floor(roi.Width * scaleRate), shape.Height));
+        
         if (resized.Width < shape.Width)
         {
             Cv2.CopyMakeBorder(resized, resized, 0, 0, 0, shape.Width - resized.Width, BorderTypes.Constant, Scalar.Black);
