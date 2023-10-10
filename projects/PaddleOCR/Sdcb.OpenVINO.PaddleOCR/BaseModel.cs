@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Sdcb.OpenVINO.PaddleOCR;
 
@@ -18,18 +19,34 @@ public abstract class BaseModel
     public abstract Model CreateOVModel(OVCore core);
 
     /// <summary>
-    /// Creates an instance of <see cref="InferRequest"/> class.
+    /// Creates an instance of <see cref="InferRequest"/> class using the specified <see cref="DeviceOptions"/>.
     /// </summary>
-    /// <param name="options">used for the <see cref="InferRequest"/> instance creation.</param>
+    /// <remarks>
+    /// The purpose of this method is to be able to create an instance of <see cref="InferRequest"/> class from the <see cref="DeviceOptions"/> that are passed to it.
+    /// It utilizes the <see cref="CreateOVModel(OVCore)"/> method to create an <see cref="Model"/> instance from the specified <see cref="OVCore"/>.
+    /// After the model is created, it invokes the <see cref="AfterReadModel(Model)"/> method to make any necessary adjustments to the model.
+    /// Then it compiles the model using the specified device and properties using <see cref="OVCore.CompileModel(Model, string, System.Collections.Generic.Dictionary{string, string}?)"/> method. After the model is compiled, it invokes <see cref="AfterCompiledModel(Model, CompiledModel)"/> to make any necessary adjustment to the compile model, and then it returns the created <see cref="InferRequest"/> instance.
+    /// </remarks>
+    /// <param name="options">The <see cref="DeviceOptions"/> instance to be used for creating the <see cref="InferRequest"/> instance.</param>
+    /// <param name="readModelCallback">The <see cref="Action&lt;Model&gt;"/> delegate that is invoked after the <see cref="Model"/> instance is created.</param>
+    /// <param name="compiledModelCallback">The <see cref="Action&lt;CompiledModel&gt;"/> delegate that is invoked after the <see cref="CompiledModel"/> instance is created.</param>
     /// <returns>Returns an <see cref="InferRequest"/> instance.</returns>
-    public virtual InferRequest CreateInferRequest(DeviceOptions? options = null)
+    public virtual InferRequest CreateInferRequest(
+        DeviceOptions? options = null, 
+        Action<Model>? readModelCallback = null, 
+        Action<CompiledModel>? compiledModelCallback = null)
     {
         options ??= DefaultDeviceOptions;
         using OVCore core = options.CreateCore();
+
         using Model m = CreateOVModel(core);
+        readModelCallback?.Invoke(m);
         AfterReadModel(m);
+
         using CompiledModel cm = core.CompileModel(m, options.DeviceName, options.Properties);
+        compiledModelCallback?.Invoke(cm);
         AfterCompiledModel(m, cm);
+
         return cm.CreateInferRequest();
     }
 

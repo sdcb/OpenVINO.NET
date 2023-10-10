@@ -132,40 +132,32 @@ public class PaddleOcrRecognizer : IDisposable
             IntPtr dataPtr = output.DangerousGetDataPtr();
             Shape shape = output.Shape;
 
-            GCHandle dataHandle = default;
-            try
-            {
-                int labelCount = (int)shape.Dimensions[2];
-                int charCount = (int)shape.Dimensions[1];
+            int labelCount = (int)shape.Dimensions[2];
+            int charCount = (int)shape.Dimensions[1];
 
-                return Enumerable.Range(0, (int)shape.Dimensions[0])
-                    .Select(i =>
+            return Enumerable.Range(0, (int)shape.Dimensions[0])
+                .Select(i =>
+                {
+                    StringBuilder sb = new();
+                    int lastIndex = 0;
+                    float score = 0;
+                    for (int n = 0; n < charCount; ++n)
                     {
-                        StringBuilder sb = new();
-                        int lastIndex = 0;
-                        float score = 0;
-                        for (int n = 0; n < charCount; ++n)
+                        using Mat mat = new(1, labelCount, MatType.CV_32FC1, dataPtr + (n + i * charCount) * labelCount * sizeof(float));
+                        int[] maxIdx = new int[2];
+                        mat.MinMaxIdx(out double _, out double maxVal, new int[0], maxIdx);
+
+                        if (maxIdx[1] > 0 && (!(n > 0 && maxIdx[1] == lastIndex)))
                         {
-                            using Mat mat = new(1, labelCount, MatType.CV_32FC1, dataPtr + (n + i * charCount) * labelCount * sizeof(float));
-                            int[] maxIdx = new int[2];
-                            mat.MinMaxIdx(out double _, out double maxVal, new int[0], maxIdx);
-
-                            if (maxIdx[1] > 0 && (!(n > 0 && maxIdx[1] == lastIndex)))
-                            {
-                                score += (float)maxVal;
-                                sb.Append(Model.GetLabelByIndex(maxIdx[1]));
-                            }
-                            lastIndex = maxIdx[1];
+                            score += (float)maxVal;
+                            sb.Append(Model.GetLabelByIndex(maxIdx[1]));
                         }
+                        lastIndex = maxIdx[1];
+                    }
 
-                        return new PaddleOcrRecognizerResult(sb.ToString(), score / sb.Length);
-                    })
-                    .ToArray();
-            }
-            finally
-            {
-                dataHandle.Free();
-            }
+                    return new PaddleOcrRecognizerResult(sb.ToString(), score / sb.Length);
+                })
+                .ToArray();
         }
     }
 

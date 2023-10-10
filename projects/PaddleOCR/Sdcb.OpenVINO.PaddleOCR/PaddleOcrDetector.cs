@@ -40,7 +40,17 @@ public class PaddleOcrDetector : IDisposable
     /// <param name="options">The device and configure of the PaddleConfig, pass null to using model's DefaultDevice.</param>
     public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null)
     {
-        _p = model.CreateInferRequest(options);
+        _p = model.CreateInferRequest(options, readModelCallback: model =>
+        {
+            if (MaxSize.HasValue)
+            {
+                model.ReshapePrimaryInput(new PartialShape(1, 3, new Dimension(32, MaxSize.Value), new Dimension(32, MaxSize.Value)));
+            }
+            else
+            {
+                model.ReshapePrimaryInput(new PartialShape(1, 3, Dimension.Dynamic, Dimension.Dynamic));
+            }
+        });
     }
 
     /// <summary>
