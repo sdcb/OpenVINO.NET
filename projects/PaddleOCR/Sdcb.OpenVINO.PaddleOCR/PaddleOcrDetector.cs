@@ -16,7 +16,7 @@ public class PaddleOcrDetector : IDisposable
     readonly InferRequest _p;
 
     /// <summary>Gets or sets the maximum size for resizing the input image.</summary>
-    public int? MaxSize { get; set; } = 1536;
+    public int? MaxSize { get; init; } = 1536;
 
     /// <summary>Gets or sets the size for dilation during preprocessing.</summary>
     public int? DilatedSize { get; set; } = 2;
@@ -42,14 +42,7 @@ public class PaddleOcrDetector : IDisposable
     {
         _p = model.CreateInferRequest(options, readModelCallback: model =>
         {
-            if (MaxSize.HasValue)
-            {
-                model.ReshapePrimaryInput(new PartialShape(1, 3, new Dimension(32, MaxSize.Value), new Dimension(32, MaxSize.Value)));
-            }
-            else
-            {
-                model.ReshapePrimaryInput(new PartialShape(1, 3, Dimension.Dynamic, Dimension.Dynamic));
-            }
+            model.ReshapePrimaryInput(new PartialShape(1, 3, new Dimension(32, int.MaxValue), new Dimension(32, int.MaxValue)));
         });
     }
 
