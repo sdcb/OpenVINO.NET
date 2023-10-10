@@ -35,7 +35,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sdcb.OpenVINO" Version="0.2.4" Condition="'$(Configuration)' != 'Debug'" />
+    <PackageReference Include="Sdcb.OpenVINO" Version="0.3.0" Condition="'$(Configuration)' != 'Debug'" />
     <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'" />
   </ItemGroup>
 

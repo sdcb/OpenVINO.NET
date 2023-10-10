@@ -26,8 +26,9 @@ void PublishProGet(string path)
 void PublishNuGet(string path)
 {
 	string nugetApiUrl = "nuget.org";
-	string nugetApiKey = Util.GetPassword("nuget-api-key");
-	NuGetRun($@"push {path} {nugetApiKey} -Source {nugetApiUrl}".Dump());
+	//string nugetApiKey = Util.GetPassword("nuget-api-key");
+	//NuGetRun($@"push {path} {nugetApiKey} -Source {nugetApiUrl}".Dump());
+	NuGetRun($@"push {path} -Source {nugetApiUrl}".Dump());
 }
 
 void Refresh()
