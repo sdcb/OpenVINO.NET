@@ -28,7 +28,18 @@ public class OnlineDetectionTest
             MaxSize = null
         };
         RotatedRect[] results = det.Run(src);
-        PaddleOcrDetector.Visualize(src, results, Scalar.Red, 2).ImWrite("test.jpg");
+        //PaddleOcrDetector.Visualize(src, results, Scalar.Red, 2).ImWrite("test.jpg");
+        Assert.NotEmpty(results);
+    }
+
+    [Fact]
+    public async Task SpecifySize()
+    {
+        using Mat src = Cv2.ImRead("./samples/xdr5450.webp");
+        using PaddleOcrDetector det = new(await OnlineDetectionModel.ChineseV4.DownloadAsync());
+        det.MaxSize = null;
+        RotatedRect[] results = det.Run(src);
+        //PaddleOcrDetector.Visualize(src, results, Scalar.Red, 2).ImWrite("test.jpg");
         Assert.NotEmpty(results);
     }
 

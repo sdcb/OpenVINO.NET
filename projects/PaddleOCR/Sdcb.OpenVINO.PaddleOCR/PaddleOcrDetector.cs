@@ -16,7 +16,7 @@ public class PaddleOcrDetector : IDisposable
     readonly InferRequest _p;
 
     /// <summary>Gets or sets the maximum size for resizing the input image.</summary>
-    public int? MaxSize { get; init; } = 1536;
+    public int? MaxSize { get; set; } = 1536;
 
     /// <summary>Gets or sets the size for dilation during preprocessing.</summary>
     public int? DilatedSize { get; set; } = 2;
