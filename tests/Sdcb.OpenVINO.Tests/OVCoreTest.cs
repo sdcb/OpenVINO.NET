@@ -21,6 +21,12 @@ public class OVCoreTest
     }
 
     [Fact]
+    public void DevicesTest()
+    {
+        Assert.NotEmpty(SharedOVCore.Instance.AvailableDevices);
+    }
+
+    [Fact]
     public void DeviceVersionTest()
     {
         using OVCore c = new();

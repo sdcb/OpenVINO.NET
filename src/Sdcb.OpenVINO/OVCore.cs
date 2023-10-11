@@ -68,6 +68,35 @@ public class OVCore : CppPtrObject
         }
     }
 
+    /// <summary>
+    /// Gets an array of string containing the available devices names.
+    /// </summary>
+    public unsafe string[] AvailableDevices
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            ov_available_devices_t rawDevices;
+            try
+            {
+                OpenVINOException.ThrowIfFailed(ov_core_get_available_devices((ov_core*)Handle, &rawDevices));
+
+                string[] devices = new string[rawDevices.size];
+                for (int i = 0; i < devices.Length; ++i)
+                {
+                    devices[i] = StringUtils.UTF8PtrToString((IntPtr)rawDevices.devices[i])!;
+                }
+
+                return devices;
+            }
+            finally
+            {
+                ov_available_devices_free(&rawDevices);
+            }
+        }
+    }
+
     /// <summary>Sets properties for a device, acceptable keys can be found in ov_property_key_xxx.</summary>
     /// <param name="deviceName">Name of a device.</param>
     /// <param name="key">The key of the property to set.</param>
