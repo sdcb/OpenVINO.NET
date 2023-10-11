@@ -42,7 +42,7 @@ public class PaddleOcrDetector : IDisposable
     {
         _p = model.CreateInferRequest(options, readModelCallback: model =>
         {
-            model.ReshapePrimaryInput(new PartialShape(1, 3, new Dimension(32, int.MaxValue), new Dimension(32, int.MaxValue)));
+            model.ReshapePrimaryInput(new PartialShape(1, 3, Dimension.Dynamic, Dimension.Dynamic));
         });
     }
 

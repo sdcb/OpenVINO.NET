@@ -31,4 +31,19 @@ public class OnlineDetectionTest
         PaddleOcrDetector.Visualize(src, results, Scalar.Red, 2).ImWrite("test.jpg");
         Assert.NotEmpty(results);
     }
+
+    [Fact(Skip = "Too slow")]
+    public async Task DetectGPU()
+    {
+        using Mat src = Cv2.ImRead("./samples/vsext.png");
+        using PaddleOcrDetector det = new(
+            await OnlineDetectionModel.ChineseV3.DownloadAsync(), 
+            new DeviceOptions("GPU"))
+        {
+            MaxSize = 1536
+        };
+        RotatedRect[] results = det.Run(src);
+        PaddleOcrDetector.Visualize(src, results, Scalar.Red, 2).ImWrite("test.jpg");
+        Assert.NotEmpty(results);
+    }
 }

@@ -75,14 +75,13 @@ public class OnlineModelsTest
         }
     }
 
-    [Fact(Skip = "Don't know why but too slow in my i9-9880h")]
+    [Fact(Skip = "Too slow")]
     public async Task GPUFastCheckOCR()
     {
         FullOcrModel model = await OnlineFullModels.EnglishV3.DownloadAsync();
 
         // from: https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Home-page-extension-visual-updated.png
         byte[] sampleImageData = File.ReadAllBytes(@"./samples/vsext.png");
-
         using (PaddleOcrAll all = new(model, new DeviceOptions("GPU"))
         {
             AllowRotateDetection = true,
