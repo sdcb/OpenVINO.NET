@@ -15,8 +15,8 @@ class Program
         IServiceProvider sp = ConfigureServices();
         ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
-        string purpose = args.Length > 0 ? args[0] : "linux";
-        string? versionSuffix = "preview.2";
+        string purpose = args.Length > 0 ? args[0] : "win64";
+        string? versionSuffix = null; // preview.1
         string dir = Path.Combine(DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo("."), "OpenVINO.NET.sln").DirectoryName!,
             "build", "nupkgs");
 
@@ -33,7 +33,7 @@ class Program
         }
     }
 
-    private static async Task Build_Win_x64(ArtifactDownloader w, StorageNodeRoot root, string versionSuffix, string dir)
+    private static async Task Build_Win_x64(ArtifactDownloader w, StorageNodeRoot root, string? versionSuffix, string dir)
     {
         ArtifactInfo artifact = root.LatestStableVersion.Artifacts.First(x => x.OS == KnownOS.Windows);
         NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
@@ -42,7 +42,7 @@ class Program
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
     }
 
-    private static async Task Build_Linuxs(ArtifactDownloader w, StorageNodeRoot root, string versionSuffix, string dir)
+    private static async Task Build_Linuxs(ArtifactDownloader w, StorageNodeRoot root, string? versionSuffix, string dir)
     {
         foreach (ArtifactInfo artifact in root.LatestStableVersion.Artifacts.Where(x => x.OS == KnownOS.Linux))
         {
