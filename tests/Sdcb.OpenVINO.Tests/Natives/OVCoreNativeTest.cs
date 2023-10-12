@@ -21,9 +21,8 @@ public class OVCoreNativeTest
         _modelFile = PrepareModel();
     }
 
-    internal static string PrepareModel()
+    internal static string PrepareModel(string dir = "ppocrv3-det-cn")
     {
-        string dir = "ppocrv3-det-cn";
         string modelFile = new FileInfo(Path.Combine(dir, "inference.pdmodel")).FullName;
 
         if (!File.Exists(modelFile))

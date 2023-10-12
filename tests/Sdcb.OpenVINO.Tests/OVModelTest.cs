@@ -28,6 +28,19 @@ public class OVModelTest
     }
 
     [Fact]
+    public void CanReadChinese()
+    {
+        using OVCore c = new();
+        using Model m = c.ReadModel(OVCoreNativeTest.PrepareModel("支持中文"));
+        Assert.NotNull(m);
+        Assert.NotEmpty(m.Inputs);
+        Assert.NotNull(m.Inputs.Primary);
+        Assert.NotEmpty(m.Outputs);
+        Assert.NotNull(m.Outputs.Primary);
+        Assert.NotNull(m.FriendlyName);
+    }
+
+    [Fact]
     public void ReshapeByTensorNames()
     {
         using OVCore c = new();
