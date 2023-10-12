@@ -1,6 +1,7 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
-using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Sdcb.OpenVINO;
 
@@ -9,13 +10,14 @@ using static NativeMethods;
 /// <summary>
 /// Provides an abstract class for indexing into <see cref="Tensor"/> data.
 /// </summary>
-public abstract class TensorIndexer
+public abstract class TensorIndexer : IReadOnlyList<Tensor>
 {
     internal readonly unsafe ov_infer_request* _req;
 
-    internal unsafe TensorIndexer(ov_infer_request* req)
+    internal unsafe TensorIndexer(ov_infer_request* req, int count)
     {
         _req = req;
+        Count = count;
     }
 
     /// <summary>
@@ -23,22 +25,38 @@ public abstract class TensorIndexer
     /// </summary>
     public abstract Tensor Primary { get; set; }
 
+    /// <inheritdoc/>
+    public int Count { get; }
+
     /// <summary>
     /// Indexes into the tensor data with the specified index.
     /// </summary>
     /// <param name="index">The index into the tensor data.</param>
     /// <returns>The tensor data indexed by the specified index.</returns>
+    /// <exception cref="IndexOutOfRangeException"/>
+    /// <exception cref="ObjectDisposedException"/>
     public abstract Tensor this[int index] { get; set; }
 
     internal unsafe void ThrowIfDisposed()
     {
         if (_req == null) throw new ObjectDisposedException($"{nameof(ov_infer_request)}* is null");
     }
+
+    /// <inheritdoc/>
+    public IEnumerator<Tensor> GetEnumerator()
+    {
+        for (int i = 0; i < Count; ++i)
+        {
+            yield return this[i];
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 
 internal class InputTensorIndexer : TensorIndexer
 {
-    public unsafe InputTensorIndexer(ov_infer_request* inferRequest) : base(inferRequest)
+    public unsafe InputTensorIndexer(ov_infer_request* inferRequest, int count) : base(inferRequest, count)
     {
     }
 
@@ -46,6 +64,8 @@ internal class InputTensorIndexer : TensorIndexer
     {
         get
         {
+            if (index < 0 || index >= Count) throw new IndexOutOfRangeException(nameof(index));
+
             ThrowIfDisposed();
 
             ov_tensor* tensor;
@@ -81,7 +101,7 @@ internal class InputTensorIndexer : TensorIndexer
 
 internal class OutputTensorIndexer : TensorIndexer
 {
-    public unsafe OutputTensorIndexer(ov_infer_request* inferRequest) : base(inferRequest)
+    public unsafe OutputTensorIndexer(ov_infer_request* inferRequest, int count) : base(inferRequest, count)
     {
     }
 
@@ -89,6 +109,7 @@ internal class OutputTensorIndexer : TensorIndexer
     {
         get
         {
+            if (index < 0 || index >= Count) throw new IndexOutOfRangeException(nameof(index));
             ThrowIfDisposed();
 
             ov_tensor* tensor;

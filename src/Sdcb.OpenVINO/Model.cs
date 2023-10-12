@@ -200,6 +200,20 @@ public class Model : CppPtrObject
         OpenVINOException.ThrowIfFailed(ov_model_reshape_single_input((ov_model*)Handle, l.PartialShape));
     }
 
+    /// <summary>
+    /// Creates a preprocessor/postprocessor for the model.
+    /// </summary>
+    /// <returns>The preprocessor/postprocessor.</returns>
+    public unsafe PrePostProcessor CreatePrePostProcessor()
+    {
+        ThrowIfDisposed();
+
+        ov_preprocess_prepostprocessor* prePostProcessor;
+        OpenVINOException.ThrowIfFailed(ov_preprocess_prepostprocessor_create((ov_model*)Handle, &prePostProcessor));
+
+        return new PrePostProcessor(prePostProcessor, Inputs.Count, Outputs.Count, owned: true);
+    }
+
     /// <inheritdoc/>
     protected unsafe override void ReleaseCore()
     {

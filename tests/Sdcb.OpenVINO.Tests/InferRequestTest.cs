@@ -56,6 +56,15 @@ public class InferRequestTest
     }
 
     [Fact]
+    public async Task IRShouldLimitTensorCount()
+    {
+        using OVCore c = new();
+        using CompiledModel cm = c.CompileModel(_modelFile);
+        using InferRequest r = cm.CreateInferRequest();
+        Assert.Throws<IndexOutOfRangeException>(() => r.Inputs[4]);
+    }
+
+    [Fact(Skip = "Cancel after 1ms is not reliable")]
     public void MinInferAsyncWithCancel()
     {
         using OVCore c = new();

@@ -18,10 +18,10 @@ public class InferRequest : CppPtrObject
     /// </summary>
     /// <param name="ptr">The pointer for the existing <see cref="ov_infer_request"/> object.</param>
     /// <param name="owned">A boolean indicating whether the underlying object is owned (default is true).</param>
-    public unsafe InferRequest(ov_infer_request* ptr, bool owned = true) : base((IntPtr)ptr, owned)
+    public unsafe InferRequest(ov_infer_request* ptr, int inputTensorCount, int outputTensorCount, bool owned = true) : base((IntPtr)ptr, owned)
     {
-        Inputs = new InputTensorIndexer(ptr);
-        Outputs = new OutputTensorIndexer(ptr);
+        Inputs = new InputTensorIndexer(ptr, inputTensorCount);
+        Outputs = new OutputTensorIndexer(ptr, outputTensorCount);
     }
 
     /// <summary>

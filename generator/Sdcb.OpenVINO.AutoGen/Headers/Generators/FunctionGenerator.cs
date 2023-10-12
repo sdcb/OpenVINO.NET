@@ -45,11 +45,28 @@ internal class FunctionGenerator
 
         if (func.IsVariadic)
         {
-            for (int i = 0; i < 10; ++i)
+            if (func.Name == "ov_preprocess_input_tensor_info_set_color_format_with_subname")
+            {
+                for (int i = 0; i < 10; ++i)
+                {
+                    w.Write($"[DllImport(Dll, EntryPoint = nameof({func.Name}), CallingConvention = CallingConvention.Cdecl)] ");
+                    string variadics = string.Join(", ", Enumerable.Range(0, i + 1).Select(x => $"IntPtr varg{x + 1}"));
+                    w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams.Where(x => !x.IsVariadic))}, {variadics});");
+                }
+            }
+            else if (func.Name == "ov_compiled_model_set_property")
             {
                 w.Write($"[DllImport(Dll, EntryPoint = nameof({func.Name}), CallingConvention = CallingConvention.Cdecl)] ");
-                string variadics = string.Join(", ", Enumerable.Range(0, i + 1).Select(x => $"IntPtr varg{x * 2 + 1}, IntPtr varg{x * 2 + 2}"));
-                w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams.Where(x => !x.IsVariadic))}, {variadics});");
+                w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams.Where(x => !x.IsVariadic))}, IntPtr key, IntPtr value);");
+            }
+            else
+            {
+                for (int i = 0; i < 10; ++i)
+                {
+                    w.Write($"[DllImport(Dll, EntryPoint = nameof({func.Name}), CallingConvention = CallingConvention.Cdecl)] ");
+                    string variadics = string.Join(", ", Enumerable.Range(0, i + 1).Select(x => $"IntPtr varg{x * 2 + 1}, IntPtr varg{x * 2 + 2}"));
+                    w.WriteLine($"public static extern {CSharpUtils.TypeTransform(func.ReturnType.Type)} {func.Name}({string.Join(", ", realParams.Where(x => !x.IsVariadic))}, {variadics});");
+                }
             }
         }
         return new GeneratedUnit(func.Name, group, func.LineNumberStart, func.LineNumberEnd, headerFile, w.Lines);

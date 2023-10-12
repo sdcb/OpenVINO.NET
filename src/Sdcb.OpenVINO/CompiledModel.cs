@@ -55,7 +55,7 @@ public class CompiledModel : CppPtrObject
         ov_infer_request* req;
         OpenVINOException.ThrowIfFailed(ov_compiled_model_create_infer_request((ov_compiled_model*)Handle, &req));
 
-        return new InferRequest(req, owned: true);
+        return new InferRequest(req, Inputs.Count, Outputs.Count, owned: true);
     }
 
     /// <summary>
