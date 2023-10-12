@@ -26,7 +26,7 @@ Note:
 
 This docker image was built by [this dockerfile](https://github.com/sdcb/dockerfiles/blob/main/openvino/openvino-base/dockerfile), You can build other docker images as well.
 
-## Infer example(Detection model):
+## Infer examples:
 
 Install packages:
 * OpenCvSharp4
@@ -34,27 +34,11 @@ Install packages:
 * Sdcb.OpenVINO
 * Sdcb.OpenVINO.runtime.win-x64
 
-```csharp
-Console.WriteLine(SharedOVCore.Instance.AvailableDevices);
+### Face detection example:
+Please refer to [this project](https://github.com/sdcb/mini-openvino-facedetection)
 
-using OVCore c = new();
-using CompiledModel cm = c.CompileModel(@"C:\models\ch_PP_OCRv3_det.pdmodel");
-using InferRequest ir = cm.CreateInferRequest();
-float[] data = new float[224*224*3];
-using (Tensor tensor = Tensor.FromArray(data, new Shape(1, 3, 224, 224)))
-{
-    ir.Inputs.Primary = tensor;
-}
-
-ir.Run();
-
-using (Tensor output = ir.Outputs.Primary)
-{
-    Shape outputShape = output.Shape;
-    Span<byte> data = output.GetData<float>();
-}
-```
-
+### PaddleOCR example:
+Please refer to [this project](https://github.com/sdcb/mini-openvino-paddleocr)
 
 # Projects
 
