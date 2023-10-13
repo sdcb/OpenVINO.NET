@@ -1,6 +1,7 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -198,6 +199,7 @@ public class OVCore : CppPtrObject
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
+        if (!File.Exists(modelPath)) throw new FileNotFoundException($"File not found: {modelPath}", modelPath);
 
         ov_model* model;
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -234,6 +236,7 @@ public class OVCore : CppPtrObject
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
+        if (!File.Exists(modelPath)) throw new FileNotFoundException($"File not found: {modelPath}", modelPath);
 
         properties ??= new();
         GCHandle[] gchs = new GCHandle[properties.Count * 2];
