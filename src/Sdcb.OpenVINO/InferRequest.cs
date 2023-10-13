@@ -17,6 +17,8 @@ public class InferRequest : CppPtrObject
     /// Initializes a new instance of the <see cref="InferRequest"/> class with an pointer and an optional owned parameter.
     /// </summary>
     /// <param name="ptr">The pointer for the existing <see cref="ov_infer_request"/> object.</param>
+    /// <param name="inputTensorCount">The count of input tensors.</param>
+    /// <param name="outputTensorCount">The count of the output tensors.</param>
     /// <param name="owned">A boolean indicating whether the underlying object is owned (default is true).</param>
     public unsafe InferRequest(ov_infer_request* ptr, int inputTensorCount, int outputTensorCount, bool owned = true) : base((IntPtr)ptr, owned)
     {
