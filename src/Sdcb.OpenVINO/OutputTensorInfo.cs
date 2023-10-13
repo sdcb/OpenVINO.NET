@@ -28,6 +28,18 @@ public class OutputTensorInfo : CppPtrObject
     {
     }
 
+    /// <summary>
+    /// Sets the element type of the output tensor.
+    /// </summary>
+    public unsafe ov_element_type_e ElementType
+    {
+        set
+        {
+            ThrowIfDisposed();
+            OpenVINOException.ThrowIfFailed(ov_preprocess_output_set_element_type((ov_preprocess_output_tensor_info*)Handle, value));
+        }
+    }
+
     /// <inheritdoc/>
     protected unsafe override void ReleaseCore()
     {

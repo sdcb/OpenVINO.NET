@@ -22,7 +22,7 @@ public abstract class PrePostProcessorIndexer<T> : IReadOnlyList<T>
     /// Initializes a new instance of the <see cref="PrePostProcessorIndexer{T}"/> class.
     /// </summary>
     /// <param name="ptr">A pointer to the native <c>ov_preprocess_prepostprocessor</c> struct.</param>
-    /// <param name="count">The number of elements in the indexer.</param></param>
+    /// <param name="count">The number of elements in the indexer.</param>
     internal unsafe PrePostProcessorIndexer(ov_preprocess_prepostprocessor* ptr, int count)
     {
         _ptr = ptr;

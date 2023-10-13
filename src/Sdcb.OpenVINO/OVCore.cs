@@ -21,7 +21,7 @@ public class OVCore : CppPtrObject
     {
     }
 
-    private unsafe static ov_core* CreateHandle()
+    private static unsafe ov_core* CreateHandle()
     {
         ov_core* core;
         OpenVINOException.ThrowIfFailed(ov_core_create(&core));
@@ -398,5 +398,35 @@ public class OVCore : CppPtrObject
             OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory((ov_core*)Handle, modelDataPtr, (ov_tensor*)weights?.DangerousGetHandle(), &model));
         }
         return new Model(model, owned: true);
+    }
+
+    /// <summary>
+    /// Creates a weak reference to this OVCore object.
+    /// </summary>
+    /// <returns>A weak reference to this OVCore object.</returns>
+    public unsafe OVCore WeakRef()
+    {
+        ThrowIfDisposed();
+        return new OVCore((ov_core*)Handle, owned: false);
+    }
+
+    private unsafe static Lazy<OVCore> _sharedCore = new(() => new OVCore());
+
+    /// <summary>
+    /// Gets the shared instance of the <see cref="OVCore"/> class.
+    /// </summary>
+    public static OVCore Shared => _sharedCore.Value.WeakRef();
+
+    /// <summary>
+    /// Disposes the shared handle.
+    /// </summary>
+    public unsafe static void DisposeSharedInstance()
+    {
+        if (_sharedCore.IsValueCreated)
+        {
+            OVCore core = _sharedCore.Value;
+            core.Dispose();
+            _sharedCore = new Lazy<OVCore>(() => new OVCore());
+        }
     }
 }

@@ -90,9 +90,9 @@ public record DeviceOptions
     }
 
     /// <summary>
-    /// Gets or sets a function to create a new <see cref="OVCore"/> instance.
+    /// Creates a new <see cref="OVCore"/> instance.
     /// </summary>
-    public Func<OVCore> CreateOVCore { get; init; } = () => SharedOVCore.Instance;
+    public virtual OVCore CreateOVCore() => OVCore.Shared;
 
     /// <summary>
     /// Gets or sets a dictionary of properties to configure the CompiledModel.

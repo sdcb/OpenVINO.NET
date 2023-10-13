@@ -56,7 +56,7 @@ public class InferRequestTest
     }
 
     [Fact]
-    public async Task IRShouldLimitTensorCount()
+    public void IRShouldLimitTensorCount()
     {
         using OVCore c = new();
         using CompiledModel cm = c.CompileModel(_modelFile);
