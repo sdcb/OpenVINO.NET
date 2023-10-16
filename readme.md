@@ -34,6 +34,11 @@ Install packages:
 * Sdcb.OpenVINO
 * Sdcb.OpenVINO.runtime.win-x64
 
+### Yolov8 models inference example:
+
+* [Yolov8 detection model](https://github.com/sdcb/sdcb-openvino-yolov8-det)
+* [Yolov8 classification model](https://github.com/sdcb/sdcb-openvino-yolov8-cls)
+
 ### Face detection example:
 Please refer to [this project](https://github.com/sdcb/mini-openvino-facedetection)
 
