@@ -381,7 +381,28 @@ public class OVCore : CppPtrObject
                 }
             }
         }
+    }
 
+    /// <summary>
+    /// Compiles the specified modelPath into a binary using deviceOptions.
+    /// </summary>
+    /// <param name="modelPath">The path to the model to compile.</param>
+    /// <param name="deviceOptions">The device options (device name and a dictionary of properties) to use while compiling.</param>
+    /// <returns>The compiled model.</returns>
+    public CompiledModel CompileModel(string modelPath, DeviceOptions deviceOptions)
+    {
+        return CompileModel(modelPath, deviceOptions.DeviceName, deviceOptions.Properties);
+    }
+
+    /// <summary>
+    /// Compiles the specified model into a binary using deviceOptions.
+    /// </summary>
+    /// <param name="model">The Model object to compile.</param>
+    /// <param name="deviceOptions">The device options (device name and a dictionary of properties) to use while compiling.</param>
+    /// <returns>The compiled model.</returns>
+    public CompiledModel CompileModel(Model model, DeviceOptions deviceOptions)
+    {
+        return CompileModel(model, deviceOptions.DeviceName, deviceOptions.Properties);
     }
 
     /// <summary>Reads models from IR / ONNX / PDPD / TF / TFLite formats.</summary>
