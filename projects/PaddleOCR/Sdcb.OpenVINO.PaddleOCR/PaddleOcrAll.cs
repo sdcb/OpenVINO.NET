@@ -50,6 +50,16 @@ public class PaddleOcrAll : IDisposable
         Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, device);
     }
 
+    public PaddleOcrAll(FullOcrModel model, PaddleOcrOptions options)
+    {
+        Detector = new PaddleOcrDetector(model.DetectionModel, options.DetectionDeviceOptions, options.DetectionStaticSize);
+        if (model.ClassificationModel != null)
+        {
+            Classifier = new PaddleOcrClassifier(model.ClassificationModel, options.ClassificationDeviceOptions);
+        }
+        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, options.RecognitionDeviceOptions);
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PaddleOcrAll"/> class with the specified PaddlePaddle models and device configurations for each model.
     /// </summary>

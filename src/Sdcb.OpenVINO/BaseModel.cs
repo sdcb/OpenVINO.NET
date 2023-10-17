@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace Sdcb.OpenVINO;
 
@@ -29,19 +28,26 @@ public abstract class BaseModel
     /// </remarks>
     /// <param name="options">The <see cref="DeviceOptions"/> instance to be used for creating the <see cref="InferRequest"/> instance.</param>
     /// <param name="readModelCallback">The <see cref="Action&lt;Model&gt;"/> delegate that is invoked after the <see cref="Model"/> instance is created.</param>
+    /// <param name="prePostProcessCallback">The <see cref="Action&lt;Model, PrePostProcessor&gt;"/> delegate that is invoked after the <see cref="PrePostProcessor"/> instance is created.</param>
     /// <param name="compiledModelCallback">The <see cref="Action&lt;CompiledModel&gt;"/> delegate that is invoked after the <see cref="CompiledModel"/> instance is created.</param>
     /// <returns>Returns an <see cref="InferRequest"/> instance.</returns>
     public virtual InferRequest CreateInferRequest(
-        DeviceOptions? options = null, 
-        Action<Model>? readModelCallback = null, 
+        DeviceOptions? options = null,
+        Action<Model>? readModelCallback = null,
+        Action<Model, PrePostProcessor>? prePostProcessCallback = null,
         Action<CompiledModel>? compiledModelCallback = null)
     {
         options ??= DefaultDeviceOptions;
         using OVCore core = options.CreateOVCore();
 
-        using Model m = CreateOVModel(core);
-        readModelCallback?.Invoke(m);
-        AfterReadModel(m);
+        using Model rawModel = CreateOVModel(core);
+        readModelCallback?.Invoke(rawModel);
+        AfterReadModel(rawModel);
+
+        using PrePostProcessor ppp = rawModel.CreatePrePostProcessor();
+        prePostProcessCallback?.Invoke(rawModel, ppp);
+        PrePostProcessing(rawModel, ppp);
+        using Model m = ppp.BuildModel();
 
         using CompiledModel cm = core.CompileModel(m, options.DeviceName, options.Properties);
         compiledModelCallback?.Invoke(cm);
@@ -57,6 +63,16 @@ public abstract class BaseModel
     /// The purpose of this method is to be able to access/adjust more information about the model such as statistics or details.</remarks>
     /// <param name="model">The OpenVINO <see cref="Model"/> object.</param>
     public virtual void AfterReadModel(Model model) { }
+
+    /// <summary>
+    /// Virtual method for preprocessing and postprocessing models created using OpenVINO.
+    /// </summary>
+    /// <remarks>
+    /// This method is intended to be used to make any necessary changes to the model or the pre/postprocessing stages before compiling the model and creating an InferRequest instance.
+    /// </remarks>
+    /// <param name="model">The OpenVINO <see cref="Model"/> object.</param>
+    /// <param name="prePostProcessor">The <see cref="PrePostProcessor"/> instance used for pre/postprocessing.</param>
+    public virtual void PrePostProcessing(Model model, PrePostProcessor prePostProcessor) { }
 
     /// <summary>
     /// Call after compiled model.

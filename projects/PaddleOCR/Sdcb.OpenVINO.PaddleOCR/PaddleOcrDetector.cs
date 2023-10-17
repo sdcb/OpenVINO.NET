@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp;
+using Sdcb.OpenVINO.Natives;
 using Sdcb.OpenVINO.PaddleOCR.Models;
 using System;
 using System.Linq;
@@ -33,16 +34,33 @@ public class PaddleOcrDetector : IDisposable
     /// <summary>Gets or sets the ratio for enlarging text boxes during post-processing.</summary>
     public float UnclipRatio { get; set; } = 2.0f;
 
+    public Size? StaticShapeSize { get; }
+
+    public bool IsDynamicGraph => !StaticShapeSize.HasValue;
+
     /// <summary>
     /// Initializes a new instance of the PaddleOcrDetector class with the provided DetectionModel and PaddleConfig.
     /// </summary>
     /// <param name="model">The DetectionModel to use.</param>
     /// <param name="options">The device and configure of the PaddleConfig, pass null to using model's DefaultDevice.</param>
-    public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null)
+    public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null, Size? staticShapeSize = null)
     {
-        _p = model.CreateInferRequest(options, readModelCallback: model =>
+        StaticShapeSize = staticShapeSize;
+        _p = model.CreateInferRequest(options, readModelCallback: m =>
         {
-            model.ReshapePrimaryInput(new PartialShape(1, 3, Dimension.Dynamic, Dimension.Dynamic));
+            if (model.Version != ModelVersion.V4)
+            {
+                m.ReshapePrimaryInput(new PartialShape(1, 3, Dimension.Dynamic, Dimension.Dynamic));
+            }
+        }, prePostProcessCallback: (m, ppp) =>
+        {
+            using PreProcessInputInfo ppii = ppp.Inputs.Primary;
+            ppii.TensorInfo.Layout = Layout.NHWC;
+            ppii.ModelInfo.Layout = Layout.NCHW;
+            if (staticShapeSize.HasValue)
+            {
+                ppii.TensorInfo.SpatialStaticShape = (staticShapeSize.Value.Height, staticShapeSize.Value.Width);
+            }
         });
     }
 
@@ -136,7 +154,7 @@ public class PaddleOcrDetector : IDisposable
     /// <param name="src">The input image to run detection model on.</param>
     /// <param name="resizedSize">The returned image actuall size without padding.</param>
     /// <returns>the detected image as a <see cref="MatType.CV_32FC1"/> <see cref="Mat"/> object.</returns>
-    public Mat RunRaw(Mat src, out Size resizedSize)
+    public unsafe Mat RunRaw(Mat src, out Size resizedSize)
     {
         if (src.Empty())
         {
@@ -161,12 +179,14 @@ public class PaddleOcrDetector : IDisposable
         }
 
         using (Mat _ = normalized)
-        using (Tensor input = Tensor.FromArray(ExtractMat(normalized), new Shape(1, 3, normalized.Rows, normalized.Cols)))
+        using (Tensor input = Tensor.FromRaw(
+            new ReadOnlySpan<byte>(normalized.DataPointer, (int)((long)normalized.DataEnd - (long)normalized.DataStart)), 
+            new Shape(1, normalized.Rows, normalized.Cols, 3), 
+            ov_element_type_e.F32))
         {
             _p.Inputs.Primary = input;
+            _p.Run();
         }
-
-        _p.Run();
 
         using (Tensor output = _p.Outputs[0])
         {
