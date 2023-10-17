@@ -27,30 +27,34 @@ public abstract class BaseModel
     /// Then it compiles the model using the specified device and properties using <see cref="OVCore.CompileModel(Model, string, System.Collections.Generic.Dictionary{string, string}?)"/> method. After the model is compiled, it invokes <see cref="AfterCompiledModel(Model, CompiledModel)"/> to make any necessary adjustment to the compile model, and then it returns the created <see cref="InferRequest"/> instance.
     /// </remarks>
     /// <param name="options">The <see cref="DeviceOptions"/> instance to be used for creating the <see cref="InferRequest"/> instance.</param>
-    /// <param name="readModelCallback">The <see cref="Action&lt;Model&gt;"/> delegate that is invoked after the <see cref="Model"/> instance is created.</param>
-    /// <param name="prePostProcessCallback">The <see cref="Action&lt;Model, PrePostProcessor&gt;"/> delegate that is invoked after the <see cref="PrePostProcessor"/> instance is created.</param>
-    /// <param name="compiledModelCallback">The <see cref="Action&lt;CompiledModel&gt;"/> delegate that is invoked after the <see cref="CompiledModel"/> instance is created.</param>
+    /// <param name="afterReadModel">The <see cref="Action&lt;Model&gt;"/> delegate that is invoked after the <see cref="Model"/> instance is created.</param>
+    /// <param name="prePostProcessing">The <see cref="Action&lt;Model, PrePostProcessor&gt;"/> delegate that is invoked after the <see cref="PrePostProcessor"/> instance is created.</param>
+    /// <param name="afterCompiledModel">The <see cref="Action&lt;CompiledModel&gt;"/> delegate that is invoked after the <see cref="CompiledModel"/> instance is created.</param>
     /// <returns>Returns an <see cref="InferRequest"/> instance.</returns>
     public virtual InferRequest CreateInferRequest(
         DeviceOptions? options = null,
-        Action<Model>? readModelCallback = null,
-        Action<Model, PrePostProcessor>? prePostProcessCallback = null,
-        Action<CompiledModel>? compiledModelCallback = null)
+        Action<Model>? afterReadModel = null,
+        Action<Model, PrePostProcessor>? prePostProcessing = null,
+        Action<Model>? afterBuildModel = null,
+        Action<CompiledModel>? afterCompiledModel = null)
     {
         options ??= DefaultDeviceOptions;
         using OVCore core = options.CreateOVCore();
 
         using Model rawModel = CreateOVModel(core);
-        readModelCallback?.Invoke(rawModel);
+        afterReadModel?.Invoke(rawModel);
         AfterReadModel(rawModel);
 
         using PrePostProcessor ppp = rawModel.CreatePrePostProcessor();
-        prePostProcessCallback?.Invoke(rawModel, ppp);
+        prePostProcessing?.Invoke(rawModel, ppp);
         PrePostProcessing(rawModel, ppp);
+
         using Model m = ppp.BuildModel();
+        afterBuildModel?.Invoke(m);
+        AfterBuildModel(m);
 
         using CompiledModel cm = core.CompileModel(m, options.DeviceName, options.Properties);
-        compiledModelCallback?.Invoke(cm);
+        afterCompiledModel?.Invoke(cm);
         AfterCompiledModel(m, cm);
 
         return cm.CreateInferRequest();
@@ -73,6 +77,8 @@ public abstract class BaseModel
     /// <param name="model">The OpenVINO <see cref="Model"/> object.</param>
     /// <param name="prePostProcessor">The <see cref="PrePostProcessor"/> instance used for pre/postprocessing.</param>
     public virtual void PrePostProcessing(Model model, PrePostProcessor prePostProcessor) { }
+
+    public virtual void AfterBuildModel(Model m) { }
 
     /// <summary>
     /// Call after compiled model.

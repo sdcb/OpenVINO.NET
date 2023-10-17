@@ -46,20 +46,31 @@ public class PaddleOcrDetector : IDisposable
     public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null, Size? staticShapeSize = null)
     {
         StaticShapeSize = staticShapeSize;
-        _p = model.CreateInferRequest(options, readModelCallback: m =>
+
+        _p = model.CreateInferRequest(options, afterReadModel: m =>
         {
             if (model.Version != ModelVersion.V4)
             {
                 m.ReshapePrimaryInput(new PartialShape(1, 3, Dimension.Dynamic, Dimension.Dynamic));
             }
-        }, prePostProcessCallback: (m, ppp) =>
+        }, prePostProcessing: (m, ppp) =>
         {
             using PreProcessInputInfo ppii = ppp.Inputs.Primary;
             ppii.TensorInfo.Layout = Layout.NHWC;
             ppii.ModelInfo.Layout = Layout.NCHW;
-            if (staticShapeSize.HasValue)
+        }, afterBuildModel: m =>
+        {
+            if (staticShapeSize != null)
             {
-                ppii.TensorInfo.SpatialStaticShape = (staticShapeSize.Value.Height, staticShapeSize.Value.Width);
+                Size rawSize = staticShapeSize.Value;
+                Size size = new(
+                    32 * Math.Ceiling(1.0 * rawSize.Width / 32),
+                    32 * Math.Ceiling(1.0 * rawSize.Height / 32));
+                m.ReshapePrimaryInput(new PartialShape(1, size.Height, size.Width, 3));
+            }
+            else if (model.Version != ModelVersion.V4)
+            {
+                m.ReshapePrimaryInput(new PartialShape(1, Dimension.Dynamic, Dimension.Dynamic, 3));
             }
         });
     }
