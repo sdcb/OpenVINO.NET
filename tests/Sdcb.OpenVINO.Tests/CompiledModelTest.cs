@@ -37,6 +37,18 @@ public class CompiledModelTest
     }
 
     [Fact]
+    public void CanCompileWithDeviceOptions()
+    {
+        using OVCore c = new();
+        using CompiledModel m = c.CompileModel(_modelFile, new DeviceOptions()
+        {
+            PerformanceMode = PerformanceMode.CumulativeThroughput,
+        });
+        Assert.NotNull(m);
+        Assert.Equal("CUMULATIVE_THROUGHPUT", m.Properties[PropertyKeys.HintPerformanceMode]);
+    }
+
+    [Fact]
     public void CanCompileExistingModelWithProps()
     {
         using OVCore c = new();
