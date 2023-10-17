@@ -14,14 +14,14 @@ namespace Sdcb.OpenVINO;
 public record DeviceOptions
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="DeviceOptions"/> class with default values, where deviceName is set to "CPU".
+    /// Initializes a new instance of the <see cref="DeviceOptions"/> class with default values, where deviceName is set to <see cref="DefaultDeviceName"/>.
     /// </summary>
     /// <remarks>
     /// This constructor does not set any properties. Use the properties of the class to specify inference performance mode and increase the number of inference threads. 
     /// </remarks>
     /// <param name="deviceName">The name of the device to use.</param>
     [SetsRequiredMembers]
-    public DeviceOptions(string deviceName = "CPU") : this(deviceName, new())
+    public DeviceOptions(string deviceName = DefaultDeviceName) : this(deviceName, new())
     {
     }
 
@@ -98,4 +98,9 @@ public record DeviceOptions
     /// Gets or sets a dictionary of properties to configure the CompiledModel.
     /// </summary>
     public required Dictionary<string, string> Properties { get; init; }
+
+    /// <summary>
+    /// The default device name to be AUTO.
+    /// </summary>
+    public const string DefaultDeviceName = "AUTO";
 }

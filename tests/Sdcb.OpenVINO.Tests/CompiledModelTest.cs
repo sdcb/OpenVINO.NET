@@ -26,7 +26,7 @@ public class CompiledModelTest
     public void CanCompileWithProps()
     {
         using OVCore c = new();
-        using CompiledModel m = c.CompileModel(_modelFile, properties: new Dictionary<string, string>
+        using CompiledModel m = c.CompileModel(_modelFile, "CPU", properties: new Dictionary<string, string>
         {
             ["INFERENCE_NUM_THREADS"] = "4",
             ["NUM_STREAMS"] = "2",
@@ -53,7 +53,7 @@ public class CompiledModelTest
     {
         using OVCore c = new();
         using Model rawModel = c.ReadModel(_modelFile);
-        using CompiledModel m = c.CompileModel(rawModel, properties: new Dictionary<string, string>
+        using CompiledModel m = c.CompileModel(rawModel, "CPU", properties: new Dictionary<string, string>
         {
             ["INFERENCE_NUM_THREADS"] = "4",
             ["NUM_STREAMS"] = "2",

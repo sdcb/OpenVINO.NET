@@ -232,7 +232,7 @@ public class OVCore : CppPtrObject
     /// <returns>The <see cref="Model"/> that read from specific path.</returns>
     /// <exception cref="ObjectDisposedException" />
     /// <exception cref="OpenVINOException" />
-    public unsafe CompiledModel CompileModel(string modelPath, string deviceName = "CPU", Dictionary<string, string>? properties = null)
+    public unsafe CompiledModel CompileModel(string modelPath, string deviceName = DeviceOptions.DefaultDeviceName, Dictionary<string, string>? properties = null)
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
@@ -325,12 +325,12 @@ public class OVCore : CppPtrObject
     /// Creates a <see cref="CompiledModel"/> from a source <see cref="Model"/> object.
     /// </summary>
     /// <param name="model">A Model object acquired from <see cref="ReadModel(byte[], Tensor?)"/>. This is the source model object from which the compiled model is created. </param>
-    /// <param name="deviceName">Name of a device to load the model to. The default value is "CPU"</param>
+    /// <param name="deviceName">Name of a device to load the model to. The default value is <see cref="DeviceOptions.DefaultDeviceName"/></param>
     /// <param name="properties">Properties to configure the <see cref="CompiledModel"/></param>
     /// <returns>Returns an instance of the <see cref="CompiledModel"/> class.</returns>
     /// <exception cref="OpenVINOException">Throws an exception if compilation of the model fails or if the Handle is null.</exception>
 
-    public unsafe CompiledModel CompileModel(Model model, string deviceName = "CPU", Dictionary<string, string>? properties = null)
+    public unsafe CompiledModel CompileModel(Model model, string deviceName = DeviceOptions.DefaultDeviceName, Dictionary<string, string>? properties = null)
     {
         properties ??= new();
         GCHandle[] gCHandles = new GCHandle[properties.Count * 2];
