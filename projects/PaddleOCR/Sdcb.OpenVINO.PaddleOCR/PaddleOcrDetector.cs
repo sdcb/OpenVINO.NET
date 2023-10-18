@@ -16,7 +16,10 @@ public class PaddleOcrDetector : IDisposable
     /// <summary>Holds an instance of the InferRequest class.</summary>
     readonly InferRequest _p;
 
-    /// <summary>Gets or sets the maximum size for resizing the input image.</summary>
+    /// <summary>
+    /// Gets or sets the maximum size for resizing the input image.
+    /// <para>Note: this property is invalid when <see cref="IsDynamicGraph"/> = <c>false</c></para>
+    /// </summary>
     public int? MaxSize { get; set; } = 1536;
 
     /// <summary>Gets or sets the size for dilation during preprocessing.</summary>
@@ -34,8 +37,24 @@ public class PaddleOcrDetector : IDisposable
     /// <summary>Gets or sets the ratio for enlarging text boxes during post-processing.</summary>
     public float UnclipRatio { get; set; } = 2.0f;
 
-    public Size? StaticShapeSize { get; }
+    /// <summary>
+    /// Gets the static size of the input image for network infer.
+    /// </summary>
+    /// <remarks>
+    /// If this property is null, network can work with image of any size and h/w ratio (dynamic).
+    /// Otherwise, network works with fixed size image (static).
+    /// </remarks>
+    public Size? StaticShapeSize { get; } = null;
 
+    /// <summary>
+    /// Gets a value indicating whether the network uses dynamic graph.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if network uses dynamic graph; otherwise, <c>false</c>.
+    /// </value>
+    /// <remarks>
+    /// A graph can be static or dynamic. Static graphs have a fixed structure determined before execution, while dynamic graphs have an undefined structure that emerges during execution. 
+    /// </remarks>
     public bool IsDynamicGraph => !StaticShapeSize.HasValue;
 
     /// <summary>
@@ -43,9 +62,19 @@ public class PaddleOcrDetector : IDisposable
     /// </summary>
     /// <param name="model">The DetectionModel to use.</param>
     /// <param name="options">The device and configure of the PaddleConfig, pass null to using model's DefaultDevice.</param>
+    /// <param name="staticShapeSize">
+    /// The static size of the input image for network infer, 
+    /// <para>If this property is null, network can work with image of any size and h/w ratio (dynamic).</para>
+    /// <para>Otherwise, network works with fixed size image (static).</para>
+    /// </param>
     public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null, Size? staticShapeSize = null)
     {
-        StaticShapeSize = staticShapeSize;
+        if (staticShapeSize != null)
+        {
+            StaticShapeSize = new(
+                32 * Math.Ceiling(1.0 * staticShapeSize.Value.Width / 32),
+                32 * Math.Ceiling(1.0 * staticShapeSize.Value.Height / 32));
+        }
 
         _p = model.CreateInferRequest(options, afterReadModel: m =>
         {
@@ -60,13 +89,9 @@ public class PaddleOcrDetector : IDisposable
             ppii.ModelInfo.Layout = Layout.NCHW;
         }, afterBuildModel: m =>
         {
-            if (staticShapeSize != null)
+            if (StaticShapeSize != null)
             {
-                Size rawSize = staticShapeSize.Value;
-                Size size = new(
-                    32 * Math.Ceiling(1.0 * rawSize.Width / 32),
-                    32 * Math.Ceiling(1.0 * rawSize.Height / 32));
-                m.ReshapePrimaryInput(new PartialShape(1, size.Height, size.Width, 3));
+                m.ReshapePrimaryInput(new PartialShape(1, StaticShapeSize.Value.Height, StaticShapeSize.Value.Width, 3));
             }
             else if (model.Version != ModelVersion.V4)
             {
@@ -176,11 +201,19 @@ public class PaddleOcrDetector : IDisposable
         {
             throw new NotSupportedException($"{nameof(src)} channel must be 3 or 1, provided {src.Channels()}.");
         }
-        Mat padded;
-        using (Mat resized = MatResize(src, MaxSize))
+
+        Mat padded = null!;
+        if (IsDynamicGraph)
         {
+            using Mat resized = MatResize(src, MaxSize);
             resizedSize = new Size(resized.Width, resized.Height);
             padded = MatPadding32(resized);
+        }
+        else
+        {
+            using Mat resized = MatResize(src, StaticShapeSize!.Value);
+            resizedSize = new Size(resized.Width, resized.Height);
+            padded = resized.CopyMakeBorder(0, StaticShapeSize.Value.Height - resizedSize.Height, 0, StaticShapeSize.Value.Width - resizedSize.Width, BorderTypes.Constant, Scalar.Black);
         }
 
         Mat normalized;
@@ -190,10 +223,7 @@ public class PaddleOcrDetector : IDisposable
         }
 
         using (Mat _ = normalized)
-        using (Tensor input = Tensor.FromRaw(
-            new ReadOnlySpan<byte>(normalized.DataPointer, (int)((long)normalized.DataEnd - (long)normalized.DataStart)), 
-            new Shape(1, normalized.Rows, normalized.Cols, 3), 
-            ov_element_type_e.F32))
+        using (Tensor input = Tensor.FromMat(normalized))
         {
             _p.Inputs.Primary = input;
             _p.Run();
@@ -252,27 +282,25 @@ public class PaddleOcrDetector : IDisposable
             src.Clone();
     }
 
-    internal static float[] ExtractMat(Mat src)
+    private static Mat MatResize(Mat src, Size maxSize)
     {
-        int rows = src.Rows;
-        int cols = src.Cols;
-        float[] result = new float[rows * cols * 3];
-        GCHandle resultHandle = default;
-        try
+        Size srcSize = src.Size();
+        if (srcSize == maxSize)
         {
-            resultHandle = GCHandle.Alloc(result, GCHandleType.Pinned);
-            IntPtr resultPtr = resultHandle.AddrOfPinnedObject();
-            for (int i = 0; i < src.Channels(); ++i)
-            {
-                using Mat dest = new(rows, cols, MatType.CV_32FC1, resultPtr + i * rows * cols * sizeof(float));
-                Cv2.ExtractChannel(src, dest, i);
-            }
+            return src.Clone();
         }
-        finally
-        {
-            resultHandle.Free();
-        }
-        return result;
+
+        double scale = Math.Min(maxSize.Width / (double)srcSize.Width, maxSize.Height / (double)srcSize.Height);
+
+        // 新的大小
+        Size newSize = new((int)(scale * srcSize.Width), (int)(scale * srcSize.Height));
+
+        // 设置缩放后的图像
+        Mat resizedMat = new();
+
+        Cv2.Resize(src, resizedMat, newSize);
+
+        return resizedMat;
     }
 
     private static Mat MatPadding32(Mat src)

@@ -2,6 +2,7 @@
 
 namespace Sdcb.OpenVINO;
 
+
 /// <summary>
 /// Represents an abstract base class for all models.
 /// </summary>
@@ -29,6 +30,7 @@ public abstract class BaseModel
     /// <param name="options">The <see cref="DeviceOptions"/> instance to be used for creating the <see cref="InferRequest"/> instance.</param>
     /// <param name="afterReadModel">The <see cref="Action&lt;Model&gt;"/> delegate that is invoked after the <see cref="Model"/> instance is created.</param>
     /// <param name="prePostProcessing">The <see cref="Action&lt;Model, PrePostProcessor&gt;"/> delegate that is invoked after the <see cref="PrePostProcessor"/> instance is created.</param>
+    /// <param name="afterBuildModel">The <see cref="Action&lt;Model&gt;"/> delegate that is invoked after the <see cref="Model"/> instance is built from <see cref="PrePostProcessor"/>.</param>
     /// <param name="afterCompiledModel">The <see cref="Action&lt;CompiledModel&gt;"/> delegate that is invoked after the <see cref="CompiledModel"/> instance is created.</param>
     /// <returns>Returns an <see cref="InferRequest"/> instance.</returns>
     public virtual InferRequest CreateInferRequest(
@@ -78,6 +80,10 @@ public abstract class BaseModel
     /// <param name="prePostProcessor">The <see cref="PrePostProcessor"/> instance used for pre/postprocessing.</param>
     public virtual void PrePostProcessing(Model model, PrePostProcessor prePostProcessor) { }
 
+    /// <summary>
+    /// This method is called after a <see cref="Model"/> has been built by <see cref="PrePostProcessor"/>
+    /// </summary>
+    /// <param name="m">The <see cref="Model"/> object that has been built by <see cref="PrePostProcessor"/>.</param>
     public virtual void AfterBuildModel(Model m) { }
 
     /// <summary>

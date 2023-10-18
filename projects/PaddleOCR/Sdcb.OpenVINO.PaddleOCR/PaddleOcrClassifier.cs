@@ -29,7 +29,12 @@ public class PaddleOcrClassifier : IDisposable
     public PaddleOcrClassifier(ClassificationModel model, DeviceOptions? device = null)
     {
         Shape = model.Shape;
-        _p = model.CreateInferRequest(device);
+        _p = model.CreateInferRequest(device, prePostProcessing: (m, ppp) =>
+        {
+            using PreProcessInputInfo ppii = ppp.Inputs.Primary;
+            ppii.TensorInfo.Layout = Layout.NHWC;
+            ppii.ModelInfo.Layout = Layout.NCHW;
+        });
     }
 
     /// <summary>
@@ -59,12 +64,11 @@ public class PaddleOcrClassifier : IDisposable
         using Mat resized = ResizePadding(src, Shape);
         using Mat normalized = Normalize(resized);
 
-        using (Tensor input = Tensor.FromArray(PaddleOcrDetector.ExtractMat(normalized), new Shape(1, 3, normalized.Rows, normalized.Cols)))
+        using (Tensor input = Tensor.FromMat(normalized))
         {
             _p.Inputs.Primary = input;
+            _p.Run();
         }
-
-        _p.Run();
 
         using (Tensor output = _p.Outputs.Primary)
         {
