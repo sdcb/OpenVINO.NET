@@ -4,28 +4,72 @@ namespace Sdcb.OpenVINO;
 
 /// <summary>
 /// Represents a base class for managing native resources.
-/// Implements the <see cref="System.IDisposable"/> interface.
+/// Implements the <see cref="IDisposable"/> interface.
 /// </summary>
-public abstract class CppPtrObject : CppObject
+public abstract class CppPtrObject : IDisposable
 {
     /// <summary>
     /// The handle to the native resource.
     /// </summary>
     protected IntPtr Handle;
 
-    /// <inheritdoc/>
-    public override bool Disposed => Handle == IntPtr.Zero;
+    /// <summary>
+    /// Determines whether the instance owns the underlying C++ object.
+    /// </summary>
+    protected readonly bool Owned;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance is disposed.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if this instance is disposed; otherwise, <c>false</c>.
+    /// </value>
+    public virtual bool Disposed => Handle == IntPtr.Zero;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CppPtrObject"/> class.
     /// </summary>
     /// <param name="handle">The handle to the native resource.</param>
     /// <param name="owned">If set to <c>true</c> the instance owns the handle.</param>
-    public CppPtrObject(IntPtr handle, bool owned = true) : base(owned)
+    public CppPtrObject(IntPtr handle, bool owned = true)
     {
+        Owned = owned;
         if (handle == IntPtr.Zero) throw new ArgumentNullException(nameof(handle));
 
         Handle = handle;
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases the native (unmanaged) resource.
+    /// </summary>
+    protected abstract void ReleaseCore();
+
+    /// <summary>
+    /// Throws an <see cref="ObjectDisposedException"/> exception if the object is disposed.
+    /// </summary>
+    protected void ThrowIfDisposed()
+    {
+        if (Disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+
+    /// <summary>
+    /// Destroys the object and releases its unmanaged resources when they are no longer needed.
+    /// </summary>
+    ~CppPtrObject()
+    {
+        Dispose(false);
     }
 
     /// <summary>
@@ -36,7 +80,7 @@ public abstract class CppPtrObject : CppObject
     /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects.
     /// Only unmanaged resources can be disposed.
     /// </param>
-    protected override void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!Disposed && Owned)
         {
