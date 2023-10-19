@@ -62,8 +62,11 @@ public class PaddleOcrClassifier : IDisposable
             throw new NotSupportedException($"{nameof(src)} channel must be 3 or 1, provided {src.Channels()}.");
         }
 
-        using Mat resized = ResizePadding(src, Shape);
-        using Mat normalized = Normalize(resized);
+        using Mat normalized = new();
+        using (Mat resized = ResizePadding(src, Shape))
+        {
+            resized.ConvertTo(normalized, MatType.CV_32FC3, 2.0 / 255, -1);
+        }
 
         using (Tensor input = normalized.AsTensor())
         {
@@ -129,34 +132,11 @@ public class PaddleOcrClassifier : IDisposable
 
         double scaleRate = 1.0 * shape.Height / srcSize.Height;
         Mat resized = roi.Resize(new Size(Math.Floor(roi.Width * scaleRate), shape.Height));
-        
+
         if (resized.Width < shape.Width)
         {
             Cv2.CopyMakeBorder(resized, resized, 0, 0, 0, shape.Width - resized.Width, BorderTypes.Constant, Scalar.Black);
         }
         return resized;
-    }
-
-    private static Mat Normalize(Mat src)
-    {
-        using Mat normalized = new();
-        src.ConvertTo(normalized, MatType.CV_32FC3, 1.0 / 255);
-        Mat[] bgr = normalized.Split();
-        float[] scales = new[] { 2.0f, 2.0f, 2.0f };
-        float[] means = new[] { 0.5f, 0.5f, 0.5f };
-        for (int i = 0; i < bgr.Length; ++i)
-        {
-            bgr[i].ConvertTo(bgr[i], MatType.CV_32FC1, 1.0 * scales[i], (0.0 - means[i]) * scales[i]);
-        }
-
-        Mat dest = new();
-        Cv2.Merge(bgr, dest);
-
-        foreach (Mat channel in bgr)
-        {
-            channel.Dispose();
-        }
-
-        return dest;
     }
 }

@@ -110,7 +110,7 @@ public class PaddleOcrRecognizer : IDisposable
                 {
                     using Mat channel3 = src.Channels() switch
                     {
-                        4 => src.CvtColor(ColorConversionCodes.RGBA2BGR),
+                        4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
                         1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
                         3 => src.WeakRef(),
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
