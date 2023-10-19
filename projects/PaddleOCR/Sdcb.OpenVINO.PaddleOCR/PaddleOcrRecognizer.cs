@@ -1,5 +1,6 @@
 ﻿using OpenCvSharp;
-using Sdcb.OpenVINO.OpenCvSharp4;
+using Sdcb.OpenVINO.Natives;
+using Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 using Sdcb.OpenVINO.PaddleOCR.Models;
 using System;
 using System.Linq;
@@ -28,7 +29,12 @@ public class PaddleOcrRecognizer : IDisposable
     public PaddleOcrRecognizer(RecognizationModel model, DeviceOptions? deviceOptions = null)
     {
         Model = model;
-        _p = model.CreateInferRequest(deviceOptions);
+        _p = model.CreateInferRequest(deviceOptions, prePostProcessing: (m, ppp) =>
+        {
+            //using PreProcessInputInfo ppii = ppp.Inputs.Primary;
+            //ppii.TensorInfo.Layout = Layout.NHWC;
+            //ppii.ModelInfo.Layout = Layout.NCHW;
+        });
     }
 
     /// <summary>
@@ -112,7 +118,11 @@ public class PaddleOcrRecognizer : IDisposable
                 .ToArray();
 
             int channel = normalizeds[0].Channels();
-            using (Tensor input = Tensor.FromArray(ExtractMat(normalizeds, channel, modelHeight, maxWidth), new Shape(normalizeds.Length, channel, modelHeight, maxWidth)))
+            using Mat combined = CombineMats(normalizeds, channel, modelHeight, maxWidth);
+            using (Tensor input = Tensor.FromRaw(
+                combined.AsByteSpan(), 
+                new Shape(normalizeds.Length, modelHeight, maxWidth, channel), 
+                ov_element_type_e.F32))
             {
                 _p.Inputs.Primary = input;
             }
@@ -200,6 +210,21 @@ public class PaddleOcrRecognizer : IDisposable
         }
 
         return dest;
+    }
+
+    static Mat CombineMats(Mat[] srcs, int channel, int height, int width)
+    {
+        // 创建一个空的Mat，它的大小等于所有输入Mat的加总
+        Mat combinedMat = new Mat(height * srcs.Length, width, channel);
+
+        for (int i = 0; i < srcs.Length; i++)
+        {
+            // 将源Mat的数据复制到目标Mat的正确位置
+            using Mat dest = combinedMat[new Rect(0, i * height, width, height)];
+            srcs[i].CopyTo(dest);
+        }
+
+        return combinedMat;
     }
 
     private static float[] ExtractMat(Mat[] srcs, int channel, int height, int width)

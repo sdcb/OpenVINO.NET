@@ -36,6 +36,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Sdcb.OpenVINO" Version="0.3.0" Condition="'$(Configuration)' != 'Debug'" />
+    <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO.Extensions.OpenCvSharp4\Sdcb.OpenVINO.Extensions.OpenCvSharp4.csproj" />
     <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'" />
   </ItemGroup>
 

@@ -1,10 +1,8 @@
 ﻿using OpenCvSharp;
-using Sdcb.OpenVINO.Natives;
-using Sdcb.OpenVINO.OpenCvSharp4;
 using Sdcb.OpenVINO.PaddleOCR.Models;
+using Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace Sdcb.OpenVINO.PaddleOCR;
 

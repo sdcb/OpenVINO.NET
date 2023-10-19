@@ -1,10 +1,5 @@
 ﻿using OpenCvSharp;
-using Sdcb.OpenVINO.OpenCvSharp4;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 
 namespace Sdcb.OpenVINO.Tests.OpenCvSharp4;
 

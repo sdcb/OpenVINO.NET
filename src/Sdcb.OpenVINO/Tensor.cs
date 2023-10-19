@@ -1,5 +1,4 @@
-﻿using OpenCvSharp;
-using Sdcb.OpenVINO.Natives;
+﻿using Sdcb.OpenVINO.Natives;
 using System;
 using System.Runtime.InteropServices;
 

@@ -2,7 +2,7 @@
 using Sdcb.OpenVINO.Natives;
 using System;
 
-namespace Sdcb.OpenVINO.OpenCvSharp4;
+namespace Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 
 /// <summary>
 /// Provides extension methods for converting between <see cref="Mat"/> and <see cref="Tensor"/> objects.
@@ -38,6 +38,45 @@ public static class TensorExtensions
 
         Size size = mat.Size();
         return Tensor.FromRaw(mat.AsByteSpan(), new NCHW(1, size.Height, size.Width, channels), elementType);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="Tensor"/> from a <see cref="Mat"/> object and stacks it as specified by the number of batches.
+    /// This method shares memory with the Mat, so if the Mat is disposed, the Tensor will also be invalidated.
+    /// The shape of the Tensor is automatically determined from the Mat and the number of batches.
+    /// </summary>
+    /// <param name="mat">The input Mat object.</param>
+    /// <param name="numberOfBatches">The number of batches to stack the Tensor. Default value is 1.</param>
+    /// <returns>A Tensor that shares memory with the Mat.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when mat is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when mat.MatType.Depth is not supported.</exception>
+    /// <exception cref="ArgumentException">Thrown when the height of the Mat is not divisible by the number of batches.</exception>
+    public static unsafe Tensor StackedAsTensor(this Mat mat, int numberOfBatches = 1)
+    {
+        if (mat == null) throw new ArgumentNullException(nameof(mat));
+
+        MatType matType = mat.Type();
+        int channels = matType.Channels;
+        ov_element_type_e elementType = matType.Depth switch
+        {
+            MatType.CV_8U => ov_element_type_e.U8,
+            MatType.CV_8S => ov_element_type_e.I8,
+            MatType.CV_16U => ov_element_type_e.U16,
+            MatType.CV_16S => ov_element_type_e.I16,
+            MatType.CV_32S => ov_element_type_e.I32,
+            MatType.CV_32F => ov_element_type_e.F32,
+            MatType.CV_64F => ov_element_type_e.F64,
+            _ => throw new NotSupportedException($"Mat.MatType.Depth ({matType.Depth}) is not supported.")
+        };
+
+        Size size = mat.Size();
+        int height = size.Height / numberOfBatches;
+        if (height * numberOfBatches != size.Height)
+        {
+            throw new ArgumentException($"The height {size.Height} of the mat must be divisible by the number of batches {numberOfBatches}.");
+        }
+
+        return Tensor.FromRaw(mat.AsByteSpan(), new NCHW(numberOfBatches, height, size.Width, channels), elementType);
     }
 
     /// <summary>
