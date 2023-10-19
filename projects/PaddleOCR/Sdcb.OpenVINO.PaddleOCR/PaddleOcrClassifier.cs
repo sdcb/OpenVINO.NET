@@ -125,7 +125,7 @@ public class PaddleOcrClassifier : IDisposable
         double whRatio = 1.0 * shape.Width / shape.Height;
         using Mat roi = 1.0 * srcSize.Width / srcSize.Height > whRatio ?
             src[0, srcSize.Height, 0, (int)Math.Floor(1.0 * srcSize.Height * whRatio)] :
-            src.Clone();
+            src.WeakRef();
 
         double scaleRate = 1.0 * shape.Height / srcSize.Height;
         Mat resized = roi.Resize(new Size(Math.Floor(roi.Width * scaleRate), shape.Height));

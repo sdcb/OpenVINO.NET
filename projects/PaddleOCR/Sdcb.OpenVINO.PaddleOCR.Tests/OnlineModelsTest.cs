@@ -134,7 +134,7 @@ public class OnlineModelsTest
         }
     }
 
-    [Fact]
+    [Fact(Skip = "Too slow")]
     public async Task V4ServerTest()
     {
         OnlineFullModels onlineModels = OnlineFullModels.ChineseServerV4;

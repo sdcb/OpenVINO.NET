@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp;
+using Sdcb.OpenVINO.OpenCvSharp4;
 using Sdcb.OpenVINO.PaddleOCR.Models;
 using System;
 using System.Linq;
@@ -102,7 +103,7 @@ public class PaddleOcrRecognizer : IDisposable
                     {
                         4 => src.CvtColor(ColorConversionCodes.RGBA2BGR),
                         1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
-                        3 => src.Clone(),
+                        3 => src.WeakRef(),
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
                     };
                     using Mat resized = ResizePadding(channel3, modelHeight, maxWidth);

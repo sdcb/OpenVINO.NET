@@ -260,19 +260,12 @@ public class PaddleOcrDetector : IDisposable
         using Mat croppedMat = pred[ymin, ymax + 1, xmin, xmax + 1];
         float score = (float)croppedMat.Mean(mask).Val0;
 
-        // Debug
-        //{
-        //	using Mat cu = new Mat();
-        //	croppedMat.ConvertTo(cu, MatType.CV_8UC1, 255);
-        //	Util.HorizontalRun(true, Image(cu), Image(mask), score).Dump();
-        //}
-
         return score;
     }
 
     private static Mat MatResize(Mat src, int? maxSize)
     {
-        if (maxSize == null) return src.Clone();
+        if (maxSize == null) return src.WeakRef();
 
         Size size = src.Size();
         int longEdge = Math.Max(size.Width, size.Height);
@@ -280,7 +273,7 @@ public class PaddleOcrDetector : IDisposable
 
         return scaleRate < 1.0 ?
             src.Resize(Size.Zero, scaleRate, scaleRate) :
-            src.Clone();
+            src.WeakRef();
     }
 
     private static Mat MatResize(Mat src, Size maxSize)
@@ -288,7 +281,7 @@ public class PaddleOcrDetector : IDisposable
         Size srcSize = src.Size();
         if (srcSize == maxSize)
         {
-            return src.Clone();
+            return src.WeakRef();
         }
 
         double scale = Math.Min(maxSize.Width / (double)srcSize.Width, maxSize.Height / (double)srcSize.Height);
@@ -298,7 +291,7 @@ public class PaddleOcrDetector : IDisposable
 
         if (scale == 1)
         {
-            return src.Clone();
+            return src.WeakRef();
         }
         else
         {
