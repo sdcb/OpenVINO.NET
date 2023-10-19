@@ -3,7 +3,7 @@ using Sdcb.OpenVINO.PaddleOCR.Models.Online;
 
 namespace Sdcb.OpenVINO.PaddleOCR.Tests;
 
-public class ClsTest
+public class OnlineClsTest
 {
     [Fact]
     public async Task ClsResultIsCorrect()

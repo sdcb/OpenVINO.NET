@@ -116,7 +116,9 @@ public class PaddleOcrRecognizer : IDisposable
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
                     };
                     using Mat resized = ResizePadding(channel3, modelHeight, maxWidth);
-                    return Normalize(resized);
+                    Mat normalized = new();
+                    resized.ConvertTo(normalized, MatType.CV_32FC3, 2.0 / 255, -1.0);
+                    return normalized;
                 })
                 .ToArray();
 
@@ -190,29 +192,6 @@ public class PaddleOcrRecognizer : IDisposable
             using Mat resized = src.Resize(new Size(width, height));
             return resized.CopyMakeBorder(0, 0, 0, targetWidth - width, BorderTypes.Constant, Scalar.Gray);
         }
-    }
-
-    private static Mat Normalize(Mat src)
-    {
-        using Mat normalized = new();
-        src.ConvertTo(normalized, MatType.CV_32FC3, 1.0 / 255);
-        Mat[] bgr = normalized.Split();
-        float[] scales = new[] { 2.0f, 2.0f, 2.0f };
-        float[] means = new[] { 0.5f, 0.5f, 0.5f };
-        for (int i = 0; i < bgr.Length; ++i)
-        {
-            bgr[i].ConvertTo(bgr[i], MatType.CV_32FC1, 1.0 * scales[i], (0.0 - means[i]) * scales[i]);
-        }
-
-        Mat dest = new();
-        Cv2.Merge(bgr, dest);
-
-        foreach (Mat channel in bgr)
-        {
-            channel.Dispose();
-        }
-
-        return dest;
     }
 
     static Mat CombineMats(Mat[] srcs, int height, int width)

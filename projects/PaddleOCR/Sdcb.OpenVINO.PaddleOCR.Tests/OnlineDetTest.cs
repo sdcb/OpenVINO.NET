@@ -1,20 +1,15 @@
 ﻿using OpenCvSharp;
 using Sdcb.OpenVINO.PaddleOCR.Models.Online;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace Sdcb.OpenVINO.PaddleOCR.Tests;
 
-public class OnlineDetectionTest
+public class OnlineDetTest
 {
     private readonly ITestOutputHelper _console;
 
-    public OnlineDetectionTest(ITestOutputHelper console)
+    public OnlineDetTest(ITestOutputHelper console)
     {
         _console = console;
     }
@@ -27,16 +22,6 @@ public class OnlineDetectionTest
         Stopwatch sw = Stopwatch.StartNew();
         RotatedRect[] results = det.Run(src);
         _console.WriteLine($"elapsed={sw.Elapsed.TotalMilliseconds}ms");
-        sw.Restart();
-        results = det.Run(src);
-        _console.WriteLine($"elapsed={sw.Elapsed.TotalMilliseconds}ms");
-        sw.Restart();
-        results = det.Run(src);
-        _console.WriteLine($"elapsed={sw.Elapsed.TotalMilliseconds}ms");
-        sw.Restart();
-        results = det.Run(src);
-        _console.WriteLine($"elapsed={sw.Elapsed.TotalMilliseconds}ms");
-
         Assert.NotEmpty(results);
     }
 
