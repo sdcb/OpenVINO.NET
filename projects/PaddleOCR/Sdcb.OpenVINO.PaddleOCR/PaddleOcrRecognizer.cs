@@ -31,9 +31,9 @@ public class PaddleOcrRecognizer : IDisposable
         Model = model;
         _p = model.CreateInferRequest(deviceOptions, prePostProcessing: (m, ppp) =>
         {
-            //using PreProcessInputInfo ppii = ppp.Inputs.Primary;
-            //ppii.TensorInfo.Layout = Layout.NHWC;
-            //ppii.ModelInfo.Layout = Layout.NCHW;
+            using PreProcessInputInfo ppii = ppp.Inputs.Primary;
+            ppii.TensorInfo.Layout = Layout.NHWC;
+            ppii.ModelInfo.Layout = Layout.NCHW;
         });
     }
 
@@ -96,10 +96,13 @@ public class PaddleOcrRecognizer : IDisposable
         int maxWidth = (int)Math.Ceiling(srcs.Max(src =>
         {
             Size size = src.Size();
-            return 1.0 * size.Width / size.Height * modelHeight;
+            double width = 1.0 * size.Width / size.Height * modelHeight;
+            double padded = 32 * Math.Ceiling(1.0 * width / 32);
+            return padded;
         }));
 
         Mat[] normalizeds = null!;
+        Mat combined;
         try
         {
             normalizeds = srcs
@@ -117,15 +120,7 @@ public class PaddleOcrRecognizer : IDisposable
                 })
                 .ToArray();
 
-            int channel = normalizeds[0].Channels();
-            using Mat combined = CombineMats(normalizeds, channel, modelHeight, maxWidth);
-            using (Tensor input = Tensor.FromRaw(
-                combined.AsByteSpan(), 
-                new Shape(normalizeds.Length, modelHeight, maxWidth, channel), 
-                ov_element_type_e.F32))
-            {
-                _p.Inputs.Primary = input;
-            }
+            combined = CombineMats(normalizeds, modelHeight, maxWidth);
         }
         finally
         {
@@ -135,7 +130,15 @@ public class PaddleOcrRecognizer : IDisposable
             }
         }
 
-        _p.Run();
+        using (Mat _ = combined)
+        using (Tensor input = Tensor.FromRaw(
+                combined.AsByteSpan(),
+                new Shape(normalizeds.Length, modelHeight, maxWidth, 3),
+                ov_element_type_e.F32))
+        {
+            _p.Inputs.Primary = input;
+            _p.Run();
+        }
 
         using (Tensor output = _p.Outputs.Primary)
         {
@@ -212,15 +215,16 @@ public class PaddleOcrRecognizer : IDisposable
         return dest;
     }
 
-    static Mat CombineMats(Mat[] srcs, int channel, int height, int width)
+    static Mat CombineMats(Mat[] srcs, int height, int width)
     {
         // 创建一个空的Mat，它的大小等于所有输入Mat的加总
-        Mat combinedMat = new Mat(height * srcs.Length, width, channel);
+        int matType = srcs[0].Type();
+        Mat combinedMat = new(height * srcs.Length, width, matType);
 
         for (int i = 0; i < srcs.Length; i++)
         {
             // 将源Mat的数据复制到目标Mat的正确位置
-            using Mat dest = combinedMat[new Rect(0, i * height, width, height)];
+            using Mat dest = combinedMat[i * height, (i + 1) * height, 0, width];
             srcs[i].CopyTo(dest);
         }
 

@@ -50,8 +50,8 @@ public static class MatExtensions
 
         Size size = src.Size();
         Size newSize = new(
-            32 * Math.Ceiling(1.0 * size.Width / padSize),
-            32 * Math.Ceiling(1.0 * size.Height / padSize));
+            padSize * Math.Ceiling(1.0 * size.Width / padSize),
+            padSize * Math.Ceiling(1.0 * size.Height / padSize));
         if (newSize == size)
         {
             return src.WeakRef();
