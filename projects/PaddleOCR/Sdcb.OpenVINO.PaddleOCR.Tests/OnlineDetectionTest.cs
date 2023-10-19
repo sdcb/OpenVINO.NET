@@ -23,7 +23,7 @@ public class OnlineDetectionTest
     public async Task DetectSimple()
     {
         using Mat src = Cv2.ImRead("./samples/vsext.png");
-        using PaddleOcrDetector det = new(await OnlineDetectionModel.ChineseV4.DownloadAsync(), staticShapeSize: src.Size());
+        using PaddleOcrDetector det = new(await OnlineDetectionModel.ChineseV4.DownloadAsync(), new DeviceOptions("CPU"), staticShapeSize: src.Size());
         Stopwatch sw = Stopwatch.StartNew();
         RotatedRect[] results = det.Run(src);
         _console.WriteLine($"elapsed={sw.Elapsed.TotalMilliseconds}ms");

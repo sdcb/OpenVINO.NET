@@ -292,15 +292,25 @@ public class PaddleOcrDetector : IDisposable
 
         double scale = Math.Min(maxSize.Width / (double)srcSize.Width, maxSize.Height / (double)srcSize.Height);
 
-        // 新的大小
-        Size newSize = new((int)(scale * srcSize.Width), (int)(scale * srcSize.Height));
+        // Ensure the scale is never more than 1 (i.e., the image is never magnified)
+        scale = Math.Min(scale, 1.0);
 
-        // 设置缩放后的图像
-        Mat resizedMat = new();
+        if (scale == 1)
+        {
+            return src.Clone();
+        }
+        else
+        {
+            // New size
+            Size newSize = new((int)(scale * srcSize.Width), (int)(scale * srcSize.Height));
 
-        Cv2.Resize(src, resizedMat, newSize);
+            // Set the resized image
+            Mat resizedMat = new();
 
-        return resizedMat;
+            Cv2.Resize(src, resizedMat, newSize);
+
+            return resizedMat;
+        }
     }
 
     private static Mat MatPadding32(Mat src)
