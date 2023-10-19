@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp;
+using Sdcb.OpenVINO.OpenCvSharp4;
 using Sdcb.OpenVINO.PaddleOCR.Models;
 using System;
 
@@ -64,7 +65,7 @@ public class PaddleOcrClassifier : IDisposable
         using Mat resized = ResizePadding(src, Shape);
         using Mat normalized = Normalize(resized);
 
-        using (Tensor input = Tensor.FromMat(normalized))
+        using (Tensor input = normalized.AsTensor())
         {
             _p.Inputs.Primary = input;
             _p.Run();

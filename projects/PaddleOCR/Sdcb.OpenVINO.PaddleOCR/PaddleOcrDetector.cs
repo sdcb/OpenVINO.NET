@@ -1,5 +1,6 @@
 ﻿using OpenCvSharp;
 using Sdcb.OpenVINO.Natives;
+using Sdcb.OpenVINO.OpenCvSharp4;
 using Sdcb.OpenVINO.PaddleOCR.Models;
 using System;
 using System.Linq;
@@ -223,7 +224,7 @@ public class PaddleOcrDetector : IDisposable
         }
 
         using (Mat _ = normalized)
-        using (Tensor input = Tensor.FromMat(normalized))
+        using (Tensor input = normalized.AsTensor())
         {
             _p.Inputs.Primary = input;
             _p.Run();
