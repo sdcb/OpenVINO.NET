@@ -40,14 +40,8 @@ public class PaddleOcrAll : IDisposable
     /// </summary>
     /// <param name="model">The full OCR model containing detection, classification, and recognition models.</param>
     /// <param name="device">The device configuration for running det, cls and rec models.</param>
-    public PaddleOcrAll(FullOcrModel model, DeviceOptions device)
+    public PaddleOcrAll(FullOcrModel model, DeviceOptions? device = null) : this(model, new PaddleOcrOptions(device ?? new DeviceOptions()))
     {
-        Detector = new PaddleOcrDetector(model.DetectionModel, device);
-        if (model.ClassificationModel != null)
-        {
-            Classifier = new PaddleOcrClassifier(model.ClassificationModel, device);
-        }
-        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, device);
     }
 
     /// <summary>
@@ -63,26 +57,6 @@ public class PaddleOcrAll : IDisposable
             Classifier = new PaddleOcrClassifier(model.ClassificationModel, options.ClassificationDeviceOptions);
         }
         Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, options.RecognitionDeviceOptions, options.RecognitionStaticWidth);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PaddleOcrAll"/> class with the specified PaddlePaddle models and device configurations for each model.
-    /// </summary>
-    /// <param name="model">The full OCR model containing detection, classification, and recognition models.</param>
-    /// <param name="detectorDevice">The device configuration for running the detection model.</param>
-    /// <param name="classifierDevice">The device configuration for running the classification model.</param>
-    /// <param name="recognizerDevice">The device configuration for running the recognition model.</param>
-    public PaddleOcrAll(FullOcrModel model,
-        DeviceOptions? detectorDevice = null,
-        DeviceOptions? classifierDevice = null,
-        DeviceOptions? recognizerDevice = null)
-    {
-        Detector = new PaddleOcrDetector(model.DetectionModel, detectorDevice);
-        if (model.ClassificationModel != null)
-        {
-            Classifier = new PaddleOcrClassifier(model.ClassificationModel, classifierDevice);
-        }
-        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, recognizerDevice);
     }
 
     /// <summary>
