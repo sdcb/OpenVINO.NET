@@ -2,6 +2,7 @@
 using Sdcb.OpenVINO.PaddleOCR.Models;
 using Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 using System;
+using System.Linq;
 
 namespace Sdcb.OpenVINO.PaddleOCR;
 
@@ -47,10 +48,10 @@ public class PaddleOcrClassifier : IDisposable
     /// Determines whether the image should be rotated by 180 degrees based on the threshold value.
     /// </summary>
     /// <param name="src">The source image.</param>
-    /// <returns>True if the image should be rotated, false otherwise.</returns>
+    /// <returns>An instance of the <see cref="Ocr180DegreeClsResult"/> record struct, containing a bool indicating whether the image should be rotated and a float representing the confidence of the determination.</returns>
     /// <exception cref="ArgumentException">Thrown if the source image size is 0.</exception>
     /// <exception cref="NotSupportedException">Thrown if the source image has a channel count other than 3 or 1.</exception>
-    public bool ShouldRotate180(Mat src)
+    public Ocr180DegreeClsResult ShouldRotate180(Mat src)
     {
         if (src.Empty())
         {
@@ -74,22 +75,20 @@ public class PaddleOcrClassifier : IDisposable
             _p.Run();
         }
 
-        using (Tensor output = _p.Outputs.Primary)
-        {
-            Span<float> softmax = output.GetData<float>();
-            float score = 0;
-            int label = 0;
-            for (int i = 0; i < softmax.Length; ++i)
-            {
-                if (softmax[i] > score)
-                {
-                    score = softmax[i];
-                    label = i;
-                }
-            }
+        using Tensor output = _p.Outputs.Primary;
+        ReadOnlySpan<float> softmax = output.GetData<float>();
+        return new Ocr180DegreeClsResult(softmax, RotateThreshold);
+    }
 
-            return label % 2 == 1 && score > RotateThreshold;
-        }
+    /// <summary>
+    /// Determines whether each image in an array should be rotated by 180 degrees based on the threshold value.
+    /// </summary>
+    /// <param name="srcs">The array of source images.</param>
+    /// <returns>An array of Ocr180DegreeClsResult instances, each containing a bool indicating whether the corresponding image should be rotated and a float representing the confidence of the determination.</returns>
+
+    public Ocr180DegreeClsResult[] ShouldRotate180(Mat[] srcs)
+    {
+        return srcs.Select(ShouldRotate180).ToArray();
     }
 
     /// <summary>
@@ -101,25 +100,9 @@ public class PaddleOcrClassifier : IDisposable
     /// <exception cref="NotSupportedException">Thrown if the source image has a channel count other than 3 or 1.</exception>
     public Mat Run(Mat src)
     {
-        if (src.Empty())
-        {
-            throw new ArgumentException("src size should not be 0, wrong input picture provided?");
-        }
-
-        if (!(src.Channels() switch { 3 or 1 => true, _ => false }))
-        {
-            throw new NotSupportedException($"{nameof(src)} channel must be 3 or 1, provided {src.Channels()}.");
-        }
-
-        if (ShouldRotate180(src))
-        {
-            Cv2.Rotate(src, src, RotateFlags.Rotate180);
-            return src;
-        }
-        else
-        {
-            return src;
-        }
+        Ocr180DegreeClsResult res = ShouldRotate180(src);
+        res.RotateIfShould(src);
+        return src;
     }
 
     private static Mat ResizePadding(Mat src, NCHW shape)
