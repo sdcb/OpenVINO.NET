@@ -1,4 +1,6 @@
-﻿namespace Sdcb.OpenVINO.Natives;
+﻿using System.Runtime.InteropServices;
+
+namespace Sdcb.OpenVINO.Natives;
 
 /// <summary>
 /// Contains PInvoke methods to interact with the openvino_c.dll
@@ -22,4 +24,15 @@ public static partial class NativeMethods
 #else
     public const string Dll = "openvino_c";
 #endif
+
+    /// <summary>
+    /// Retrieves the last error message and resets the error state.
+    /// </summary>
+    /// <returns>A pointer to the last error message.</returns>
+    /// <remarks>
+    /// The returned pointer is valid until the next call to any OpenVINO function.
+    /// </remarks>
+    /// <seealso cref="ov_get_error_info(ov_status_e)"/>
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+    public static unsafe extern byte* ov_get_and_reset_last_error();
 }

@@ -22,18 +22,45 @@ public class PaddleOcrRecognizer : IDisposable
     public RecognizationModel Model { get; init; }
 
     /// <summary>
+    /// Gets the width of the static shape input for the OCR model. This property is particularly useful in cases 
+    /// where the model input shape is not dynamic or it's desired to have a constant shape input. If `null`, 
+    /// the shape is considered to be dynamic. The value is automatically rounded to the nearest upper multiple of 32 
+    /// following the instance creation based on the provided `staticShapeWidth` value in the constructor.
+    /// </summary>
+    public int? StaticShapeWidth { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether the input shape for the OCR model is dynamic or not.
+    /// If this property returns `true`, it means that the model can accept input of various shapes.
+    /// If it returns `false`, it indicates that the model requires a fixed input shape defined by the <see cref="StaticShapeWidth"/> property.
+    /// </summary>
+    public bool IsDynamic => StaticShapeWidth is null;
+
+    /// <summary>
     /// Constructor for creating a new instance of the <see cref="PaddleOcrRecognizer"/> class using a specified model and a callback configuration.
     /// </summary>
     /// <param name="model">The RecognizationModel object.</param>
     /// <param name="deviceOptions">The device of the inference request, pass null to using model's <see cref="BaseModel.DefaultDeviceOptions"/>.</param>
-    public PaddleOcrRecognizer(RecognizationModel model, DeviceOptions? deviceOptions = null)
+    /// <param name="staticShapeWidth">The width of the static shape for the OCR model. If provided, this value must be a positive integer. 
+    /// The value will be rounded to the nearest upper multiple of 32. This parameter is useful for models that require a fixed shape input.
+    /// Pass `null` if the model supports dynamic input shape.
+    /// </param>
+    public PaddleOcrRecognizer(RecognizationModel model, DeviceOptions? deviceOptions = null, int? staticShapeWidth = null)
     {
         Model = model;
+        StaticShapeWidth = staticShapeWidth.HasValue ? (int)(32 * Math.Ceiling(1.0 * staticShapeWidth.Value / 32)) : null;
+
         _p = model.CreateInferRequest(deviceOptions, prePostProcessing: (m, ppp) =>
         {
             using PreProcessInputInfo ppii = ppp.Inputs.Primary;
             ppii.TensorInfo.Layout = Layout.NHWC;
             ppii.ModelInfo.Layout = Layout.NCHW;
+        }, afterBuildModel: m =>
+        {
+            if (StaticShapeWidth.HasValue)
+            {
+                m.ReshapePrimaryInput(new PartialShape(new Dimension(1, 128), 48, StaticShapeWidth.Value, 3));
+            }
         });
     }
 
@@ -59,8 +86,8 @@ public class PaddleOcrRecognizer : IDisposable
         PaddleOcrRecognizerResult[] allResult = new PaddleOcrRecognizerResult[srcs.Length];
 
         return srcs
-            .Select((x, i) => (mat: x, i))
-            .OrderBy(x => x.mat.Width)
+            .Select((x, i) => (mat: x, i, ratio: 1.0 * x.Width / x.Height))
+            .OrderBy(x => x.ratio)
             .Chunk(chooseBatchSize)
             .Select(x => (result: RunMulti(x.Select(x => x.mat).ToArray()), ids: x.Select(x => x.i).ToArray()))
             .SelectMany(x => x.result.Zip(x.ids, (result, i) => (result, i)))
@@ -76,7 +103,7 @@ public class PaddleOcrRecognizer : IDisposable
     /// <returns><see cref="PaddleOcrRecognizerResult"/> instance corresponding to OCR recognition result of the image.</returns>
     public PaddleOcrRecognizerResult Run(Mat src) => RunMulti(new[] { src }).Single();
 
-    private PaddleOcrRecognizerResult[] RunMulti(Mat[] srcs)
+    private unsafe PaddleOcrRecognizerResult[] RunMulti(Mat[] srcs)
     {
         if (srcs.Length == 0)
         {
@@ -93,7 +120,7 @@ public class PaddleOcrRecognizer : IDisposable
         }
 
         int modelHeight = Model.Shape.Height;
-        int maxWidth = (int)Math.Ceiling(srcs.Max(src =>
+        int maxWidth = StaticShapeWidth ?? (int)Math.Ceiling(srcs.Max(src =>
         {
             Size size = src.Size();
             double width = 1.0 * size.Width / size.Height * modelHeight;
@@ -102,7 +129,7 @@ public class PaddleOcrRecognizer : IDisposable
         }));
 
         Mat[] normalizeds = null!;
-        Mat combined;
+        Mat final = new();
         try
         {
             normalizeds = srcs
@@ -115,14 +142,11 @@ public class PaddleOcrRecognizer : IDisposable
                         3 => src.WeakRef(),
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
                     };
-                    using Mat resized = ResizePadding(channel3, modelHeight, maxWidth);
-                    Mat normalized = new();
-                    resized.ConvertTo(normalized, MatType.CV_32FC3, 2.0 / 255, -1.0);
-                    return normalized;
+                    return ResizePadding(channel3, modelHeight, maxWidth);                    
                 })
                 .ToArray();
-
-            combined = CombineMats(normalizeds, modelHeight, maxWidth);
+            using Mat combined = CombineMats(normalizeds, modelHeight, maxWidth);
+            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);            
         }
         finally
         {
@@ -132,11 +156,7 @@ public class PaddleOcrRecognizer : IDisposable
             }
         }
 
-        using (Mat _ = combined)
-        using (Tensor input = Tensor.FromRaw(
-                combined.AsByteSpan(),
-                new Shape(normalizeds.Length, modelHeight, maxWidth, 3),
-                ov_element_type_e.F32))
+        using (Tensor input = final.StackedAsTensor(srcs.Length))
         {
             _p.Inputs.Primary = input;
             _p.Run();
@@ -177,64 +197,46 @@ public class PaddleOcrRecognizer : IDisposable
         }
     }
 
-    private static Mat ResizePadding(Mat src, int height, int targetWidth)
+    private static Mat ResizePadding(Mat src, int modelHeight, int targetWidth)
     {
-        Size size = src.Size();
-        float whRatio = 1.0f * size.Width / size.Height;
-        int width = (int)Math.Ceiling(height * whRatio);
+        // Calculate scaling factor
+        double scale = Math.Min((double)modelHeight / src.Height, (double)targetWidth / src.Width);
 
-        if (width == targetWidth)
+        // Resize image
+        Mat resized = new();
+        Cv2.Resize(src, resized, new Size(), scale, scale);
+
+        // Compute padding for height and width
+        int padTop = Math.Max(0, (modelHeight - resized.Height) / 2);
+
+        if (padTop > 0)
         {
-            return src.Resize(new Size(width, height));
+            // Add padding. If padding needs to be added to top and bottom we divide it equally,
+            // but if there is an odd number we add the extra pixel to the bottom.
+            Mat result = new();
+            int remainder = (modelHeight - resized.Height) % 2;
+            Cv2.CopyMakeBorder(resized, result, padTop, padTop + remainder, 0, 0, BorderTypes.Constant, Scalar.Black);
+            resized.Dispose();
+            return result;
         }
         else
         {
-            using Mat resized = src.Resize(new Size(width, height));
-            return resized.CopyMakeBorder(0, 0, 0, targetWidth - width, BorderTypes.Constant, Scalar.Gray);
+            return resized;
         }
     }
 
     static Mat CombineMats(Mat[] srcs, int height, int width)
     {
         // 创建一个空的Mat，它的大小等于所有输入Mat的加总
-        int matType = srcs[0].Type();
-        Mat combinedMat = new(height * srcs.Length, width, matType);
-
+        MatType matType = srcs[0].Type();
+        Mat combinedMat = new(height * srcs.Length, width, matType, Scalar.Black);
         for (int i = 0; i < srcs.Length; i++)
         {
             // 将源Mat的数据复制到目标Mat的正确位置
-            using Mat dest = combinedMat[i * height, (i + 1) * height, 0, width];
+            Mat src = srcs[i];
+            using Mat dest = combinedMat[i * height, (i + 1) * height, 0, src.Width];
             srcs[i].CopyTo(dest);
         }
-
         return combinedMat;
-    }
-
-    private static float[] ExtractMat(Mat[] srcs, int channel, int height, int width)
-    {
-        float[] result = new float[srcs.Length * channel * width * height];
-        GCHandle resultHandle = GCHandle.Alloc(result, GCHandleType.Pinned);
-        IntPtr resultPtr = resultHandle.AddrOfPinnedObject();
-        try
-        {
-            for (int i = 0; i < srcs.Length; ++i)
-            {
-                Mat src = srcs[i];
-                if (src.Channels() != channel)
-                {
-                    throw new Exception($"src[{i}] channel={src.Channels()}, expected {channel}");
-                }
-                for (int c = 0; c < channel; ++c)
-                {
-                    using Mat dest = new(height, width, MatType.CV_32FC1, resultPtr + (c + i * channel) * height * width * sizeof(float));
-                    Cv2.ExtractChannel(src, dest, c);
-                }
-            }
-            return result;
-        }
-        finally
-        {
-            resultHandle.Free();
-        }
     }
 }

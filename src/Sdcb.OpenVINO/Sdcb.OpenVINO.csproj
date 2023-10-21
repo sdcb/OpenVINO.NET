@@ -17,6 +17,8 @@
     <RepositoryUrl>https://github.com/sdcb/OpenVINO.NET.git</RepositoryUrl>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6|AnyCPU'" />
+
   <ItemGroup>
     <None Include="..\..\icon.png">
       <Pack>True</Pack>

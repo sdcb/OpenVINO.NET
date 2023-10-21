@@ -33,7 +33,7 @@ public class OpenVINOException : Exception
     /// <param name="callerFilePath">The path of the calling file (optional).</param>
     /// <param name="callerLineNumber">The line number of the calling expression (optional).</param>
     /// <exception cref="OpenVINOException">Thrown when the provided OpenVINO status is not <see cref="ov_status_e.OK"/>.</exception>
-    public static void ThrowIfFailed(ov_status_e e,
+    public static unsafe void ThrowIfFailed(ov_status_e e,
         string? message = null,
         [CallerMemberName] string? callerMemberName = null,
         [CallerArgumentExpression(nameof(e))] string? callerExpression = null,
@@ -42,6 +42,10 @@ public class OpenVINOException : Exception
     {
         if (e != ov_status_e.OK)
         {
+#if OV20536
+            IntPtr lastError = (IntPtr)ov_get_and_reset_last_error();
+            message ??= StringUtils.UTF8PtrToString(lastError);
+#endif
             throw new OpenVINOException(e, OVStatusToString(e, message, callerMemberName, callerExpression, callerFilePath, callerLineNumber));
         }
     }
