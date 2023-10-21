@@ -70,19 +70,17 @@ public class QueuedPaddleOcrAll : IDisposable
     /// Queues an OCR request to be processed.
     /// </summary>
     /// <param name="src">The image to be recognized.</param>
-    /// <param name="recognizeBatchSize">The number of images recognized with one call. 
-    /// Zero means single recognition only. Maximum value is limited by the model and hardware.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="Task"/> that represents the queued OCR operation.</returns>
     /// <exception cref="ObjectDisposedException">The instance of <see cref="QueuedPaddleOcrAll"/> is disposed.</exception>
-    public Task<PaddleOcrResult> Run(Mat src, int recognizeBatchSize = 0, CancellationToken cancellationToken = default)
+    public Task<PaddleOcrResult> Run(Mat src, CancellationToken cancellationToken = default)
     {
         if (_disposed) throw new ObjectDisposedException(nameof(QueuedPaddleOcrAll));
 
         TaskCompletionSource<PaddleOcrResult> tcs = new();
         cancellationToken.ThrowIfCancellationRequested();
 
-        _queue.Add(new ThreadedQueueItem(src, recognizeBatchSize, cancellationToken, tcs), cancellationToken);
+        _queue.Add(new ThreadedQueueItem(src, cancellationToken, tcs), cancellationToken);
 
         return tcs.Task;
     }
@@ -114,7 +112,7 @@ public class QueuedPaddleOcrAll : IDisposable
 
             try
             {
-                PaddleOcrResult result = paddleOcr.Run(item.Source, item.RecognizeBatchSize);
+                PaddleOcrResult result = paddleOcr.Run(item.Source);
                 item.TaskCompletionSource.SetResult(result);
             }
             catch (Exception ex)
@@ -136,4 +134,4 @@ public class QueuedPaddleOcrAll : IDisposable
     }
 }
 
-internal record ThreadedQueueItem(Mat Source, int RecognizeBatchSize, CancellationToken CancellationToken, TaskCompletionSource<PaddleOcrResult> TaskCompletionSource);
+internal record ThreadedQueueItem(Mat Source, CancellationToken CancellationToken, TaskCompletionSource<PaddleOcrResult> TaskCompletionSource);

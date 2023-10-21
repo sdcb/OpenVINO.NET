@@ -21,6 +21,12 @@ public class PaddleOcrOptions
         DetectionDeviceOptions = allDeviceOptions;
         ClassificationDeviceOptions = allDeviceOptions;
         RecognitionDeviceOptions = allDeviceOptions;
+
+        if (allDeviceOptions.DeviceName == "GPU")
+        {
+            DetectionStaticSize = new Size(1024, 1024);
+            RecognitionStaticWidth = 512;
+        }
     }
 
     /// <summary>
@@ -40,7 +46,17 @@ public class PaddleOcrOptions
     public DeviceOptions? RecognitionDeviceOptions { get; set; }
 
     /// <summary>
-    /// Gets or sets the specific size as model graph size (instead of dynamic graph) for detection model.
+    /// Get or set the static size for the detection model graph. 
+    /// It may improve performance but could involve image scaling during inference, 
+    /// possibly reducing accuracy. If `null`, the graph size is dynamic.
     /// </summary>
     public Size? DetectionStaticSize { get; set; }
+
+    /// <summary>
+    /// Get or set the fixed width for the OCR rec model input. 
+    /// Increasing this value may improve performance, 
+    /// but may also result in automatic image scaling during inference, 
+    /// potentially reducing accuracy. If `null`, input shape is dynamic.
+    /// </summary>
+    public int? RecognitionStaticWidth { get; set; }
 }

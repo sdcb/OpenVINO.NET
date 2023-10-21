@@ -62,7 +62,7 @@ public class PaddleOcrAll : IDisposable
         {
             Classifier = new PaddleOcrClassifier(model.ClassificationModel, options.ClassificationDeviceOptions);
         }
-        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, options.RecognitionDeviceOptions);
+        Recognizer = new PaddleOcrRecognizer(model.RecognizationModel, options.RecognitionDeviceOptions, options.RecognitionStaticWidth);
     }
 
     /// <summary>
@@ -117,10 +117,9 @@ public class PaddleOcrAll : IDisposable
     /// Runs the OCR engine on the specified source image.
     /// </summary>
     /// <param name="src">The source image to run OCR on.</param>
-    /// <param name="recognizeBatchSize">The batch size for recognition.</param>
     /// <returns>The OCR result.</returns>
     /// <exception cref="Exception">Thrown if 180-degree classification is enabled but no classifier is set.</exception>
-    public PaddleOcrResult Run(Mat src, int recognizeBatchSize = 0)
+    public PaddleOcrResult Run(Mat src)
     {
         if (Enable180Classification && Classifier == null)
         {
@@ -129,16 +128,18 @@ public class PaddleOcrAll : IDisposable
 
         RotatedRect[] rects = Detector.Run(src);
 
-        Mat[] mats =
-            rects.Select(rect =>
-            {
-                Mat roi = AllowRotateDetection ? GetRotateCropImage(src, rect) : src[GetCropedRect(rect.BoundingRect(), src.Size())];
-                return Enable180Classification ? Classifier!.Run(roi) : roi;
-            })
+        Mat[] mats = rects
+            .Select(rect => AllowRotateDetection ? GetRotateCropImage(src, rect) : src[GetCropedRect(rect.BoundingRect(), src.Size())])
             .ToArray();
+        
         try
         {
-            return new PaddleOcrResult(Recognizer.Run(mats, recognizeBatchSize)
+            if (Enable180Classification)
+            {
+                Classifier!.Run(mats);
+            }
+
+            return new PaddleOcrResult(Recognizer.Run(mats)
                 .Select((result, i) => new PaddleOcrResultRegion(rects[i], result.Text, result.Score))
                 .ToArray());
         }

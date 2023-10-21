@@ -27,6 +27,17 @@ public class OnlineClsTest
     }
 
     [Fact]
+    public async Task ClsCPUBatch()
+    {
+        using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
+        using Mat src2 = new();
+        Cv2.Rotate(src, src2, RotateFlags.Rotate180);
+        using PaddleOcrClassifier cls = new(await OnlineClassificationModel.ChineseMobileV2.DownloadAsync(), new DeviceOptions("CPU"));
+
+        ClsAsserts(cls, new[] { false, true }, new[] { src, src2 });
+    }
+
+    [Fact]
     public async Task ClsGpu()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -35,6 +46,38 @@ public class OnlineClsTest
 
         Cv2.Rotate(src, src, RotateFlags.Rotate180);
         ClsAsserts(cls, true, src);
+    }
+
+    [Fact]
+    public async Task ClsGpuBatch()
+    {
+        using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
+        using Mat src2 = new();
+        Cv2.Rotate(src, src2, RotateFlags.Rotate180);
+        using PaddleOcrClassifier cls = new(await OnlineClassificationModel.ChineseMobileV2.DownloadAsync(), new DeviceOptions("GPU"));
+
+        ClsAsserts(cls, new[] { false, true }, new[] { src, src2 });
+    }
+
+    [Fact]
+    public async Task ClsGpuBatch10()
+    {
+        using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
+        using Mat src2 = new();
+        Cv2.Rotate(src, src2, RotateFlags.Rotate180);
+        using Mat src3 = src.Clone();
+        using Mat src4 = src2.Clone();
+        using Mat src5 = src.Clone();
+        using Mat src6 = src2.Clone();
+        using Mat src7 = src.Clone();
+        using Mat src8 = src2.Clone();
+        using Mat src9 = src.Clone();
+        using Mat src10 = src2.Clone();
+        using PaddleOcrClassifier cls = new(await OnlineClassificationModel.ChineseMobileV2.DownloadAsync(), new DeviceOptions("GPU"));
+
+        ClsAsserts(cls, 
+            new[] { false, true, false, true, false, true, false, true, false, true }, 
+            new[] { src, src2, src3, src4, src5, src6, src7, src8, src9, src10 });
     }
 
     private void ClsAsserts(PaddleOcrClassifier cls, bool[] rotated, Mat[] srcs)

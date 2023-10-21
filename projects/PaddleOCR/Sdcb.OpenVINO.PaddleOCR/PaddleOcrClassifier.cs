@@ -16,12 +16,20 @@ public class PaddleOcrClassifier : IDisposable
     /// <summary>
     /// Rotation threshold value used to determine if the image should be rotated.
     /// </summary>
-    public double RotateThreshold { get; init; } = 0.75;
+    public double RotateThreshold { get; init; } = 0.5;
 
     /// <summary>
     /// The OcrShape used for the model.
     /// </summary>
     public NCHW Shape { get; init; } = ClassificationModel.DefaultShape;
+
+    /// <summary>
+    /// The batch size used for inference. If not specified or zero, the batch size will be determined by minimum of 8 and the processor count.
+    /// </summary>
+    /// <remarks>
+    /// The batch size determines the number of images that will be processed in parallel during inference. A larger batch size can lead to faster inference times, but may require more memory and may not fit on devices with limited memory.
+    /// </remarks>
+    public int BatchSize { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PaddleOcrClassifier"/> class with a specified model and configuration.
@@ -63,21 +71,7 @@ public class PaddleOcrClassifier : IDisposable
             throw new NotSupportedException($"{nameof(src)} channel must be 3 or 1, provided {src.Channels()}.");
         }
 
-        using Mat normalized = new();
-        using (Mat resized = ResizePadding(src, Shape))
-        {
-            resized.ConvertTo(normalized, MatType.CV_32FC3, 2.0 / 255, -1);
-        }
-
-        using (Tensor input = normalized.AsTensor())
-        {
-            _p.Inputs.Primary = input;
-            _p.Run();
-        }
-
-        using Tensor output = _p.Outputs.Primary;
-        ReadOnlySpan<float> softmax = output.GetData<float>();
-        return new Ocr180DegreeClsResult(softmax, RotateThreshold);
+        return BatchedShouldRotate180(new[] { src }).Single();
     }
 
     /// <summary>
@@ -85,24 +79,103 @@ public class PaddleOcrClassifier : IDisposable
     /// </summary>
     /// <param name="srcs">The array of source images.</param>
     /// <returns>An array of Ocr180DegreeClsResult instances, each containing a bool indicating whether the corresponding image should be rotated and a float representing the confidence of the determination.</returns>
-
     public Ocr180DegreeClsResult[] ShouldRotate180(Mat[] srcs)
     {
-        return srcs.Select(ShouldRotate180).ToArray();
+        if (srcs.Length == 0)
+        {
+            return new Ocr180DegreeClsResult[0];
+        }
+
+        int chooseBatchSize = BatchSize != 0 ? BatchSize : Math.Min(8, Environment.ProcessorCount);
+        Ocr180DegreeClsResult[] allResult = new Ocr180DegreeClsResult[srcs.Length];
+
+        return srcs
+            .Select((x, i) => (mat: x, i))
+            .Chunk(chooseBatchSize)
+            .Select(x => (result: BatchedShouldRotate180(x.Select(x => x.mat).ToArray()), ids: x.Select(x => x.i).ToArray()))
+            .SelectMany(x => x.result.Zip(x.ids, (result, i) => (result, i)))
+            .Select(x => x.result)
+            .ToArray();
+    }
+
+
+    private Ocr180DegreeClsResult[] BatchedShouldRotate180(Mat[] srcs)
+    {
+        Mat[] normalizeds = null!;
+        Mat final = new();
+        try
+        {
+            normalizeds = srcs
+                .Select(src =>
+                {
+                    using Mat channel3 = src.Channels() switch
+                    {
+                        4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
+                        1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
+                        3 => src.WeakRef(),
+                        var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
+                    };
+                    return ResizePadding(channel3, Shape);
+                })
+                .ToArray();
+            using Mat combined = PaddleOcrRecognizer.CombineMats(normalizeds, Shape.Height, Shape.Width);
+            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
+        }
+        finally
+        {
+            foreach (Mat normalized in normalizeds)
+            {
+                normalized.Dispose();
+            }
+        }
+
+        using (Tensor input = final.StackedAsTensor(srcs.Length))
+        {
+            _p.Inputs.Primary = input;
+            _p.Run();
+        }
+
+        using (Tensor output = _p.Outputs.Primary)
+        {
+            ReadOnlySpan<float> data = output.GetData<float>();
+            Ocr180DegreeClsResult[] results = new Ocr180DegreeClsResult[data.Length / 2];
+            for (int i = 0; i < results.Length; i++)
+            {
+                results[i] = new Ocr180DegreeClsResult(data[(i * 2)..((i + 1) * 2)], RotateThreshold);
+            }
+
+            return results;
+        }
     }
 
     /// <summary>
-    /// Processes the input image, and returns the resulting image.
+    /// Processes the input images directly and rotates each image if necessary.
     /// </summary>
-    /// <param name="src">The source image.</param>
-    /// <returns>The resulting image.</returns>
+    /// <param name="srcs">The source images.</param>
     /// <exception cref="ArgumentException">Thrown if the source image size is 0.</exception>
     /// <exception cref="NotSupportedException">Thrown if the source image has a channel count other than 3 or 1.</exception>
-    public Mat Run(Mat src)
+    /// <remarks>No return value. The source images are modified directly.</remarks>
+    public void Run(Mat[] srcs)
+    {
+        Ocr180DegreeClsResult[] ress = ShouldRotate180(srcs);
+        for (int i = 0; i < srcs.Length; i++)
+        {
+            Mat src = srcs[i];
+            ress[i].RotateIfShould(src);
+        }
+    }
+
+    /// <summary>
+    /// Processes the input image directly and rotates it if necessary.
+    /// </summary>
+    /// <param name="src">The source image.</param>
+    /// <exception cref="ArgumentException">Thrown if the source image size is 0.</exception>
+    /// <exception cref="NotSupportedException">Thrown if the source image has a channel count other than 3 or 1.</exception>
+    /// <remarks>No return value. The source images are modified directly.</remarks>
+    public void Run(Mat src)
     {
         Ocr180DegreeClsResult res = ShouldRotate180(src);
         res.RotateIfShould(src);
-        return src;
     }
 
     private static Mat ResizePadding(Mat src, NCHW shape)

@@ -37,6 +37,14 @@ public class PaddleOcrRecognizer : IDisposable
     public bool IsDynamic => StaticShapeWidth is null;
 
     /// <summary>
+    /// The batch size used for inference. If not specified or zero, the batch size will be determined by minimum of 8 and the processor count.
+    /// </summary>
+    /// <remarks>
+    /// The batch size determines the number of images that will be processed in parallel during inference. A larger batch size can lead to faster inference times, but may require more memory and may not fit on devices with limited memory.
+    /// </remarks>
+    public int BatchSize { get; set; }
+
+    /// <summary>
     /// Constructor for creating a new instance of the <see cref="PaddleOcrRecognizer"/> class using a specified model and a callback configuration.
     /// </summary>
     /// <param name="model">The RecognizationModel object.</param>
@@ -73,23 +81,22 @@ public class PaddleOcrRecognizer : IDisposable
     /// Run OCR recognition on multiple images in batches.
     /// </summary>
     /// <param name="srcs">Array of images for OCR recognition.</param>
-    /// <param name="batchSize">Size of the batch to run OCR recognition on.</param>
     /// <returns>Array of <see cref="PaddleOcrRecognizerResult"/> instances corresponding to OCR recognition results of the images.</returns>
-    public PaddleOcrRecognizerResult[] Run(Mat[] srcs, int batchSize = 0)
+    public PaddleOcrRecognizerResult[] Run(Mat[] srcs)
     {
         if (srcs.Length == 0)
         {
             return new PaddleOcrRecognizerResult[0];
         }
 
-        int chooseBatchSize = batchSize != 0 ? batchSize : Math.Min(8, Environment.ProcessorCount);
+        int chooseBatchSize = BatchSize != 0 ? BatchSize : Math.Min(8, Environment.ProcessorCount);
         PaddleOcrRecognizerResult[] allResult = new PaddleOcrRecognizerResult[srcs.Length];
 
         return srcs
             .Select((x, i) => (mat: x, i, ratio: 1.0 * x.Width / x.Height))
             .OrderBy(x => x.ratio)
             .Chunk(chooseBatchSize)
-            .Select(x => (result: RunMulti(x.Select(x => x.mat).ToArray()), ids: x.Select(x => x.i).ToArray()))
+            .Select(x => (result: BatchedRun(x.Select(x => x.mat).ToArray()), ids: x.Select(x => x.i).ToArray()))
             .SelectMany(x => x.result.Zip(x.ids, (result, i) => (result, i)))
             .OrderBy(x => x.i)
             .Select(x => x.result)
@@ -101,9 +108,9 @@ public class PaddleOcrRecognizer : IDisposable
     /// </summary>
     /// <param name="src">Image for OCR recognition.</param>
     /// <returns><see cref="PaddleOcrRecognizerResult"/> instance corresponding to OCR recognition result of the image.</returns>
-    public PaddleOcrRecognizerResult Run(Mat src) => RunMulti(new[] { src }).Single();
+    public PaddleOcrRecognizerResult Run(Mat src) => BatchedRun(new[] { src }).Single();
 
-    private unsafe PaddleOcrRecognizerResult[] RunMulti(Mat[] srcs)
+    private unsafe PaddleOcrRecognizerResult[] BatchedRun(Mat[] srcs)
     {
         if (srcs.Length == 0)
         {
@@ -197,7 +204,7 @@ public class PaddleOcrRecognizer : IDisposable
         }
     }
 
-    private static Mat ResizePadding(Mat src, int modelHeight, int targetWidth)
+    internal static Mat ResizePadding(Mat src, int modelHeight, int targetWidth)
     {
         // Calculate scaling factor
         double scale = Math.Min((double)modelHeight / src.Height, (double)targetWidth / src.Width);
@@ -225,7 +232,7 @@ public class PaddleOcrRecognizer : IDisposable
         }
     }
 
-    static Mat CombineMats(Mat[] srcs, int height, int width)
+    internal static Mat CombineMats(Mat[] srcs, int height, int width)
     {
         // 创建一个空的Mat，它的大小等于所有输入Mat的加总
         MatType matType = srcs[0].Type();

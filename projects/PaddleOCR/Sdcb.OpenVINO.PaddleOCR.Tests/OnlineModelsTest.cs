@@ -48,7 +48,7 @@ public class OnlineModelsTest
     [Fact]
     public async Task FastCheckOCRWith180Cls()
     {
-        FullOcrModel model = await OnlineFullModels.EnglishV3.DownloadAsync();
+        FullOcrModel model = await OnlineFullModels.EnglishV4.DownloadAsync();
 
         // from: https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Home-page-extension-visual-updated.png
         byte[] sampleImageData = File.ReadAllBytes(@"./samples/vsext.png");
@@ -67,25 +67,26 @@ public class OnlineModelsTest
                 PaddleOcrResult result = all.Run(src);
                 _console.WriteLine($"elapsed={sw.ElapsedMilliseconds} ms");
                 _console.WriteLine("Detected all texts: \n" + result.Text);
+
                 foreach (PaddleOcrResultRegion region in result.Regions)
                 {
-                    _console.WriteLine($"Text: {region.Text}, Score: {region.Score}, RectCenter: {region.Rect.Center}, RectSize:    {region.Rect.Size}, Angle: {region.Rect.Angle}");
+                    _console.WriteLine($"Text: {region.Text}, Score: {region.Score}, RectCenter: {region.Rect.Center}, RectSize: {region.Rect.Size}, Angle: {region.Rect.Angle}");
                 }
             }
         }
     }
 
-    [Fact(Skip = "Too slow")]
+    [Fact]
     public async Task GPUFastCheckOCR()
     {
         FullOcrModel model = await OnlineFullModels.EnglishV3.DownloadAsync();
 
         // from: https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Home-page-extension-visual-updated.png
         byte[] sampleImageData = File.ReadAllBytes(@"./samples/vsext.png");
-        using (PaddleOcrAll all = new(model, new DeviceOptions("GPU"))
+        using (PaddleOcrAll all = new(model, new PaddleOcrOptions(new DeviceOptions("GPU")))
         {
             AllowRotateDetection = true,
-            Enable180Classification = false,
+            Enable180Classification = true,
         })
         {
             // Load local file by following code:
