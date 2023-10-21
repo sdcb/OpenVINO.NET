@@ -33,7 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" />
+    <ProjectReference Include="..\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'"/>
+    <PackageReference Include="Sdcb.OpenVINO" Version="0.4.5" Condition="'$(Configuration)' != 'Debug'" />
   </ItemGroup>
 
 </Project>
