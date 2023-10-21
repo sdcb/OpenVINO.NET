@@ -101,33 +101,7 @@ public class PaddleOcrClassifier : IDisposable
 
     private Ocr180DegreeClsResult[] BatchedShouldRotate180(Mat[] srcs)
     {
-        Mat[] normalizeds = null!;
-        Mat final = new();
-        try
-        {
-            normalizeds = srcs
-                .Select(src =>
-                {
-                    using Mat channel3 = src.Channels() switch
-                    {
-                        4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
-                        1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
-                        3 => src.WeakRef(),
-                        var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
-                    };
-                    return ResizePadding(channel3, Shape);
-                })
-                .ToArray();
-            using Mat combined = PaddleOcrRecognizer.CombineMats(normalizeds, Shape.Height, Shape.Width);
-            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
-        }
-        finally
-        {
-            foreach (Mat normalized in normalizeds)
-            {
-                normalized.Dispose();
-            }
-        }
+        Mat final = PrepareAndStackImages(srcs);
 
         using (Tensor input = final.StackedAsTensor(srcs.Length))
         {
@@ -146,6 +120,39 @@ public class PaddleOcrClassifier : IDisposable
 
             return results;
         }
+    }
+
+    private Mat PrepareAndStackImages(Mat[] srcs)
+    {
+        Mat[] normalizeds = null!;
+        Mat final = new();
+        try
+        {
+            normalizeds = srcs
+                .Select(src =>
+                {
+                    using Mat channel3 = src.Channels() switch
+                    {
+                        4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
+                        1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
+                        3 => src.WeakRef(),
+                        var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
+                    };
+                    return ResizePadding(channel3, Shape);
+                })
+                .ToArray();
+            using Mat combined = normalizeds.StackingVertically(Shape.Height, Shape.Width);
+            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
+        }
+        finally
+        {
+            foreach (Mat normalized in normalizeds)
+            {
+                normalized.Dispose();
+            }
+        }
+
+        return final;
     }
 
     /// <summary>

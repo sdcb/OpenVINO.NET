@@ -135,33 +135,7 @@ public class PaddleOcrRecognizer : IDisposable
             return padded;
         }));
 
-        Mat[] normalizeds = null!;
-        Mat final = new();
-        try
-        {
-            normalizeds = srcs
-                .Select(src =>
-                {
-                    using Mat channel3 = src.Channels() switch
-                    {
-                        4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
-                        1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
-                        3 => src.WeakRef(),
-                        var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
-                    };
-                    return ResizePadding(channel3, modelHeight, maxWidth);                    
-                })
-                .ToArray();
-            using Mat combined = CombineMats(normalizeds, modelHeight, maxWidth);
-            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);            
-        }
-        finally
-        {
-            foreach (Mat normalized in normalizeds)
-            {
-                normalized.Dispose();
-            }
-        }
+        Mat final = PrepareAndStackImages(srcs, modelHeight, maxWidth);
 
         using (Tensor input = final.StackedAsTensor(srcs.Length))
         {
@@ -204,6 +178,39 @@ public class PaddleOcrRecognizer : IDisposable
         }
     }
 
+    private static unsafe Mat PrepareAndStackImages(Mat[] srcs, int modelHeight, int maxWidth)
+    {
+        Mat[] normalizeds = null!;
+        Mat final = new();
+        try
+        {
+            normalizeds = srcs
+                .Select(src =>
+                {
+                    using Mat channel3 = src.Channels() switch
+                    {
+                        4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
+                        1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
+                        3 => src.WeakRef(),
+                        var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
+                    };
+                    return ResizePadding(channel3, modelHeight, maxWidth);
+                })
+                .ToArray();
+            using Mat combined = normalizeds.StackingVertically(modelHeight, maxWidth);
+            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
+        }
+        finally
+        {
+            foreach (Mat normalized in normalizeds)
+            {
+                normalized.Dispose();
+            }
+        }
+
+        return final;
+    }
+
     internal static Mat ResizePadding(Mat src, int modelHeight, int targetWidth)
     {
         // Calculate scaling factor
@@ -230,20 +237,5 @@ public class PaddleOcrRecognizer : IDisposable
         {
             return resized;
         }
-    }
-
-    internal static Mat CombineMats(Mat[] srcs, int height, int width)
-    {
-        // 创建一个空的Mat，它的大小等于所有输入Mat的加总
-        MatType matType = srcs[0].Type();
-        Mat combinedMat = new(height * srcs.Length, width, matType, Scalar.Black);
-        for (int i = 0; i < srcs.Length; i++)
-        {
-            // 将源Mat的数据复制到目标Mat的正确位置
-            Mat src = srcs[i];
-            using Mat dest = combinedMat[i * height, (i + 1) * height, 0, src.Width];
-            srcs[i].CopyTo(dest);
-        }
-        return combinedMat;
     }
 }
