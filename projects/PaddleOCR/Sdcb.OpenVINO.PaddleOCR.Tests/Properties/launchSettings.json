@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sdcb.OpenVINO.PaddleOCR.Tests": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

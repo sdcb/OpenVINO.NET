@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Sdcb.OpenVINO.Extensions.OpenCvSharp4\Sdcb.OpenVINO.Extensions.OpenCvSharp4.csproj" />
     <ProjectReference Include="..\..\src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" />
   </ItemGroup>
 

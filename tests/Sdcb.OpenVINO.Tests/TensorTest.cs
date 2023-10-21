@@ -1,4 +1,5 @@
 ﻿using Sdcb.OpenVINO.Natives;
+using System.Runtime.InteropServices;
 
 namespace Sdcb.OpenVINO.Tests;
 
@@ -40,5 +41,16 @@ public class TensorTest
         using Tensor tensor = Tensor.FromArray(data, new Shape(5));
         Span<byte> result = tensor.GetData<byte>();
         Assert.Equal(data.Length * 4, result.Length);
+    }
+
+    [Fact]
+    public unsafe void TensorMemoryIsSameAsInput()
+    {
+        byte* data = stackalloc byte[5];
+        IntPtr dataPtr = new(data);
+        using Tensor tensor = Tensor.FromRaw(dataPtr, new Shape(5));
+
+        IntPtr dataPtr2 = tensor.DangerousGetDataPtr();
+        Assert.Equal(dataPtr, dataPtr2);
     }
 }

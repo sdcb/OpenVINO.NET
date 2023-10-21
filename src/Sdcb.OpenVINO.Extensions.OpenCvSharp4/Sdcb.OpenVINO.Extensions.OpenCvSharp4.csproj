@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net48;net6</TargetFrameworks>
-    <LangVersion>11</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <IncludeSymbols>true</IncludeSymbols>
@@ -17,8 +17,6 @@
     <RepositoryUrl>https://github.com/sdcb/OpenVINO.NET.git</RepositoryUrl>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6|AnyCPU'" />
-
   <ItemGroup>
     <None Include="..\..\icon.png">
       <Pack>True</Pack>
@@ -31,12 +29,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PolySharp" Version="1.13.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)' != 'net6'" />
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' != 'net6'" />
+    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'"/>
+    <PackageReference Include="Sdcb.OpenVINO" Version="0.4.5" Condition="'$(Configuration)' != 'Debug'" />
   </ItemGroup>
 
 </Project>

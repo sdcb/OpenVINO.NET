@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CF0B0CBC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{A1134490-79DC-4E05-AF32-DFF25DAC58D8}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		readme.md = readme.md
 	EndProjectSection
 EndProject
@@ -43,7 +44,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.PaddleOCR", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.PaddleOCR.Tests", "projects\PaddleOCR\Sdcb.OpenVINO.PaddleOCR.Tests\Sdcb.OpenVINO.PaddleOCR.Tests.csproj", "{920A7881-AB99-497B-A995-A6AD29360767}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdcb.OpenVINO.PaddleOCR.Models.Online", "projects\PaddleOCR\Sdcb.OpenVINO.PaddleOCR.Models.Online\Sdcb.OpenVINO.PaddleOCR.Models.Online.csproj", "{C34C36F8-5844-4B43-B0FB-591039460182}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.PaddleOCR.Models.Online", "projects\PaddleOCR\Sdcb.OpenVINO.PaddleOCR.Models.Online\Sdcb.OpenVINO.PaddleOCR.Models.Online.csproj", "{C34C36F8-5844-4B43-B0FB-591039460182}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.Extensions.OpenCvSharp4", "src\Sdcb.OpenVINO.Extensions.OpenCvSharp4\Sdcb.OpenVINO.Extensions.OpenCvSharp4.csproj", "{57CE7EF4-962F-4730-922F-E150F85DCA23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +90,10 @@ Global
 		{C34C36F8-5844-4B43-B0FB-591039460182}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C34C36F8-5844-4B43-B0FB-591039460182}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C34C36F8-5844-4B43-B0FB-591039460182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57CE7EF4-962F-4730-922F-E150F85DCA23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57CE7EF4-962F-4730-922F-E150F85DCA23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57CE7EF4-962F-4730-922F-E150F85DCA23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57CE7EF4-962F-4730-922F-E150F85DCA23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +110,7 @@ Global
 		{9C0656FC-017D-485F-8F4C-18B018C15E35} = {A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0}
 		{920A7881-AB99-497B-A995-A6AD29360767} = {A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0}
 		{C34C36F8-5844-4B43-B0FB-591039460182} = {A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0}
+		{57CE7EF4-962F-4730-922F-E150F85DCA23} = {FF193ABD-7BEF-48A8-A256-478FBF0ABBC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E5CE293-BD62-4ACF-B872-285B8C995E38}

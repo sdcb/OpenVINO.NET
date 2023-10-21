@@ -131,11 +131,27 @@ public class Tensor : CppPtrObject
 
         fixed (byte* dataPtr = data)
         {
-            ov_tensor* tensor;
-            using NativeShapeWrapper l = shape.Lock();
-            OpenVINOException.ThrowIfFailed(ov_tensor_create_from_host_ptr(rawType, l.Shape, dataPtr, &tensor));
-            return new Tensor(tensor, owned: true);
+            return FromRaw((IntPtr)dataPtr, shape, rawType);
         }
+    }
+
+    /// <summary>
+    /// Create a Tensor from raw data.
+    /// </summary>
+    /// <remarks>
+    /// Be careful when using this method. The resulting Tensor will share the memory used by the IntPtr data.
+    /// If the memory used by IntPtr data becomes invalid, the Tensor will also become invalid.
+    /// </remarks>
+    /// <param name="data">The IntPtr to the raw data.</param>
+    /// <param name="shape">The shape of the tensor.</param>
+    /// <param name="rawType">The type of data. Default is ov_element_type_e.U8.</param>
+    /// <returns>A Tensor that uses the raw data.</returns>
+    public static unsafe Tensor FromRaw(IntPtr data, Shape shape, ov_element_type_e rawType = ov_element_type_e.U8)
+    {
+        ov_tensor* tensor;
+        using NativeShapeWrapper l = shape.Lock();
+        OpenVINOException.ThrowIfFailed(ov_tensor_create_from_host_ptr(rawType, l.Shape, (void*)data, &tensor));
+        return new Tensor(tensor, owned: true);
     }
 
     /// <summary>
