@@ -226,4 +226,52 @@ public readonly struct PartialShape : IEquatable<PartialShape>
         }
         return new PartialShape(ds);
     }
+
+    /// <summary>
+    /// Determines if the current <see cref="PartialShape"/> instance is compatible with the specified <see cref="PartialShape"/>.
+    /// </summary>
+    /// <param name="s">
+    /// The other <see cref="PartialShape"/> instance to compare with the current object.
+    /// </param>
+    /// <returns>
+    /// <c>true</c> if the current instance is compatible with <paramref name="s"/>.
+    /// This method returns <c>true</c> under the following conditions:
+    /// - Both instances' Ranks are dynamic.
+    /// - Current instance's Rank is dynamic and <paramref name="s"/>'s is static.
+    /// - Current instance's Rank is static and <paramref name="s"/>'s is dynamic.
+    /// - Both instances' Ranks are static and equal, and if a Dimension is dynamic in any of the instances, 
+    ///   or the Dimensions are equal in both instances for all corresponding indexes.
+    /// <c>false</c> otherwise.
+    /// </returns>
+    /// <remarks>
+    /// This method considers an instance is dynamic when <see cref="Rank"/> or any <see cref="Dimension"/> is dynamic.
+    /// </remarks>
+    public bool IsCompatible(PartialShape s)
+    {
+        // If we don't know *this's rank, or we don't know s's rank, they are compatible.
+        if (Rank.IsDynamic || s.Rank.IsDynamic)
+        {
+            return true;
+        }
+        // If we do know *this's rank and s's rank, and they are unequal, they are incompatible.
+        else if (Rank.Max != s.Rank.Max)
+        {
+            return false;
+        }
+        // If we know both the ranks and they are equal, then *this and s are compatible iff they
+        // are elementwise compatible everywhere.
+        else
+        {
+            for (int i = 0; i < Rank.Max; i++)
+            {
+                if (!Dimensions[i].IsDynamic && !s.Dimensions[i].IsDynamic && (Dimensions[i].Min != s.Dimensions[i].Min || Dimensions[i].Max != s.Dimensions[i].Max))
+                {
+                    return false;
+                }
+            }
+            // If we are still here, we know that s1 and s2 have the same rank and are elementwise
+            // compatible everywhere.
+            return true;
+        }
+    }
 }

@@ -97,4 +97,85 @@ public class PartialShapeTest
         PartialShape ps = new (new Dimension(0, -1), 3, new Dimension(0, -1), new Dimension(0, -1));
         Assert.Equal("{?,3,?,?}", ps.ToString());
     }
+
+    [Fact]
+    public void TestIsCompatible_WithSameRankDimensions_ShouldReturnTrue()
+    {
+        var ps1 = new PartialShape(new Rank(4), new Dimension(1), new Dimension(2), new Dimension(3), new Dimension(4));
+        var ps2 = new PartialShape(new Rank(4), new Dimension(1), new Dimension(2), new Dimension(3), new Dimension(4));
+
+        Assert.True(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_WithDifferentRankDimensions_ShouldReturnFalse()
+    {
+        var ps1 = new PartialShape(new Rank(4), new Dimension(1), new Dimension(2), new Dimension(3), new Dimension(4));
+        var ps2 = new PartialShape(new Rank(3), new Dimension(1), new Dimension(2), new Dimension(3));
+
+        Assert.False(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_WithDifferentDimensions_ShouldReturnFalse()
+    {
+        var ps1 = new PartialShape(new Rank(4), new Dimension(1), new Dimension(2), new Dimension(3), new Dimension(4));
+        var ps2 = new PartialShape(new Rank(4), new Dimension(1), new Dimension(2), new Dimension(3), new Dimension(5));
+
+        Assert.False(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_WithDynamicRank_ShouldReturnTrue()
+    {
+        var ps1 = new PartialShape(Rank.Dynamic);
+        var ps2 = new PartialShape(new Rank(4), new Dimension(1), new Dimension(2), new Dimension(3), new Dimension(4));
+
+        Assert.True(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_WithDynamicThisAndStaticOther_ShouldReturnTrue()
+    {
+        var ps1 = new PartialShape(Rank.Dynamic);
+        var ps2 = new PartialShape(new Rank(3), new Dimension(1), new Dimension(2), new Dimension(3));
+
+        Assert.True(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_WithStaticThisAndDynamicOther_ShouldReturnTrue()
+    {
+        var ps1 = new PartialShape(new Rank(3), new Dimension(1), new Dimension(2), new Dimension(3));
+        var ps2 = new PartialShape(Rank.Dynamic);
+
+        Assert.True(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_BothDynamic_ShouldReturnTrue()
+    {
+        var ps1 = new PartialShape(Rank.Dynamic);
+        var ps2 = new PartialShape(Rank.Dynamic);
+
+        Assert.True(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_WithOneDynamicDimension_ShouldReturnTrue()
+    {
+        var ps1 = new PartialShape(new Rank(3), new Dimension(1), Dimension.Dynamic, new Dimension(3));
+        var ps2 = new PartialShape(new Rank(3), new Dimension(1), new Dimension(2), new Dimension(3));
+
+        Assert.True(ps1.IsCompatible(ps2));
+    }
+
+    [Fact]
+    public void TestIsCompatible_WithAllDynamicDimensions_ShouldReturnTrue()
+    {
+        var ps1 = new PartialShape(new Rank(3), Dimension.Dynamic, Dimension.Dynamic, Dimension.Dynamic);
+        var ps2 = new PartialShape(new Rank(3), new Dimension(1), new Dimension(2), new Dimension(3));
+
+        Assert.True(ps1.IsCompatible(ps2));
+    }
 }
