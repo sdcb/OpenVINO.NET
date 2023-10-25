@@ -73,7 +73,7 @@ public class InferRequest : CppPtrObject
     /// Use it with caution and make sure you understand the risks before invoking this function.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous inference operation.</returns>
-    public unsafe Task RunAsync(CancellationToken cancellationToken = default)
+    public async Task RunAsync(CancellationToken cancellationToken = default)
     {
         if (cancellationToken.IsCancellationRequested)
         {
@@ -82,29 +82,72 @@ public class InferRequest : CppPtrObject
 
         TaskCompletionSource<int> tcs = new();
 
-        ov_callback_t cb = new()
-        {
-            callback_func = (delegate*<void*, void>)Marshal.GetFunctionPointerForDelegate((void* ptr) =>
-            {
-                tcs.TrySetResult(0);
-            })
-        };
-
-        OpenVINOException.ThrowIfFailed(ov_infer_request_set_callback((ov_infer_request*)Handle, &cb));
+        SetCallback(ex => tcs.TrySetResult(0));
 
         cancellationToken.Register(() =>
         {
             if (!tcs.Task.IsCompleted)
             {
                 tcs.TrySetCanceled();
-                OpenVINOException.ThrowIfFailed(ov_infer_request_cancel((ov_infer_request*)Handle));
+                CancelAsyncRun();
             }
         });
 
-        OpenVINOException.ThrowIfFailed(ov_infer_request_start_async((ov_infer_request*)Handle));
-        Thread.Sleep(50); // will crask if not sleep, sleep time might need to be adjusted
+        StartAsyncRun();
 
-        return tcs.Task;
+        await tcs.Task;
+    }
+
+    /// <summary>
+    /// Sets a callback to the function and associates it with user data.
+    /// </summary>
+    /// <param name="callback"> The callback function to be used later. </param>
+    /// <param name="userData"> Userdata which needs to be tied to callback. Default is null. </param>
+    public unsafe void SetCallback(Action<IntPtr> callback, IntPtr userData = default)
+    {
+        ov_callback_t cb = new()
+        {
+            callback_func = (delegate*<void*, void>)Marshal.GetFunctionPointerForDelegate((void* ptr) =>
+            {
+                callback((IntPtr)ptr);
+            }), 
+            args = (void*)userData
+        };
+
+        OpenVINOException.ThrowIfFailed(ov_infer_request_set_callback((ov_infer_request*)Handle, &cb));
+    }
+
+    /// <summary>
+    /// Starts an asynchronous inference request.
+    /// </summary>
+    public unsafe void StartAsyncRun()
+    {
+        OpenVINOException.ThrowIfFailed(ov_infer_request_start_async((ov_infer_request*)Handle));
+    }
+
+    /// <summary>
+    /// Blocks the current thread and waits for the result of the inference to become available.
+    /// </summary>
+    public unsafe void WaitAsyncRun()
+    {
+        OpenVINOException.ThrowIfFailed(ov_infer_request_wait((ov_infer_request*)Handle));
+    }
+
+    /// <summary>
+    /// Blocks the current thread and waits a specified time for the result of the inference to become available.
+    /// </summary>
+    /// <param name="duration"> The TimeSpan object representing the duration to wait for the results. </param>
+    public unsafe void WaitAsyncRun(TimeSpan duration)
+    {
+        OpenVINOException.ThrowIfFailed(ov_infer_request_wait_for((ov_infer_request*)Handle, (long)duration.TotalMilliseconds));
+    }
+
+    /// <summary>
+    /// Attempts to cancel an asynchronous inference request that has been initiated.
+    /// </summary>
+    public unsafe void CancelAsyncRun()
+    {
+        OpenVINOException.ThrowIfFailed(ov_infer_request_cancel((ov_infer_request*)Handle));
     }
 
     /// <summary>
