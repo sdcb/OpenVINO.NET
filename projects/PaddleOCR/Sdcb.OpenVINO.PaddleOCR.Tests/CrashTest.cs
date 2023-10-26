@@ -51,13 +51,38 @@ public class CrashTest
     public async Task RecMultiInstanceCrashTest()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
-        RecognizationModel model = await LocalDictOnlineRecognizationModel.ChineseV4.DownloadAsync();
+        RecognizationModel recModel = await LocalDictOnlineRecognizationModel.ChineseV4.DownloadAsync();
+        int threadCount = 16;
+        using CountdownEvent countdownEvent = new(threadCount);
+        await Task.WhenAll(Enumerable.Range(0, threadCount).Select(i => Task.Run(() =>
+        {
+            using PaddleOcrRecognizer rec = new(recModel, new DeviceOptions("CPU"), staticShapeWidth: 512);
+
+            countdownEvent.Signal();
+            countdownEvent.Wait();
+
+            Stopwatch sw = Stopwatch.StartNew();
+            for (int r = 0; r < 100; ++r)
+            {
+                rec.Run(src);
+            }
+            _console.WriteLine($"thread {i} done after: {sw.Elapsed.TotalMilliseconds}ms");
+        })));
+    }
+
+    [Fact]
+    public async Task RecClsMixed()
+    {
+        using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
+        RecognizationModel recModel = await LocalDictOnlineRecognizationModel.ChineseV4.DownloadAsync();
+        ClassificationModel clsModel = await OnlineClassificationModel.ChineseMobileV2.DownloadAsync();
         int threadCount = 16;
         using CountdownEvent countdownEvent = new(threadCount);
         await Task.WhenAll(Enumerable.Range(0, threadCount).Select(i => Task.Run(() =>
         {
             using Mat cloned = src.Clone();
-            using PaddleOcrRecognizer rec = new(model, new DeviceOptions("CPU"), staticShapeWidth: 512);
+            using PaddleOcrRecognizer rec = new(recModel, new DeviceOptions("CPU"), staticShapeWidth: 512);
+            using PaddleOcrClassifier cls = new(clsModel, new DeviceOptions("CPU"));
 
             countdownEvent.Signal();
             countdownEvent.Wait();
@@ -66,23 +91,27 @@ public class CrashTest
             for (int r = 0; r < 100; ++r)
             {
                 rec.Run(cloned);
+                cls.Run(cloned);
             }
             _console.WriteLine($"thread {i} done after: {sw.Elapsed.TotalMilliseconds}ms");
         })));
     }
 
-    [Fact(Skip = "Too slow")]
+    [Fact]
     public async Task QueuedTest()
     {
-        //using Mat src = Cv2.ImRead("./samples/vsext.png"); 
-        using Mat src = Cv2.ImDecode(await new HttpClient().GetByteArrayAsync("https://io.starworks.cc:88/paddlesharp/ocr/samples/xdr5450.webp"), ImreadModes.Color);
+        using Mat src = Cv2.ImRead("./samples/vsext.png"); 
+        //using Mat src = Cv2.ImDecode(await new HttpClient().GetByteArrayAsync("https://io.starworks.cc:88/paddlesharp/ocr/samples/xdr5450.webp"), ImreadModes.Color);
 
         FullOcrModel model = await OnlineFullModels.ChineseV4.DownloadAsync();
-        using QueuedPaddleOcrAll queued = new(() => new PaddleOcrAll(model, new PaddleOcrOptions(new DeviceOptions("CPU"))
+        using QueuedPaddleOcrAll queued = new(() => new PaddleOcrAll(model, new PaddleOcrOptions(new DeviceOptions("CPU")
+        {
+            InferenceNumThreads = 2,
+        })
         {
             DetectionStaticSize = new Size(1024, 1024),
             RecognitionStaticWidth = 512,
-        }), consumerCount: 8, boundedCapacity: 100);
+        }), consumerCount: 16, boundedCapacity: 100);
 
         await Task.WhenAll(Enumerable.Range(0, 100).Select(i => queued.Run(src)));
     }
