@@ -145,8 +145,9 @@ public class PaddleOcrRecognizer : IDisposable
 
         using (Tensor output = _p.Outputs.Primary)
         {
-            Span<float> data = output.GetData<float>();
             IntPtr dataPtr = output.DangerousGetDataPtr();
+            int dataLength = (int)output.Size;
+
             Shape shape = output.Shape;
 
             int labelCount = shape[2];
@@ -155,27 +156,54 @@ public class PaddleOcrRecognizer : IDisposable
             return Enumerable.Range(0, shape[0])
                 .Select(i =>
                 {
+                    ReadOnlySpan<float> data = new((void*)dataPtr, dataLength); ;
                     StringBuilder sb = new();
                     int lastIndex = 0;
                     float score = 0;
                     for (int n = 0; n < charCount; ++n)
                     {
-                        using Mat mat = new(1, labelCount, MatType.CV_32FC1, dataPtr + (n + i * charCount) * labelCount * sizeof(float));
-                        int[] maxIdx = new int[2];
-                        mat.MinMaxIdx(out double _, out double maxVal, new int[0], maxIdx);
+                        var start = (n + i * charCount) * labelCount;
+                        var end = start + labelCount;
+                        ReadOnlySpan<float> dataSlice = data.Slice(start, labelCount);
+                        int maxIdx = MaxIndexOfSpan(dataSlice);
+                        float maxVal = dataSlice[maxIdx];
 
-                        if (maxIdx[1] > 0 && (!(n > 0 && maxIdx[1] == lastIndex)))
+                        if (maxIdx > 0 && (!(n > 0 && maxIdx == lastIndex)))
                         {
-                            score += (float)maxVal;
-                            sb.Append(Model.GetLabelByIndex(maxIdx[1]));
+                            score += maxVal;
+                            sb.Append(Model.GetLabelByIndex(maxIdx));
                         }
-                        lastIndex = maxIdx[1];
+                        lastIndex = maxIdx;
                     }
 
                     return new PaddleOcrRecognizerResult(sb.ToString(), score / sb.Length);
                 })
                 .ToArray();
         }
+    }
+
+    static int MaxIndexOfSpan(ReadOnlySpan<float> data)
+    {
+        // 参数校验
+        if (data == null || data.Length == 0)
+            throw new ArgumentException("The provided data span is null or empty.");
+
+        // 初始化最大值及其索引
+        int maxIndex = 0;
+        float maxValue = data[0];
+
+        // 遍历跨度查找最大值及其索引
+        for (int i = 1; i < data.Length; i++)
+        {
+            if (data[i] > maxValue)
+            {
+                maxValue = data[i];
+                maxIndex = i;
+            }
+        }
+
+        // 返回最大值及其索引
+        return maxIndex;
     }
 
     private static unsafe Mat PrepareAndStackImages(Mat[] srcs, int modelHeight, int maxWidth)

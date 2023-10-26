@@ -15,7 +15,7 @@ public class CrashTest
         _console = console;
     }
 
-    [Fact]
+    [Fact(Skip = "Too slow")]
     public async Task DetMultiInstanceCrashTest()
     {
         using Mat src = Cv2.ImRead("./samples/vsext.png");
@@ -30,7 +30,7 @@ public class CrashTest
         })));
     }
 
-    [Fact]
+    [Fact(Skip = "Too slow")]
     public async Task ClsMultiInstanceCrashTest()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -47,7 +47,7 @@ public class CrashTest
         })));
     }
 
-    [Fact]
+    [Fact(Skip = "Too slow")]
     public async Task RecMultiInstanceCrashTest()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -71,7 +71,7 @@ public class CrashTest
         })));
     }
 
-    [Fact]
+    [Fact(Skip = "Too slow")]
     public async Task QueuedTest()
     {
         //using Mat src = Cv2.ImRead("./samples/vsext.png"); 

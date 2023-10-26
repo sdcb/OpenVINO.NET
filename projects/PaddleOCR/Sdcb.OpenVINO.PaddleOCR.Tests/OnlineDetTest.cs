@@ -49,18 +49,15 @@ public class OnlineDetTest
         Assert.NotEmpty(results);
     }
 
-    [Fact(Skip = "Too slow")]
+    [Fact]
     public async Task DetectGPU()
     {
         using Mat src = Cv2.ImRead("./samples/vsext.png");
-        using PaddleOcrDetector det = new(
-            await OnlineDetectionModel.ChineseV3.DownloadAsync(),
-            new DeviceOptions("GPU"))
+        using PaddleOcrDetector det = new(await OnlineDetectionModel.ChineseV3.DownloadAsync(), new DeviceOptions("GPU"), staticShapeSize: new Size(1024, 1024))
         {
             MaxSize = 1536
         };
         RotatedRect[] results = det.Run(src);
-        PaddleOcrDetector.Visualize(src, results, Scalar.Red, 2).ImWrite("test.jpg");
         Assert.NotEmpty(results);
     }
 }
