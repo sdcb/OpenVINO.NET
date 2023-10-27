@@ -185,8 +185,7 @@ public class PaddleOcrRecognizer : IDisposable
     static int MaxIndexOfSpan(ReadOnlySpan<float> data)
     {
         // 参数校验
-        if (data == null || data.Length == 0)
-            throw new ArgumentException("The provided data span is null or empty.");
+        if (data.Length == 0) throw new ArgumentException("The provided tensor data should not be empty.");
 
         // 初始化最大值及其索引
         int maxIndex = 0;
