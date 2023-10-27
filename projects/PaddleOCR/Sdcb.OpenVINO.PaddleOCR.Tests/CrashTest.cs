@@ -15,8 +15,8 @@ public class CrashTest
         _console = console;
     }
 
-    [Fact(Skip = "Too slow")]
-    public async Task DetMultiInstanceCrashTest()
+    [Fact(Skip = "Crash test only")]
+    public async Task DetRawTest()
     {
         using Mat src = Cv2.ImRead("./samples/vsext.png");
         DetectionModel model = await OnlineDetectionModel.ChineseV4.DownloadAsync();
@@ -30,7 +30,22 @@ public class CrashTest
         })));
     }
 
-    [Fact(Skip = "Too slow")]
+    [Fact(Skip = "Crash test only")]
+    public async Task DetTest()
+    {
+        using Mat src = Cv2.ImRead("./samples/vsext.png");
+        DetectionModel model = await OnlineDetectionModel.ChineseV4.DownloadAsync();
+        await Task.WhenAll(Enumerable.Range(0, Environment.ProcessorCount).Select(i => Task.Run(() =>
+        {
+            using PaddleOcrDetector det = new(model, new DeviceOptions("CPU"), new Size(256, 256));
+            for (int r = 0; r < 100; ++r)
+            {
+                RotatedRect[] rr = det.Run(src);
+            }
+        })));
+    }
+
+    [Fact(Skip = "Crash test only")]
     public async Task ClsMultiInstanceCrashTest()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -47,7 +62,7 @@ public class CrashTest
         })));
     }
 
-    [Fact(Skip = "Too slow")]
+    [Fact(Skip = "Crash test only")]
     public async Task RecMultiInstanceCrashTest()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -70,7 +85,7 @@ public class CrashTest
         })));
     }
 
-    [Fact]
+    [Fact(Skip = "Crash test only")]
     public async Task RecClsMixed()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -97,7 +112,7 @@ public class CrashTest
         })));
     }
 
-    [Fact]
+    [Fact(Skip = "Crash test only")]
     public async Task QueuedTest()
     {
         using Mat src = Cv2.ImRead("./samples/vsext.png"); 
