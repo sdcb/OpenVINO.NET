@@ -101,7 +101,7 @@ public class PaddleOcrClassifier : IDisposable
 
     private Ocr180DegreeClsResult[] BatchedShouldRotate180(Mat[] srcs)
     {
-        Mat final = PrepareAndStackImages(srcs);
+        using Mat final = PrepareAndStackImages(srcs);
 
         using (Tensor input = final.StackedAsTensor(srcs.Length))
         {

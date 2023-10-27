@@ -135,7 +135,7 @@ public class PaddleOcrRecognizer : IDisposable
             return padded;
         }));
 
-        Mat final = PrepareAndStackImages(srcs, modelHeight, maxWidth);
+        using Mat final = PrepareAndStackImages(srcs, modelHeight, maxWidth);
 
         using (Tensor input = final.StackedAsTensor(srcs.Length))
         {
