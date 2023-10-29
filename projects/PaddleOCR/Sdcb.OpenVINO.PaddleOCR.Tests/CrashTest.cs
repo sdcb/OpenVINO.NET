@@ -130,4 +130,18 @@ public class CrashTest
 
         await Task.WhenAll(Enumerable.Range(0, 100).Select(i => queued.Run(src)));
     }
+
+    [Fact]
+    public async Task OcrIsThreadSafe()
+    {
+        using Mat src = Cv2.ImRead("./samples/vsext.png"); 
+        using PaddleOcrAll ocr = new PaddleOcrAll(await OnlineFullModels.ChineseV4.DownloadAsync());
+        Task[] tasks = Enumerable.Range(0, 2).Select(tidx => Task.Run(() => 
+        {
+            ocr.Run(src);
+            _console.WriteLine($"tid {tidx}: Good");
+        })).ToArray();
+
+        await Task.WhenAll(tasks);
+    }
 }
