@@ -11,7 +11,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrTableRecognizer : IDisposable
 {
-    readonly InferRequest _p;
+    readonly InferRequestQueue _irQueue;
 
     /// <summary>
     /// Gets or sets the maximum edge size.
@@ -28,16 +28,19 @@ public class PaddleOcrTableRecognizer : IDisposable
     /// </summary>
     /// <param name="model">The TableRecognitionModel to use for recognition.</param>
     /// <param name="deviceOptions">The optional DeviceOptions to use for inference.</param>
-    public PaddleOcrTableRecognizer(TableRecognitionModel model, DeviceOptions? deviceOptions = null)
+    public PaddleOcrTableRecognizer(TableRecognitionModel model, 
+        DeviceOptions? deviceOptions = null, 
+        InferRequestQueueOptions? irQueueOptions = null)
     {
         Model = model;
-        _p = model.CreateInferRequest(deviceOptions);
+        CompiledModel cm = model.CreateCompiledModel(deviceOptions);
+        _irQueue = cm.CreateInferRequestQueue(irQueueOptions ?? InferRequestQueueOptions.Default);
     }
 
     /// <summary>
     /// Disposes the PaddleOCR table recognizer.
     /// </summary>   
-    public void Dispose() => _p.Dispose();
+    public void Dispose() => _irQueue.Dispose();
 
     /// <summary>
     /// Runs table detection on the image.
@@ -62,15 +65,16 @@ public class PaddleOcrTableRecognizer : IDisposable
         Size rawSize = src.Size();
         float[] inputData = TablePreprocess(src);
 
+        using InferRequestWrapper irWrapper = _irQueue.Using();
         using (Tensor input = Tensor.FromArray(inputData, new Shape(1, 3, MaxEdgeSize, MaxEdgeSize)))
         {
-            _p.Inputs.Primary = input;
+            irWrapper.InferRequest.Inputs.Primary = input;
         }
 
-        _p.Run();
+        irWrapper.InferRequest.Run();
 
-        using (Tensor output0 = _p.Outputs[0])
-        using (Tensor output1 = _p.Outputs[1])
+        using (Tensor output0 = irWrapper.InferRequest.Outputs[0])
+        using (Tensor output1 = irWrapper.InferRequest.Outputs[1])
         {
             Span<float> locations = output0.GetData<float>();
             Shape locationShape = output0.Shape;

@@ -16,11 +16,18 @@ public class PaddleOcrOptions
     /// Initializes a new instance of the <see cref="PaddleOcrOptions"/> class with specified device options.
     /// </summary>
     /// <param name="allDeviceOptions">The device options for detection, classification and recognition.</param>
-    public PaddleOcrOptions(DeviceOptions allDeviceOptions)
+    public PaddleOcrOptions(DeviceOptions allDeviceOptions, InferRequestQueueOptions? irQueueOptions = null)
     {
         DetectionDeviceOptions = allDeviceOptions;
         ClassificationDeviceOptions = allDeviceOptions;
         RecognitionDeviceOptions = allDeviceOptions;
+
+        if (irQueueOptions != null)
+        {
+            DetectionIRQueueOptions = irQueueOptions;
+            ClassificationIRQueueOptions = irQueueOptions;
+            RecognitionIRQueueOptions = irQueueOptions;
+        }
 
         if (allDeviceOptions.DeviceName == "GPU")
         {
@@ -44,6 +51,10 @@ public class PaddleOcrOptions
     /// Gets or sets the device options for recognition.
     /// </summary>
     public DeviceOptions? RecognitionDeviceOptions { get; set; }
+
+    public InferRequestQueueOptions? DetectionIRQueueOptions { get; set; }
+    public InferRequestQueueOptions? ClassificationIRQueueOptions { get; set; }
+    public InferRequestQueueOptions? RecognitionIRQueueOptions { get; set; }
 
     /// <summary>
     /// Get or set the static size for the detection model graph. 

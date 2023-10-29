@@ -1,10 +1,8 @@
 ﻿using OpenCvSharp;
-using Sdcb.OpenVINO.Natives;
 using Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 using Sdcb.OpenVINO.PaddleOCR.Models;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Sdcb.OpenVINO.PaddleOCR;
@@ -14,7 +12,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrRecognizer : IDisposable
 {
-    private readonly InferRequest _p;
+    private readonly InferRequestQueue _irQueue;
 
     /// <summary>
     /// Recognization model being used for OCR.
@@ -53,12 +51,15 @@ public class PaddleOcrRecognizer : IDisposable
     /// The value will be rounded to the nearest upper multiple of 32. This parameter is useful for models that require a fixed shape input.
     /// Pass `null` if the model supports dynamic input shape.
     /// </param>
-    public PaddleOcrRecognizer(RecognizationModel model, DeviceOptions? deviceOptions = null, int? staticShapeWidth = null)
+    public PaddleOcrRecognizer(RecognizationModel model, 
+        DeviceOptions? deviceOptions = null, 
+        int? staticShapeWidth = null,
+        InferRequestQueueOptions? irQueueOptions = null)
     {
         Model = model;
         StaticShapeWidth = staticShapeWidth.HasValue ? (int)(32 * Math.Ceiling(1.0 * staticShapeWidth.Value / 32)) : null;
 
-        _p = model.CreateInferRequest(deviceOptions, prePostProcessing: (m, ppp) =>
+        CompiledModel cm = model.CreateCompiledModel(deviceOptions, prePostProcessing: (m, ppp) =>
         {
             using PreProcessInputInfo ppii = ppp.Inputs.Primary;
             ppii.TensorInfo.Layout = Layout.NHWC;
@@ -70,12 +71,13 @@ public class PaddleOcrRecognizer : IDisposable
                 m.ReshapePrimaryInput(new PartialShape(new Dimension(1, 128), 48, StaticShapeWidth.Value, 3));
             }
         });
+        _irQueue = cm.CreateInferRequestQueue(irQueueOptions ?? InferRequestQueueOptions.Default);
     }
 
     /// <summary>
     /// Releases all resources used by the current instance of the <see cref="PaddleOcrRecognizer"/> class.
     /// </summary>
-    public void Dispose() => _p.Dispose();
+    public void Dispose() => _irQueue.Dispose();
 
     /// <summary>
     /// Run OCR recognition on multiple images in batches.
@@ -136,14 +138,14 @@ public class PaddleOcrRecognizer : IDisposable
         }));
 
         using Mat final = PrepareAndStackImages(srcs, modelHeight, maxWidth);
-
+        using InferRequestWrapper irWrapper = _irQueue.Using();
         using (Tensor input = final.StackedAsTensor(srcs.Length))
         {
-            _p.Inputs.Primary = input;
-            _p.Run();
+            irWrapper.InferRequest.Inputs.Primary = input;
+            irWrapper.InferRequest.Run();
         }
 
-        using (Tensor output = _p.Outputs.Primary)
+        using (Tensor output = irWrapper.InferRequest.Outputs.Primary)
         {
             IntPtr dataPtr = output.DangerousGetDataPtr();
             int dataLength = (int)output.Size;

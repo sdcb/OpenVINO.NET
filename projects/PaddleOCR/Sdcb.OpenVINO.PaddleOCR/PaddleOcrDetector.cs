@@ -12,8 +12,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrDetector : IDisposable
 {
-    /// <summary>Holds an instance of the InferRequest class.</summary>
-    readonly InferRequest _p;
+    readonly InferRequestQueue _irQueue;
 
     /// <summary>
     /// Gets or sets the maximum size for resizing the input image.
@@ -66,7 +65,10 @@ public class PaddleOcrDetector : IDisposable
     /// <para>If this property is null, network can work with image of any size and h/w ratio (dynamic).</para>
     /// <para>Otherwise, network works with fixed size image (static).</para>
     /// </param>
-    public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null, Size? staticShapeSize = null)
+    public PaddleOcrDetector(DetectionModel model, 
+        DeviceOptions? options = null, 
+        Size? staticShapeSize = null,
+        InferRequestQueueOptions? irQueueOptions = null)
     {
         if (staticShapeSize != null)
         {
@@ -75,7 +77,7 @@ public class PaddleOcrDetector : IDisposable
                 32 * Math.Ceiling(1.0 * staticShapeSize.Value.Height / 32));
         }
 
-        _p = model.CreateInferRequest(options, afterReadModel: m =>
+        CompiledModel cm = model.CreateCompiledModel(options, afterReadModel: m =>
         {
             if (model.Version != ModelVersion.V4)
             {
@@ -97,6 +99,7 @@ public class PaddleOcrDetector : IDisposable
                 m.ReshapePrimaryInput(new PartialShape(1, Dimension.Dynamic, Dimension.Dynamic, 3));
             }
         });
+        _irQueue = cm.CreateInferRequestQueue(irQueueOptions ?? InferRequestQueueOptions.Default);
     }
 
     /// <summary>
@@ -104,7 +107,7 @@ public class PaddleOcrDetector : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _p.Dispose();
+        _irQueue.Dispose();
     }
 
     /// <summary>
@@ -221,14 +224,15 @@ public class PaddleOcrDetector : IDisposable
             normalized = Normalize(padded);
         }
 
+        using InferRequestWrapper irWrapper = _irQueue.Using();
         using (Mat _ = normalized)
         using (Tensor input = normalized.AsTensor())
         {
-            _p.Inputs.Primary = input;
-            _p.Run();
+            irWrapper.InferRequest.Inputs.Primary = input;
+            irWrapper.InferRequest.Run();
         }
 
-        using (Tensor output = _p.Outputs[0])
+        using (Tensor output = irWrapper.InferRequest.Outputs[0])
         {
             Span<float> data = output.GetData<float>();
             NCHW shape = output.Shape.ToNCHW();
