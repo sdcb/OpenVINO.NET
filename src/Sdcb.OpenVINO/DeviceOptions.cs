@@ -86,25 +86,48 @@ public record DeviceOptions
     /// <summary>
     /// Gets or sets the inference performance mode. 
     /// </summary>
-    public PerformanceMode? PerformanceMode
+    public PerformanceMode PerformanceMode
     {
-        get => Properties.TryGetValue(PropertyKeys.HintPerformanceMode, out string? val) ? (PerformanceMode)Enum.Parse(typeof(PerformanceMode), val) : null;
+        get => Properties.TryGetValue(PropertyKeys.HintPerformanceMode, out string? val) ? val switch
+        {
+            "LATENCY" => PerformanceMode.Latency,
+            "THROUGHPUT" => PerformanceMode.Throughput,
+            "CUMULATIVE_THROUGHPUT" => PerformanceMode.CumulativeThroughput,
+            _ => throw new NotSupportedException($"{nameof(PerformanceMode)} {val} is not supported.")
+        } : PerformanceMode.Latency;
         set
         {
-            if (value != null)
+            Properties[PropertyKeys.HintPerformanceMode] = value switch
             {
-                Properties[PropertyKeys.HintPerformanceMode] = value.Value switch
-                {
-                    OpenVINO.PerformanceMode.Latency => "LATENCY",
-                    OpenVINO.PerformanceMode.Throughput => "THROUGHPUT",
-                    OpenVINO.PerformanceMode.CumulativeThroughput => "CUMULATIVE_THROUGHPUT",
-                    _ => throw new ArgumentOutOfRangeException(nameof(PerformanceMode)),
-                };
-            }
-            else
+                PerformanceMode.Latency => "LATENCY",
+                PerformanceMode.Throughput => "THROUGHPUT",
+                PerformanceMode.CumulativeThroughput => "CUMULATIVE_THROUGHPUT",
+                _ => throw new ArgumentOutOfRangeException(nameof(PerformanceMode)),
+            };
+        }
+    }
+
+    /// <summary>
+    /// Core type can be used for CPU tasks on different devices
+    /// </summary>
+    public SchedulingCoreType SchedulingCoreType
+    {
+        get => Properties.TryGetValue(PropertyKeys.HintSchedulingCoreType, out string? val) ? val switch
+        {
+            "ANY_CORE" => SchedulingCoreType.AnyCore,
+            "PCORE_ONLY" => SchedulingCoreType.PCoresOnly,
+            "ECORE_ONLY" => SchedulingCoreType.ECoresOnly,
+            _ => throw new NotSupportedException($"{nameof(SchedulingCoreType)} {val} is not supported.")
+        } : SchedulingCoreType.AnyCore;
+        set
+        {
+            Properties[PropertyKeys.HintSchedulingCoreType] = value switch
             {
-                Properties.Remove(PropertyKeys.HintPerformanceMode);
-            }
+                SchedulingCoreType.AnyCore => "ANY_CORE",
+                SchedulingCoreType.PCoresOnly => "PCORE_ONLY",
+                SchedulingCoreType.ECoresOnly => "ECORE_ONLY",
+                _ => throw new ArgumentOutOfRangeException(nameof(PerformanceMode)),
+            };
         }
     }
 
@@ -122,29 +145,4 @@ public record DeviceOptions
     /// The default device name to be AUTO.
     /// </summary>
     public const string DefaultDeviceName = "AUTO";
-}
-
-public readonly record struct NumStreamDef(int StreamCount)
-{
-    public static NumStreamDef Auto => new(-1);
-    public static NumStreamDef Numa => new(-2);
-    public static implicit operator NumStreamDef(int streamCount) => streamCount switch
-    {
-        < -2 => throw new ArgumentException("value must >= -2 or AUTO/NUMA", nameof(streamCount)),
-        _ => new NumStreamDef(streamCount),
-    };
-
-    public static NumStreamDef Parse(string streamCount) => streamCount switch
-    {
-        "AUTO" => Auto,
-        "NUMA" => Numa,
-        _ => int.Parse(streamCount)
-    };
-
-    public override string ToString() => StreamCount switch
-    {
-        -1 => "AUTO",
-        -2 => "NUMA",
-        _ => StreamCount.ToString()
-    };
 }
