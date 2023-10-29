@@ -11,7 +11,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrClassifier : IDisposable
 {
-    private readonly InferRequestQueue _irQueue;
+    private readonly CompiledModel _compiledModel;
 
     /// <summary>
     /// Rotation threshold value used to determine if the image should be rotated.
@@ -37,23 +37,21 @@ public class PaddleOcrClassifier : IDisposable
     /// <param name="model">The <see cref="ClassificationModel"/> to use.</param>
     /// <param name="device">The device the inference request, pass null to using model's DefaultDevice.</param>
     public PaddleOcrClassifier(ClassificationModel model, 
-        DeviceOptions? device = null, 
-        InferRequestQueueOptions? irQueueOptions = null)
+        DeviceOptions? device = null)
     {
         Shape = model.Shape;
-        CompiledModel cm = model.CreateCompiledModel(device, prePostProcessing: (m, ppp) =>
+        _compiledModel = model.CreateCompiledModel(device, prePostProcessing: (m, ppp) =>
         {
             using PreProcessInputInfo ppii = ppp.Inputs.Primary;
             ppii.TensorInfo.Layout = Layout.NHWC;
             ppii.ModelInfo.Layout = Layout.NCHW;
         });
-        _irQueue = cm.CreateInferRequestQueue(irQueueOptions ?? InferRequestQueueOptions.Default);
     }
 
     /// <summary>
     /// Releases all resources used by the <see cref="PaddleOcrClassifier"/> object.
     /// </summary>
-    public void Dispose() => _irQueue.Dispose();
+    public void Dispose() => _compiledModel.Dispose();
 
     /// <summary>
     /// Determines whether the image should be rotated by 180 degrees based on the threshold value.
@@ -106,14 +104,14 @@ public class PaddleOcrClassifier : IDisposable
     {
         using Mat final = PrepareAndStackImages(srcs);
 
-        using InferRequestWrapper irWrapper = _irQueue.Using();
+        using InferRequest ir = _compiledModel.CreateInferRequest();
         using (Tensor input = final.StackedAsTensor(srcs.Length))
         {
-            irWrapper.InferRequest.Inputs.Primary = input;
-            irWrapper.InferRequest.Run();
+            ir.Inputs.Primary = input;
+            ir.Run();
         }
 
-        using (Tensor output = irWrapper.InferRequest.Outputs.Primary)
+        using (Tensor output = ir.Outputs.Primary)
         {
             ReadOnlySpan<float> data = output.GetData<float>();
             Ocr180DegreeClsResult[] results = new Ocr180DegreeClsResult[data.Length / 2];

@@ -11,7 +11,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrTableRecognizer : IDisposable
 {
-    readonly InferRequestQueue _irQueue;
+    readonly CompiledModel _compiledModel;
 
     /// <summary>
     /// Gets or sets the maximum edge size.
@@ -29,18 +29,16 @@ public class PaddleOcrTableRecognizer : IDisposable
     /// <param name="model">The TableRecognitionModel to use for recognition.</param>
     /// <param name="deviceOptions">The optional DeviceOptions to use for inference.</param>
     public PaddleOcrTableRecognizer(TableRecognitionModel model, 
-        DeviceOptions? deviceOptions = null, 
-        InferRequestQueueOptions? irQueueOptions = null)
+        DeviceOptions? deviceOptions = null)
     {
         Model = model;
-        CompiledModel cm = model.CreateCompiledModel(deviceOptions);
-        _irQueue = cm.CreateInferRequestQueue(irQueueOptions ?? InferRequestQueueOptions.Default);
+        _compiledModel = model.CreateCompiledModel(deviceOptions);
     }
 
     /// <summary>
     /// Disposes the PaddleOCR table recognizer.
     /// </summary>   
-    public void Dispose() => _irQueue.Dispose();
+    public void Dispose() => _compiledModel.Dispose();
 
     /// <summary>
     /// Runs table detection on the image.
@@ -65,16 +63,16 @@ public class PaddleOcrTableRecognizer : IDisposable
         Size rawSize = src.Size();
         float[] inputData = TablePreprocess(src);
 
-        using InferRequestWrapper irWrapper = _irQueue.Using();
+        using InferRequest ir = _compiledModel.CreateInferRequest();
         using (Tensor input = Tensor.FromArray(inputData, new Shape(1, 3, MaxEdgeSize, MaxEdgeSize)))
         {
-            irWrapper.InferRequest.Inputs.Primary = input;
+            ir.Inputs.Primary = input;
         }
 
-        irWrapper.InferRequest.Run();
+        ir.Run();
 
-        using (Tensor output0 = irWrapper.InferRequest.Outputs[0])
-        using (Tensor output1 = irWrapper.InferRequest.Outputs[1])
+        using (Tensor output0 = ir.Outputs[0])
+        using (Tensor output1 = ir.Outputs[1])
         {
             Span<float> locations = output0.GetData<float>();
             Shape locationShape = output0.Shape;
