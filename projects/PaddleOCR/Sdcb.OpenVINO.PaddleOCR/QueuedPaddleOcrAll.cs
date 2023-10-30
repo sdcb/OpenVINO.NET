@@ -10,6 +10,10 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// <summary>
 /// A class for queuing multiple OCR requests using PaddleOCR.
 /// </summary>
+/// <remarks>
+/// <see cref="PaddleOcrAll"/> is thread-safe and should have better performance, please use <see cref="PaddleOcrAll" /> whenever possible.
+/// </remarks>
+[Obsolete("PaddleOcrAll is thread-safe and should have better performance, please use PaddleOcrAll instead.")]
 public class QueuedPaddleOcrAll : IDisposable
 {
     private readonly Func<PaddleOcrAll> _factory;
