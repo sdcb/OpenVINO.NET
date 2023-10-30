@@ -132,6 +132,30 @@ public record DeviceOptions
     }
 
     /// <summary>
+    /// Gets or sets a value indicating whether hyper-threading is enabled for OpenVINO inference.
+    /// </summary>
+    /// <remarks>
+    /// This property controls whether hyper-threading is enabled for OpenVINO inference.
+    /// By default, hyper-threading is disabled.
+    /// Enabling hyper-threading may not provide significant performance benefits, as the CPU's floating-point units are shared between hyper-threaded cores.
+    /// </remarks>
+    public bool EnableHyperThreading
+    {
+        get => Properties.TryGetValue(PropertyKeys.HintEnableHyperThreading, out string? val) && bool.Parse(val);
+        set
+        {
+            if (value)
+            {
+                Properties[PropertyKeys.HintEnableHyperThreading] = value.ToString();
+            }
+            else
+            {
+                Properties.Remove(PropertyKeys.HintEnableHyperThreading);
+            }
+        }
+    }
+
+    /// <summary>
     /// Creates a new <see cref="OVCore"/> instance.
     /// </summary>
     public Func<OVCore> CreateOVCore { get; set; } = DefaultCreateOVCore;
