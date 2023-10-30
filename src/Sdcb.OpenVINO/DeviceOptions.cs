@@ -67,9 +67,9 @@ public record DeviceOptions
     /// <summary>
     /// Gets or sets the number of inference streams.
     /// </summary>
-    public NumStreamDef? NumStreams
+    public NumStreamsDef? NumStreams
     {
-        get => Properties.TryGetValue(PropertyKeys.NumStreams, out string? val) ? NumStreamDef.Parse(val) : null;
+        get => Properties.TryGetValue(PropertyKeys.NumStreams, out string? val) ? NumStreamsDef.Parse(val) : null;
         set
         {
             if (value != null)
@@ -134,7 +134,9 @@ public record DeviceOptions
     /// <summary>
     /// Creates a new <see cref="OVCore"/> instance.
     /// </summary>
-    public virtual OVCore CreateOVCore() => OVCore.Shared;
+    public Func<OVCore> CreateOVCore { get; set; } = DefaultCreateOVCore;
+
+    private static OVCore DefaultCreateOVCore() => OVCore.Shared;
 
     /// <summary>
     /// Gets or sets a dictionary of properties to configure the CompiledModel.
