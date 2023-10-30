@@ -16,7 +16,7 @@ public class QueuedPaddleOcrAll : IDisposable
     private readonly BlockingCollection<ThreadedQueueItem> _queue;
     private readonly Task[] _workers;
     private readonly CountdownEvent _countdownEvent;
-    private readonly ConcurrentBag<Exception> _constructExceptions = new ConcurrentBag<Exception>();
+    private readonly ConcurrentBag<Exception> _constructExceptions = new();
     private bool _disposed;
 
     /// <summary>
@@ -39,9 +39,7 @@ public class QueuedPaddleOcrAll : IDisposable
 
         try
         {
-#pragma warning disable CS0618 // Method exposed for compatibility to the outside, now it called in constructor, will change to private in a future version.
             WaitFactoryReady();
-#pragma warning restore CS0618 // Method exposed for compatibility to the outside, now it called in constructor, will change to private in a future version.
         }
         catch (AggregateException)
         {
@@ -54,8 +52,7 @@ public class QueuedPaddleOcrAll : IDisposable
     /// Waits for the factory to become ready before processing OCR requests.
     /// </summary>
     /// <exception cref="ObjectDisposedException">The instance of <see cref="QueuedPaddleOcrAll"/> is disposed.</exception>
-    [Obsolete("This method been called in constructor, will change to private in a future, exposed for compatibility.")]
-    public void WaitFactoryReady()
+    private void WaitFactoryReady()
     {
         if (_disposed) throw new ObjectDisposedException(nameof(QueuedPaddleOcrAll));
 

@@ -71,16 +71,14 @@ public class PaddleOcrTableRecognizer : IDisposable
 
         ir.Run();
 
-        using (Tensor output0 = ir.Outputs[0])
-        using (Tensor output1 = ir.Outputs[1])
-        {
-            Span<float> locations = output0.GetData<float>();
-            Shape locationShape = output0.Shape;
-            Span<float> structures = output1.GetData<float>();
-            Shape structureShape = output1.Shape;
+        using Tensor output0 = ir.Outputs[0];
+        using Tensor output1 = ir.Outputs[1];
+        Span<float> locations = output0.GetData<float>();
+        Shape locationShape = output0.Shape;
+        Span<float> structures = output1.GetData<float>();
+        Shape structureShape = output1.Shape;
 
-            return TablePostProcessor(locations, locationShape, structures, structureShape, rawSize, Model.GetLabelByIndex);
-        }
+        return TablePostProcessor(locations, locationShape, structures, structureShape, rawSize, Model.GetLabelByIndex);
     }
 
     private float[] TablePreprocess(Mat src)

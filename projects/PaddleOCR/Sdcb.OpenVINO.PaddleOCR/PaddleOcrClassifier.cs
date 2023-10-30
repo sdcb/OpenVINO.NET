@@ -111,17 +111,15 @@ public class PaddleOcrClassifier : IDisposable
             ir.Run();
         }
 
-        using (Tensor output = ir.Outputs.Primary)
+        using Tensor output = ir.Outputs.Primary;
+        ReadOnlySpan<float> data = output.GetData<float>();
+        Ocr180DegreeClsResult[] results = new Ocr180DegreeClsResult[data.Length / 2];
+        for (int i = 0; i < results.Length; i++)
         {
-            ReadOnlySpan<float> data = output.GetData<float>();
-            Ocr180DegreeClsResult[] results = new Ocr180DegreeClsResult[data.Length / 2];
-            for (int i = 0; i < results.Length; i++)
-            {
-                results[i] = new Ocr180DegreeClsResult(data[(i * 2)..((i + 1) * 2)], RotateThreshold);
-            }
-
-            return results;
+            results[i] = new Ocr180DegreeClsResult(data[(i * 2)..((i + 1) * 2)], RotateThreshold);
         }
+
+        return results;
     }
 
     private Mat PrepareAndStackImages(Mat[] srcs)

@@ -126,7 +126,7 @@ public record DeviceOptions
                 SchedulingCoreType.AnyCore => "ANY_CORE",
                 SchedulingCoreType.PCoresOnly => "PCORE_ONLY",
                 SchedulingCoreType.ECoresOnly => "ECORE_ONLY",
-                _ => throw new ArgumentOutOfRangeException(nameof(PerformanceMode)),
+                _ => throw new ArgumentOutOfRangeException(nameof(SchedulingCoreType)),
             };
         }
     }
