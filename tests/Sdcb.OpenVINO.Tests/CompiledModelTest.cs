@@ -49,7 +49,7 @@ public class CompiledModelTest
     }
 
     [Fact]
-    public void CanCompileExistingModelWithProps()
+    public void CanCompileExistingModelWithDictProps()
     {
         using OVCore c = new();
         using Model rawModel = c.ReadModel(_modelFile);
@@ -61,6 +61,27 @@ public class CompiledModelTest
         Assert.NotNull(m);
         Assert.Equal("4", m.Properties["INFERENCE_NUM_THREADS"]);
         Assert.Equal("2", m.Properties["NUM_STREAMS"]);
+    }
+
+    [Fact]
+    public void CanCompileExistingModelWithProps()
+    {
+        using OVCore c = new();
+        using Model rawModel = c.ReadModel(_modelFile);
+        using CompiledModel m = c.CompileModel(rawModel, new DeviceOptions("CPU")
+        {
+            SchedulingCoreType = SchedulingCoreType.PCoresOnly, 
+            EnableHyperThreading = true, 
+            InferenceNumThreads = 4, 
+            NumStreams = 2, 
+            PerformanceMode = PerformanceMode.Throughput
+        });
+        Assert.NotNull(m);
+        Assert.Equal("4", m.Properties[PropertyKeys.InferenceNumThreads]);
+        Assert.Equal("2", m.Properties[PropertyKeys.NumStreams]);
+        Assert.Equal("YES", m.Properties[PropertyKeys.HintEnableHyperThreading]);
+        Assert.Equal("PCORE_ONLY", m.Properties[PropertyKeys.HintSchedulingCoreType]);
+        Assert.Equal("THROUGHPUT", m.Properties[PropertyKeys.HintPerformanceMode]);
     }
 
     [Fact]

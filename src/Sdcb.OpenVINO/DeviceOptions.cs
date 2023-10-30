@@ -141,12 +141,21 @@ public record DeviceOptions
     /// </remarks>
     public bool EnableHyperThreading
     {
-        get => Properties.TryGetValue(PropertyKeys.HintEnableHyperThreading, out string? val) && bool.Parse(val);
+        get => Properties.TryGetValue(PropertyKeys.HintEnableHyperThreading, out string? val) && val switch 
+        { 
+            "YES" => true, 
+            "NO" => false, 
+            _ => throw new NotSupportedException($"{nameof(EnableHyperThreading)} {val} is not supported.") 
+        };
         set
         {
             if (value)
             {
-                Properties[PropertyKeys.HintEnableHyperThreading] = value.ToString();
+                Properties[PropertyKeys.HintEnableHyperThreading] = value switch
+                {
+                    true => "YES",
+                    _ => "NO"
+                };
             }
             else
             {
