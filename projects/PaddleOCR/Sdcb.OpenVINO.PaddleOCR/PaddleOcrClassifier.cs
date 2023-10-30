@@ -135,7 +135,7 @@ public class PaddleOcrClassifier : IDisposable
                     {
                         4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
                         1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
-                        3 => src.WeakRef(),
+                        3 => src.FastClone(),
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
                     };
                     return ResizePadding(channel3, Shape);
@@ -191,7 +191,7 @@ public class PaddleOcrClassifier : IDisposable
         double whRatio = 1.0 * shape.Width / shape.Height;
         using Mat roi = 1.0 * srcSize.Width / srcSize.Height > whRatio ?
             src[0, srcSize.Height, 0, (int)Math.Floor(1.0 * srcSize.Height * whRatio)] :
-            src.WeakRef();
+            src.FastClone();
 
         double scaleRate = 1.0 * shape.Height / srcSize.Height;
         Mat resized = roi.Resize(new Size(Math.Floor(roi.Width * scaleRate), shape.Height));

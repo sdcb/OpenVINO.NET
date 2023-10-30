@@ -265,7 +265,7 @@ public class PaddleOcrDetector : IDisposable
 
     private static Mat MatResize(Mat src, int? maxSize)
     {
-        if (maxSize == null) return src.WeakRef();
+        if (maxSize == null) return src.FastClone();
 
         Size size = src.Size();
         int longEdge = Math.Max(size.Width, size.Height);
@@ -273,7 +273,7 @@ public class PaddleOcrDetector : IDisposable
 
         return scaleRate < 1.0 ?
             src.Resize(Size.Zero, scaleRate, scaleRate) :
-            src.WeakRef();
+            src.FastClone();
     }
 
     private static Mat MatResize(Mat src, Size maxSize)
@@ -281,7 +281,7 @@ public class PaddleOcrDetector : IDisposable
         Size srcSize = src.Size();
         if (srcSize == maxSize)
         {
-            return src.WeakRef();
+            return src.FastClone();
         }
 
         double scale = Math.Min(maxSize.Width / (double)srcSize.Width, maxSize.Height / (double)srcSize.Height);
@@ -291,7 +291,7 @@ public class PaddleOcrDetector : IDisposable
 
         if (scale == 1)
         {
-            return src.WeakRef();
+            return src.FastClone();
         }
         else
         {

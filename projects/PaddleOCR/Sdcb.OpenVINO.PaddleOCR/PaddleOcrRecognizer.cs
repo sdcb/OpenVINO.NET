@@ -218,7 +218,7 @@ public class PaddleOcrRecognizer : IDisposable
                     {
                         4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
                         1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
-                        3 => src.WeakRef(),
+                        3 => src.FastClone(),
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
                     };
                     return ResizePadding(channel3, modelHeight, maxWidth);

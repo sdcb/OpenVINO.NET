@@ -23,7 +23,7 @@ static ProjectVersion[] Projects = new[]
 {
 	new ProjectVersion("Sdcb.OpenVINO", "0.5.0"),
 	new ProjectVersion("Sdcb.OpenVINO.Extensions.OpenCvSharp4", "0.1.0"),
-	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR", "0.4.1"),
+	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR", "0.4.2"),
 	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR.Models.Online", "0.2"),
 };
 
