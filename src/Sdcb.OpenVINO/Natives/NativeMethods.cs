@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+[assembly: InternalsVisibleTo("Sdcb.OpenVINO.Extensions.OpenCvSharp4")]
+[assembly: InternalsVisibleTo("Sdcb.OpenVINO.Tests")]
 
 namespace Sdcb.OpenVINO.Natives;
 
