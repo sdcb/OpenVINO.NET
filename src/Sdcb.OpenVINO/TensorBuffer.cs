@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sdcb.OpenVINO.Natives;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Sdcb.OpenVINO;
@@ -9,6 +10,11 @@ namespace Sdcb.OpenVINO;
 /// </summary>
 internal abstract class TensorBuffer : IDisposable
 {
+    public TensorBuffer(ov_element_type_e elementType)
+    {
+        ElementType = elementType;
+    }
+
     /// <summary>
     /// Gets or sets a boolean value indicating the state of the object.
     /// It indicates whether the object is disposed or not.
@@ -31,19 +37,8 @@ internal abstract class TensorBuffer : IDisposable
     /// <summary>Abstract method for fetching the data pointer.</summary>
     protected abstract IntPtr GetDataPointer();
 
-    /// <summary>Gets the length of the data in the <see cref="TensorBuffer" />, represented as the number of bytes. </summary>
-    /// <exception cref="ObjectDisposedException" />
-    public int DataByteLength
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return GetDataByteLength();
-        }
-    }
-
-    /// <summary>Abstract method for fetching the data length.</summary>
-    protected abstract int GetDataByteLength();
+    /// <summary>Fetching the data element type.</summary>
+    public ov_element_type_e ElementType { get; }
 
     /// <summary>Checks whether the object has been disposed.</summary>
     /// <exception cref="ObjectDisposedException" />
@@ -106,23 +101,42 @@ internal class ArrayTensorBuffer<T> : TensorBuffer where T : unmanaged
 {
     private T[] _dataArray;
     private readonly GCHandle _handle;
-    private readonly int _byteLength;
 
-    public unsafe ArrayTensorBuffer(T[] dataArraySrc)
+    public unsafe ArrayTensorBuffer(T[] dataArraySrc) : base(GetElementType())
     {
         _dataArray = dataArraySrc;
         _handle = GCHandle.Alloc(dataArraySrc, GCHandleType.Pinned);
-        _byteLength = dataArraySrc.Length * sizeof(T);
+    }
+
+    private static ov_element_type_e GetElementType()
+    {
+        Type t = typeof(T);
+        return Type.GetTypeCode(t) switch
+        {
+            TypeCode.Byte => ov_element_type_e.U8,
+            TypeCode.SByte => ov_element_type_e.I8,
+
+            TypeCode.Int16 => ov_element_type_e.I16,
+            TypeCode.UInt16 => ov_element_type_e.U16,
+
+            TypeCode.Int32 => ov_element_type_e.I32,
+            TypeCode.UInt32 => ov_element_type_e.U32,
+
+            TypeCode.Int64 => ov_element_type_e.I64,
+            TypeCode.UInt64 => ov_element_type_e.U64,
+
+            TypeCode.Single => ov_element_type_e.F32,
+            TypeCode.Double => ov_element_type_e.F64,
+#if NET6_0_OR_GREATER
+            var _ when t == typeof(Half) => ov_element_type_e.F16,
+#endif
+            _ => throw new NotSupportedException($"Type {t.Name} is not supported when convert to {nameof(Tensor)}.")
+        };
     }
 
     protected override IntPtr GetDataPointer()
     {
         return _handle.AddrOfPinnedObject();
-    }
-
-    protected override int GetDataByteLength()
-    {
-        return _byteLength;
     }
 
     protected override void ReleaseManagedData()

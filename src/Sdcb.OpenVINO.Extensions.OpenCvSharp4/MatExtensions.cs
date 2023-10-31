@@ -45,16 +45,6 @@ public static class MatExtensions
     }
 
     /// <summary>
-    /// Returns a <see cref="Span{T}"/> of <see cref="byte"/> that represents the underlying data of the <see cref="Mat"/> object.
-    /// </summary>
-    /// <param name="mat">The <see cref="Mat"/> object to create a <see cref="Span{T}"/> of <see cref="byte"/> from.</param>
-    /// <returns>A <see cref="Span{T}"/> of <see cref="byte"/> that represents the underlying data of the <see cref="Mat"/> object.</returns>
-    public static unsafe Span<byte> AsByteSpan(this Mat mat)
-    {
-        return new Span<byte>(mat.DataPointer, (int)((long)mat.DataEnd - (long)mat.DataStart));
-    }
-
-    /// <summary>
     /// Adds padding around a given image.
     /// </summary>
     /// <param name="src">Source image to apply padding to, represented as an OpenCvSharp4 Mat.</param>
