@@ -12,7 +12,7 @@ internal class MatTensorBuffer : TensorBuffer
     {
         if (matSrc.IsContinuous())
         {
-            _mat = matSrc[0, matSrc.Width, 0, matSrc.Height];
+            _mat = matSrc[new Rect(new Point(0, 0), matSrc.Size())];
         }
         else
         {

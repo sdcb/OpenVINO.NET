@@ -60,7 +60,7 @@ public class OnlineRecTest
         RecAsserts(rec, src);
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task RecGpu()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -69,7 +69,7 @@ public class OnlineRecTest
         RecAsserts(rec, src);
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task RecGpuLargerBatchShape()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");

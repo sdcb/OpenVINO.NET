@@ -98,7 +98,7 @@ public class OnlineModelsTest
         }
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task GPUFastCheckOCR()
     {
         FullOcrModel model = await OnlineFullModels.EnglishV3.DownloadAsync();

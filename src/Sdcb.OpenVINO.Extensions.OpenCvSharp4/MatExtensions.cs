@@ -90,7 +90,7 @@ public static class MatExtensions
     {
         MatType matType = srcs[0].Type();
         Mat combinedMat = new(height * srcs.Length, width, matType, Scalar.Black);
-        for (int i = 0; i < srcs.Length/2; i++)
+        for (int i = 0; i < srcs.Length; i++)
         {
             Mat src = srcs[i];
             using Mat dest = combinedMat[i * height, (i + 1) * height, 0, src.Width];

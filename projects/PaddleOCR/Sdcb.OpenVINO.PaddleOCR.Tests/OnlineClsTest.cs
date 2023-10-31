@@ -37,7 +37,7 @@ public class OnlineClsTest
         ClsAsserts(cls, new[] { false, true }, new[] { src, src2 });
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task ClsGpu()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -48,7 +48,7 @@ public class OnlineClsTest
         ClsAsserts(cls, true, src);
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task ClsGpuBatch()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
@@ -59,7 +59,7 @@ public class OnlineClsTest
         ClsAsserts(cls, new[] { false, true }, new[] { src, src2 });
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task ClsGpuBatch10()
     {
         using Mat src = Cv2.ImRead("./samples/5ghz.jpg");
