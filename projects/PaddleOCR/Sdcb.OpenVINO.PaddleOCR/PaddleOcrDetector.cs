@@ -12,8 +12,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrDetector : IDisposable
 {
-    /// <summary>Holds an instance of the InferRequest class.</summary>
-    readonly InferRequest _p;
+    readonly CompiledModel _compiledModel;
 
     /// <summary>
     /// Gets or sets the maximum size for resizing the input image.
@@ -66,7 +65,9 @@ public class PaddleOcrDetector : IDisposable
     /// <para>If this property is null, network can work with image of any size and h/w ratio (dynamic).</para>
     /// <para>Otherwise, network works with fixed size image (static).</para>
     /// </param>
-    public PaddleOcrDetector(DetectionModel model, DeviceOptions? options = null, Size? staticShapeSize = null)
+    public PaddleOcrDetector(DetectionModel model, 
+        DeviceOptions? options = null, 
+        Size? staticShapeSize = null)
     {
         if (staticShapeSize != null)
         {
@@ -75,7 +76,7 @@ public class PaddleOcrDetector : IDisposable
                 32 * Math.Ceiling(1.0 * staticShapeSize.Value.Height / 32));
         }
 
-        _p = model.CreateInferRequest(options, afterReadModel: m =>
+        _compiledModel = model.CreateCompiledModel(options, afterReadModel: m =>
         {
             if (model.Version != ModelVersion.V4)
             {
@@ -104,7 +105,7 @@ public class PaddleOcrDetector : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _p.Dispose();
+        _compiledModel.Dispose();
     }
 
     /// <summary>
@@ -221,14 +222,15 @@ public class PaddleOcrDetector : IDisposable
             normalized = Normalize(padded);
         }
 
+        using InferRequest ir = _compiledModel.CreateInferRequest();
         using (Mat _ = normalized)
         using (Tensor input = normalized.AsTensor())
         {
-            _p.Inputs.Primary = input;
-            _p.Run();
+            ir.Inputs.Primary = input;
+            ir.Run();
         }
 
-        using (Tensor output = _p.Outputs[0])
+        using (Tensor output = ir.Outputs[0])
         {
             Span<float> data = output.GetData<float>();
             NCHW shape = output.Shape.ToNCHW();
@@ -263,7 +265,7 @@ public class PaddleOcrDetector : IDisposable
 
     private static Mat MatResize(Mat src, int? maxSize)
     {
-        if (maxSize == null) return src.WeakRef();
+        if (maxSize == null) return src.FastClone();
 
         Size size = src.Size();
         int longEdge = Math.Max(size.Width, size.Height);
@@ -271,7 +273,7 @@ public class PaddleOcrDetector : IDisposable
 
         return scaleRate < 1.0 ?
             src.Resize(Size.Zero, scaleRate, scaleRate) :
-            src.WeakRef();
+            src.FastClone();
     }
 
     private static Mat MatResize(Mat src, Size maxSize)
@@ -279,7 +281,7 @@ public class PaddleOcrDetector : IDisposable
         Size srcSize = src.Size();
         if (srcSize == maxSize)
         {
-            return src.WeakRef();
+            return src.FastClone();
         }
 
         double scale = Math.Min(maxSize.Width / (double)srcSize.Width, maxSize.Height / (double)srcSize.Height);
@@ -289,7 +291,7 @@ public class PaddleOcrDetector : IDisposable
 
         if (scale == 1)
         {
-            return src.WeakRef();
+            return src.FastClone();
         }
         else
         {

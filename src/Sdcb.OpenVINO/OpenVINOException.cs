@@ -43,7 +43,7 @@ public class OpenVINOException : Exception
         if (e != ov_status_e.OK)
         {
 #if OV20536
-            IntPtr lastError = (IntPtr)ov_get_and_reset_last_error();
+            IntPtr lastError = (IntPtr)ov_get_last_err_msg();
             message ??= StringUtils.UTF8PtrToString(lastError);
 #endif
             throw new OpenVINOException(e, OVStatusToString(e, message, callerMemberName, callerExpression, callerFilePath, callerLineNumber));

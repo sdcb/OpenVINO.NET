@@ -11,6 +11,8 @@ using static Sdcb.OpenVINO.Natives.NativeMethods;
 /// </summary>
 public class Tensor : CppPtrObject
 {
+    private TensorBuffer? _tensorBuffer = null;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Tensor"/> class.
     /// </summary>
@@ -18,6 +20,19 @@ public class Tensor : CppPtrObject
     /// <param name="owned">Whether the handle is owned by this instance.</param>
     public unsafe Tensor(ov_tensor* ptr, bool owned = true) : base((IntPtr)ptr, owned)
     {
+    }
+
+    internal unsafe Tensor(TensorBuffer tensorBuffer, Shape shape, bool owned = true) : base((IntPtr)CreateFromBuffer(tensorBuffer, shape), owned)
+    {
+        _tensorBuffer = tensorBuffer;
+    }
+
+    private static unsafe ov_tensor* CreateFromBuffer(TensorBuffer tensorBuffer, Shape shape)
+    {
+        ov_tensor* ptr;
+        using NativeShapeWrapper l = shape.Lock();
+        OpenVINOException.ThrowIfFailed(ov_tensor_create_from_host_ptr(tensorBuffer.ElementType, l.Shape, (void*)tensorBuffer.DataPointer, & ptr));
+        return ptr;
     }
 
     /// <summary>
@@ -53,47 +68,14 @@ public class Tensor : CppPtrObject
             throw new ArgumentException($"The input array must have at least {shape.ElementCount} elements, but only {array.Length} elements were found.");
         }
 
-        Type t = typeof(T);
-        TypeCode code = Type.GetTypeCode(t);
-        ov_element_type_e type = code switch
-        {
-            TypeCode.Byte => ov_element_type_e.U8,
-            TypeCode.SByte => ov_element_type_e.I8,
-
-            TypeCode.Int16 => ov_element_type_e.I16,
-            TypeCode.UInt16 => ov_element_type_e.U16,
-
-            TypeCode.Int32 => ov_element_type_e.I32,
-            TypeCode.UInt32 => ov_element_type_e.U32,
-
-            TypeCode.Int64 => ov_element_type_e.I64,
-            TypeCode.UInt64 => ov_element_type_e.U64,
-
-            TypeCode.Single => ov_element_type_e.F32,
-            TypeCode.Double => ov_element_type_e.F64,
-#if NET6_0_OR_GREATER
-            var _ when t == typeof(Half) => ov_element_type_e.F16,
-#endif
-            _ => throw new NotSupportedException($"Type {t.Name} is not supported when convert to {nameof(Tensor)}.")
-        };
-
-        GCHandle handle = GCHandle.Alloc(array, GCHandleType.Pinned);
-        ov_tensor* tensor;
-        try
-        {
-            using NativeShapeWrapper l = shape.Lock();
-            OpenVINOException.ThrowIfFailed(ov_tensor_create_from_host_ptr(type, l.Shape, (void*)handle.AddrOfPinnedObject(), &tensor));
-        }
-        finally
-        {
-            handle.Free();
-        }
-
-        return new Tensor(tensor);
+        return new Tensor(new ArrayTensorBuffer<T>(array), shape, owned: true);
     }
 
     /// <summary>
     /// Creates a tensor from the provided data.
+    /// This function shares the memory of the input data. 
+    /// Callers should ensure that the data remains valid until the infer request has been completed.
+    /// Failure to maintain valid data can lead to unpredictable behavior, including program crashes.
     /// </summary>
     /// <param name="data">A read-only span of bytes that represents the data for the tensor.</param>
     /// <param name="shape">A shape representing the dimensions of the tensor.</param>
@@ -139,8 +121,9 @@ public class Tensor : CppPtrObject
     /// Create a Tensor from raw data.
     /// </summary>
     /// <remarks>
-    /// Be careful when using this method. The resulting Tensor will share the memory used by the IntPtr data.
-    /// If the memory used by IntPtr data becomes invalid, the Tensor will also become invalid.
+    /// Caution should be exercised when using this method. The resulting Tensor will share the memory of the IntPtr data.
+    /// It is the responsibility of the caller to ensure that this memory remains valid until the infer request has been completed.
+    /// If the memory used by the IntPtr data becomes invalid, the Tensor will also become invalid, which may lead to unpredictable behavior, including program crashes.
     /// </remarks>
     /// <param name="data">The IntPtr to the raw data.</param>
     /// <param name="shape">The shape of the tensor.</param>
@@ -278,5 +261,10 @@ public class Tensor : CppPtrObject
     protected unsafe override void ReleaseCore()
     {
         ov_tensor_free((ov_tensor*)Handle);
+        if (_tensorBuffer != null)
+        {
+            _tensorBuffer.Dispose();
+            _tensorBuffer = null;
+        }
     }
 }

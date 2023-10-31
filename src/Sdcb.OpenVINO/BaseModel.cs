@@ -33,7 +33,7 @@ public abstract class BaseModel
     /// <param name="afterBuildModel">The <see cref="Action&lt;Model&gt;"/> delegate that is invoked after the <see cref="Model"/> instance is built from <see cref="PrePostProcessor"/>.</param>
     /// <param name="afterCompiledModel">The <see cref="Action&lt;CompiledModel&gt;"/> delegate that is invoked after the <see cref="CompiledModel"/> instance is created.</param>
     /// <returns>Returns an <see cref="InferRequest"/> instance.</returns>
-    public virtual InferRequest CreateInferRequest(
+    public virtual CompiledModel CreateCompiledModel(
         DeviceOptions? options = null,
         Action<Model>? afterReadModel = null,
         Action<Model, PrePostProcessor>? prePostProcessing = null,
@@ -55,11 +55,11 @@ public abstract class BaseModel
         afterBuildModel?.Invoke(m);
         AfterBuildModel(m);
 
-        using CompiledModel cm = core.CompileModel(m, options.DeviceName, options.Properties);
+        CompiledModel cm = core.CompileModel(m, options.DeviceName, options.Properties);
         afterCompiledModel?.Invoke(cm);
         AfterCompiledModel(m, cm);
 
-        return cm.CreateInferRequest();
+        return cm;
     }
 
     /// <summary>

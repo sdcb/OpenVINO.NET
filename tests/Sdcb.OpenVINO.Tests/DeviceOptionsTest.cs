@@ -27,4 +27,15 @@ public class DeviceOptionsTest
 
         Assert.False(options.Properties.ContainsKey(PropertyKeys.InferenceNumThreads));
     }
+
+    [Fact]
+    public void CanUseNumStreams()
+    {
+        DeviceOptions options = new()
+        {
+            NumStreams = 1
+        };
+
+        Assert.Equal("1", options.Properties[PropertyKeys.NumStreams]);
+    }
 }

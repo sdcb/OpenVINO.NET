@@ -11,7 +11,7 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrClassifier : IDisposable
 {
-    private readonly InferRequest _p;
+    private readonly CompiledModel _compiledModel;
 
     /// <summary>
     /// Rotation threshold value used to determine if the image should be rotated.
@@ -36,10 +36,11 @@ public class PaddleOcrClassifier : IDisposable
     /// </summary>
     /// <param name="model">The <see cref="ClassificationModel"/> to use.</param>
     /// <param name="device">The device the inference request, pass null to using model's DefaultDevice.</param>
-    public PaddleOcrClassifier(ClassificationModel model, DeviceOptions? device = null)
+    public PaddleOcrClassifier(ClassificationModel model, 
+        DeviceOptions? device = null)
     {
         Shape = model.Shape;
-        _p = model.CreateInferRequest(device, prePostProcessing: (m, ppp) =>
+        _compiledModel = model.CreateCompiledModel(device, prePostProcessing: (m, ppp) =>
         {
             using PreProcessInputInfo ppii = ppp.Inputs.Primary;
             ppii.TensorInfo.Layout = Layout.NHWC;
@@ -50,7 +51,7 @@ public class PaddleOcrClassifier : IDisposable
     /// <summary>
     /// Releases all resources used by the <see cref="PaddleOcrClassifier"/> object.
     /// </summary>
-    public void Dispose() => _p.Dispose();
+    public void Dispose() => _compiledModel.Dispose();
 
     /// <summary>
     /// Determines whether the image should be rotated by 180 degrees based on the threshold value.
@@ -103,23 +104,22 @@ public class PaddleOcrClassifier : IDisposable
     {
         using Mat final = PrepareAndStackImages(srcs);
 
+        using InferRequest ir = _compiledModel.CreateInferRequest();
         using (Tensor input = final.StackedAsTensor(srcs.Length))
         {
-            _p.Inputs.Primary = input;
-            _p.Run();
+            ir.Inputs.Primary = input;
+            ir.Run();
         }
 
-        using (Tensor output = _p.Outputs.Primary)
+        using Tensor output = ir.Outputs.Primary;
+        ReadOnlySpan<float> data = output.GetData<float>();
+        Ocr180DegreeClsResult[] results = new Ocr180DegreeClsResult[data.Length / 2];
+        for (int i = 0; i < results.Length; i++)
         {
-            ReadOnlySpan<float> data = output.GetData<float>();
-            Ocr180DegreeClsResult[] results = new Ocr180DegreeClsResult[data.Length / 2];
-            for (int i = 0; i < results.Length; i++)
-            {
-                results[i] = new Ocr180DegreeClsResult(data[(i * 2)..((i + 1) * 2)], RotateThreshold);
-            }
-
-            return results;
+            results[i] = new Ocr180DegreeClsResult(data[(i * 2)..((i + 1) * 2)], RotateThreshold);
         }
+
+        return results;
     }
 
     private Mat PrepareAndStackImages(Mat[] srcs)
@@ -135,7 +135,7 @@ public class PaddleOcrClassifier : IDisposable
                     {
                         4 => src.CvtColor(ColorConversionCodes.RGBA2RGB),
                         1 => src.CvtColor(ColorConversionCodes.GRAY2RGB),
-                        3 => src.WeakRef(),
+                        3 => src.FastClone(),
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
                     };
                     return ResizePadding(channel3, Shape);
@@ -191,7 +191,7 @@ public class PaddleOcrClassifier : IDisposable
         double whRatio = 1.0 * shape.Width / shape.Height;
         using Mat roi = 1.0 * srcSize.Width / srcSize.Height > whRatio ?
             src[0, srcSize.Height, 0, (int)Math.Floor(1.0 * srcSize.Height * whRatio)] :
-            src.WeakRef();
+            src.FastClone();
 
         double scaleRate = 1.0 * shape.Height / srcSize.Height;
         Mat resized = roi.Resize(new Size(Math.Floor(roi.Width * scaleRate), shape.Height));

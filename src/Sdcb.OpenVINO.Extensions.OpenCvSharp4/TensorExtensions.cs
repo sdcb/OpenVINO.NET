@@ -22,22 +22,7 @@ public static class TensorExtensions
     {
         if (mat == null) throw new ArgumentNullException(nameof(mat));
 
-        MatType matType = mat.Type();
-        int channels = matType.Channels;
-        ov_element_type_e elementType = matType.Depth switch
-        {
-            MatType.CV_8U => ov_element_type_e.U8,
-            MatType.CV_8S => ov_element_type_e.I8,
-            MatType.CV_16U => ov_element_type_e.U16,
-            MatType.CV_16S => ov_element_type_e.I16,
-            MatType.CV_32S => ov_element_type_e.I32,
-            MatType.CV_32F => ov_element_type_e.F32,
-            MatType.CV_64F => ov_element_type_e.F64,
-            _ => throw new NotSupportedException($"Mat.MatType.Depth ({matType.Depth}) is not supported.")
-        };
-
-        Size size = mat.Size();
-        return Tensor.FromRaw(mat.AsByteSpan(), new NCHW(1, size.Height, size.Width, channels), elementType);
+        return new Tensor(new MatTensorBuffer(mat), new NCHW(1, mat.Height, mat.Width, mat.Type().Channels));
     }
 
     /// <summary>
@@ -57,18 +42,6 @@ public static class TensorExtensions
 
         MatType matType = mat.Type();
         int channels = matType.Channels;
-        ov_element_type_e elementType = matType.Depth switch
-        {
-            MatType.CV_8U => ov_element_type_e.U8,
-            MatType.CV_8S => ov_element_type_e.I8,
-            MatType.CV_16U => ov_element_type_e.U16,
-            MatType.CV_16S => ov_element_type_e.I16,
-            MatType.CV_32S => ov_element_type_e.I32,
-            MatType.CV_32F => ov_element_type_e.F32,
-            MatType.CV_64F => ov_element_type_e.F64,
-            _ => throw new NotSupportedException($"Mat.MatType.Depth ({matType.Depth}) is not supported.")
-        };
-
         Size size = mat.Size();
         int height = size.Height / numberOfBatches;
         if (height * numberOfBatches != size.Height)
@@ -76,7 +49,7 @@ public static class TensorExtensions
             throw new ArgumentException($"The height {size.Height} of the mat must be divisible by the number of batches {numberOfBatches}.");
         }
 
-        return Tensor.FromRaw(mat.AsByteSpan(), new NCHW(numberOfBatches, height, size.Width, channels), elementType);
+        return new Tensor(new MatTensorBuffer(mat), new NCHW(numberOfBatches, height, size.Width, channels));
     }
 
     /// <summary>

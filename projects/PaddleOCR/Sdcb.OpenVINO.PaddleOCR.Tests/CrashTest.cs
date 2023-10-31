@@ -112,10 +112,10 @@ public class CrashTest
         })));
     }
 
-    [Fact(Skip = "Crash test only")]
+    [Fact(Skip = "Crash test only"), Obsolete("QueuedPaddleOcrAll")]
     public async Task QueuedTest()
     {
-        using Mat src = Cv2.ImRead("./samples/vsext.png"); 
+        using Mat src = Cv2.ImRead("./samples/vsext.png");
         //using Mat src = Cv2.ImDecode(await new HttpClient().GetByteArrayAsync("https://io.starworks.cc:88/paddlesharp/ocr/samples/xdr5450.webp"), ImreadModes.Color);
 
         FullOcrModel model = await OnlineFullModels.ChineseV4.DownloadAsync();
@@ -129,5 +129,19 @@ public class CrashTest
         }), consumerCount: 16, boundedCapacity: 100);
 
         await Task.WhenAll(Enumerable.Range(0, 100).Select(i => queued.Run(src)));
+    }
+
+    [Fact]
+    public async Task OcrIsThreadSafe()
+    {
+        using Mat src = Cv2.ImRead("./samples/vsext.png"); 
+        using PaddleOcrAll ocr = new(await OnlineFullModels.ChineseV4.DownloadAsync());
+        Task[] tasks = Enumerable.Range(0, 2).Select(tidx => Task.Run(() => 
+        {
+            ocr.Run(src);
+            _console.WriteLine($"tid {tidx}: Good");
+        })).ToArray();
+
+        await Task.WhenAll(tasks);
     }
 }

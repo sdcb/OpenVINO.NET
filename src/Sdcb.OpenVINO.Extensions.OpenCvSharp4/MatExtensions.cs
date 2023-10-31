@@ -12,9 +12,15 @@ public static class MatExtensions
 {
     /// <summary>
     /// Returns a weak reference to the specified <see cref="Mat"/> object.
+    /// This method does not support Sub-matrix (ROI).
     /// </summary>
+    /// <remarks>
+    /// Note: This method has been marked as obsolete due to its inability to handle ROIs correctly. 
+    /// When src is a ROI, the Mat returned from this function will be incorrect.
+    /// </remarks>
     /// <param name="mat">The Mat object to create a weak reference to.</param>
     /// <returns>A weak reference to the specified Mat object.</returns>
+    [Obsolete("WeakRef method does not correctly handle sub-matrices (ROI). Use the FastClone method instead.")]
     public static Mat WeakRef(this Mat mat)
     {
         Size size = mat.Size();
@@ -23,13 +29,19 @@ public static class MatExtensions
     }
 
     /// <summary>
-    /// Returns a <see cref="Span{T}"/> of <see cref="byte"/> that represents the underlying data of the <see cref="Mat"/> object.
+    /// Creates a clone of the specified <see cref="Mat"/> object.
+    /// The clone shares the same memory space as the original Mat object.
     /// </summary>
-    /// <param name="mat">The <see cref="Mat"/> object to create a <see cref="Span{T}"/> of <see cref="byte"/> from.</param>
-    /// <returns>A <see cref="Span{T}"/> of <see cref="byte"/> that represents the underlying data of the <see cref="Mat"/> object.</returns>
-    public static unsafe Span<byte> AsByteSpan(this Mat mat)
+    /// <remarks>
+    /// Please note that write modifications or setting ROIs on either the new Mat or the original Mat may affect each other, 
+    /// as they share the same memory space.
+    /// </remarks>
+    /// <param name="mat">The Mat object to clone.</param>
+    /// <returns>A clone of the specified Mat object.</returns>
+    public static Mat FastClone(this Mat mat)
     {
-        return new Span<byte>(mat.DataPointer, (int)((long)mat.DataEnd - (long)mat.DataStart));
+        Size size = mat.Size();
+        return mat[0, size.Height, 0, size.Width];
     }
 
     /// <summary>
@@ -54,7 +66,7 @@ public static class MatExtensions
             padSize * Math.Ceiling(1.0 * size.Height / padSize));
         if (newSize == size)
         {
-            return src.WeakRef();
+            return src.FastClone();
         }
         else
         {
@@ -82,7 +94,7 @@ public static class MatExtensions
         {
             Mat src = srcs[i];
             using Mat dest = combinedMat[i * height, (i + 1) * height, 0, src.Width];
-            srcs[i].CopyTo(dest);
+            src.CopyTo(dest);
         }
         return combinedMat;
     }

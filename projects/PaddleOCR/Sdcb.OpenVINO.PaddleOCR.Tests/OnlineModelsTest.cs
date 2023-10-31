@@ -39,8 +39,30 @@ public class OnlineModelsTest
                 _console.WriteLine("Detected all texts: \n" + result.Text);
                 foreach (PaddleOcrResultRegion region in result.Regions)
                 {
-                    _console.WriteLine($"Text: {region.Text}, Score: {region.Score}, RectCenter: {region.Rect.Center}, RectSize:    {region.Rect.Size}, Angle: {region.Rect.Angle}");
+                    _console.WriteLine($"Text: {region.Text}, Score: {region.Score}, RectCenter: {region.Rect.Center}, RectSize: {region.Rect.Size}, Angle: {region.Rect.Angle}");
                 }
+            }
+        }
+    }
+
+    [Fact]
+    public async Task NoRotateTest()
+    {
+        FullOcrModel model = await OnlineFullModels.EnglishV3.DownloadAsync();
+
+        byte[] sampleImageData = File.ReadAllBytes(@"./samples/vsext.png");
+
+        using (PaddleOcrAll all = new(model)
+        {
+            AllowRotateDetection = false,
+            Enable180Classification = false,
+        })
+        {
+            using (Mat src = Cv2.ImDecode(sampleImageData, ImreadModes.Color))
+            {
+                PaddleOcrResult result = all.Run(src);
+                _console.WriteLine(result.Text);
+                Assert.Contains("IDE", result.Text);
             }
         }
     }
@@ -76,7 +98,7 @@ public class OnlineModelsTest
         }
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task GPUFastCheckOCR()
     {
         FullOcrModel model = await OnlineFullModels.EnglishV3.DownloadAsync();
