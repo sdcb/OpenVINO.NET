@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net48;net6</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net461;net6</TargetFrameworks>
     <LangVersion>11</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
@@ -38,6 +38,7 @@
     </PackageReference>
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)' != 'net6'" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' != 'net6'" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net461'"/>
   </ItemGroup>
 
 </Project>
