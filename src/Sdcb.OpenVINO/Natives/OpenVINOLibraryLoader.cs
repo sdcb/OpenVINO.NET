@@ -14,10 +14,18 @@ internal static class OpenVINOLibraryLoader
     internal static void WindowsNetFXLoad()
     {
         _ = OVCore.Version;
-        string libsPath = Path.GetDirectoryName(Process.GetCurrentProcess().Modules.Cast<ProcessModule>()
-            .Single(x => Path.GetFileNameWithoutExtension(x.ModuleName) == "openvino_c")
-            .FileName)!;
-        AddLibPathToWindowsEnvironment(libsPath);
+        if (!IsXamarinAndroid())
+        {
+            string libsPath = Path.GetDirectoryName(Process.GetCurrentProcess().Modules.Cast<ProcessModule>()
+                .Single(x => Path.GetFileNameWithoutExtension(x.ModuleName) == "openvino_c")
+                .FileName)!;
+            AddLibPathToWindowsEnvironment(libsPath);
+        }
+    }
+
+    internal static bool IsXamarinAndroid()
+    {
+        return Environment.OSVersion.Platform == PlatformID.Unix && Environment.GetEnvironmentVariable("ANDROID_ROOT") != null;
     }
 
     internal static void AddLibPathToWindowsEnvironment(string libPath)
