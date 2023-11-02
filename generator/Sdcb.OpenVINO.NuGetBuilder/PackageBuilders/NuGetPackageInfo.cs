@@ -30,7 +30,8 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, SemanticVersion Ve
             _ => throw new Exception($"Unknown arch: {info.Arch}")
         };
         string rid = $"{ridOs}-{ridArch}";
-        string namePrefix = $"{nameof(Sdcb)}.{nameof(OpenVINO)}";
-        return new NuGetPackageInfo(namePrefix, rid, info.Version);
+        return new NuGetPackageInfo(GetNamePrefix(), rid, info.Version);
     }
+
+    public static string GetNamePrefix() => $"{nameof(Sdcb)}.{nameof(OpenVINO)}";
 }

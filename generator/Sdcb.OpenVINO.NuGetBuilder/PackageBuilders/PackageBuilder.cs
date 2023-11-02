@@ -39,7 +39,7 @@ public sealed class PackageBuilder
         }
         else
         {
-            string iconFile = DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo(destinationFolder), iconFileName).FullName;
+            string iconFile = DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo(Environment.CurrentDirectory), iconFileName).FullName;
             Console.WriteLine($"Copy {iconFile} to {destinationFile}.");
             File.Copy(iconFile, destinationFile);
         }
