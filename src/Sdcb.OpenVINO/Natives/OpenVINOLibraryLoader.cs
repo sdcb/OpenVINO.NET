@@ -68,6 +68,13 @@ internal static class OpenVINOLibraryLoader
                     $"libopenvino.{ver}.dylib",
                 });
             }
+            else if (IsXamarinAndroid())
+            {
+                return LoadWithDeps($"libopenvino_c.so", assembly, searchPath, new string[]
+                {
+                    $"libopenvino.so",
+                });
+            }
             else
             {
                 /* linux or others */
