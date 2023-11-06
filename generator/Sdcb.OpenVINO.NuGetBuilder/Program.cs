@@ -17,7 +17,7 @@ class Program
         ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
         string purpose = args.Length > 0 ? args[0] : "custom";
-        string? versionSuffix = "preview.1"; // preview.1
+        string? versionSuffix = null; // preview.1
         string dir = Path.Combine(DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo("."), "OpenVINO.NET.sln").DirectoryName!,
             "build", "nupkgs");
 
@@ -40,7 +40,7 @@ class Program
     private static void Build_Custom(string? versionSuffix, string dir)
     {
         NuGetPackageInfo pkgInfo = new(NuGetPackageInfo.GetNamePrefix(), "android-arm64", new SemanticVersion(2023, 1, 0));
-        string destinationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "2023.1");
+        string destinationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "android-arm64", "2023.1");
         ExtractedInfo local = new(destinationFolder, "", Directory.EnumerateFiles(destinationFolder, "*.so", SearchOption.TopDirectoryOnly).ToArray());
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
     }
