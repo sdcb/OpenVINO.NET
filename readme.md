@@ -2,6 +2,8 @@
 
 High quality .NET wrapper for OpenVINO™ toolkit.
 
+Please check my cnblogs blog for more details: [20231015-sdcb-openvino-net](https://www.cnblogs.com/sdflysha/p/20231015-sdcb-openvino-net.html).
+
 ## Packages
 
 | Package                                | Version 📌                                                                                                                                                | Description                  |
@@ -15,7 +17,14 @@ High quality .NET wrapper for OpenVINO™ toolkit.
 | Sdcb.OpenVINO.runtime.ubuntu.18.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64) | Runtime for Ubuntu 18.04 x64 |
 | Sdcb.OpenVINO.runtime.ubuntu.20.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.20.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.20.04-x64) | Runtime for Ubuntu 20.04 x64 |
 | Sdcb.OpenVINO.runtime.ubuntu.22.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.22.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.22.04-x64) | Runtime for Ubuntu 22.04 x64 |
+| Sdcb.OpenVINO.runtime.android-arm64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.android-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.android-arm64)       | Runtime for Android ARM64    |
 | Sdcb.OpenVINO.runtime.win-x64          | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.win-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.win-x64)                   | Runtime for Windows x64      |
+
+### OpenCvSharp4 Extensions packages:
+
+| Package                               | Version 📌                                                                                                                                              | Description                          |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
+| Sdcb.OpenVINO.Extensions.OpenCvSharp4 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.Extensions.OpenCvSharp4.svg)](https://nuget.org/packages/Sdcb.OpenVINO.Extensions.OpenCvSharp4) | OpenVINO OpenCvSharp4 Mat Extensions |
 
 ## Linux docker images
 
