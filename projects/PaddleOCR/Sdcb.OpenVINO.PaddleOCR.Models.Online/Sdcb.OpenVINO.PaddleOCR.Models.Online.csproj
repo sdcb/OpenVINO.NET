@@ -39,7 +39,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sdcb.OpenVINO.PaddleOCR\Sdcb.OpenVINO.PaddleOCR.csproj" />
+    <ProjectReference Include="..\Sdcb.OpenVINO.PaddleOCR\Sdcb.OpenVINO.PaddleOCR.csproj" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Sdcb.OpenVINO.PaddleOCR" Version="0.5.1" Condition="'$(Configuration)' != 'Debug'"/>
   </ItemGroup>
 
 </Project>

@@ -24,7 +24,7 @@ static ProjectVersion[] Projects = new[]
 	new ProjectVersion("Sdcb.OpenVINO", "0.5.4"),
 	new ProjectVersion("Sdcb.OpenVINO.Extensions.OpenCvSharp4", "0.2.0"),
 	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR", "0.5.1"),
-	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR.Models.Online", "0.2"),
+	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR.Models.Online", "0.2.1"),
 };
 
 static async Task DownloadFile(Uri uri, string localFile, CancellationToken cancellationToken = default)
