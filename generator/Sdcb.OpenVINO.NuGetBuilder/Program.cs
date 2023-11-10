@@ -6,6 +6,7 @@ using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using Sdcb.OpenVINO.NuGetBuilders.PackageBuilder;
 using Sdcb.OpenVINO.NuGetBuilders.Utils;
+using System;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Sdcb.OpenVINO.NuGetBuilder.Tests")]
@@ -17,7 +18,7 @@ class Program
         ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
         string purpose = args.Length > 0 ? args[0] : "custom";
-        string? versionSuffix = null; // preview.1
+        string? versionSuffix = "preview.1"; // preview.1
         string dir = Path.Combine(DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo("."), "OpenVINO.NET.sln").DirectoryName!,
             "build", "nupkgs");
 
@@ -29,15 +30,35 @@ class Program
             case "linux":
                 await Build_Linuxs(w, root, versionSuffix, dir);
                 break;
+            case "android":
+                BuildAndroid(versionSuffix, dir);
+                break;
             case "custom":
-                Build_Custom(versionSuffix, dir);
+                await BuildCustom(w, versionSuffix, dir);
                 break;
             default:
                 throw new ArgumentException($"Unknown purpose: {purpose}");
         }
     }
 
-    private static void Build_Custom(string? versionSuffix, string dir)
+    private static async Task BuildCustom(ArtifactDownloader w, string? versionSuffix, string dir)
+    {
+        ArtifactInfo artifact = new (
+            KnownOS.Windows, 
+            "windows",
+            "x86_64", 
+            SemanticVersion.Parse("2023.2.20231110"), 
+            new DateTime(2023, 11, 10), 
+            "zip",
+            "https://io.starworks.cc:88/paddlesharp/ov-lib/w_openvino_toolkit_windows_2023.2.0.dev20231110_x86_64.zip", 
+            null);
+        NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
+        string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), pkgInfo.Rid);
+        ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new WindowsLibFilter(), flatten: true);
+        PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
+    }
+
+    private static void BuildAndroid(string? versionSuffix, string dir)
     {
         NuGetPackageInfo pkgInfo = new(NuGetPackageInfo.GetNamePrefix(), "android-arm64", new SemanticVersion(2023, 1, 0));
         string destinationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "android-arm64", "2023.1");

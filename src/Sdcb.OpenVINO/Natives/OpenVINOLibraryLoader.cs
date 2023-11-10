@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Sdcb.OpenVINO.Natives;
 
@@ -13,8 +15,7 @@ internal static class OpenVINOLibraryLoader
 {
     internal static void WindowsNetFXLoad()
     {
-        _ = OVCore.Version;
-        if (!IsXamarinAndroid())
+        if (!IsAndroid())
         {
             string libsPath = Path.GetDirectoryName(Process.GetCurrentProcess().Modules.Cast<ProcessModule>()
                 .Single(x => Path.GetFileNameWithoutExtension(x.ModuleName) == "openvino_c")
@@ -23,7 +24,7 @@ internal static class OpenVINOLibraryLoader
         }
     }
 
-    internal static bool IsXamarinAndroid()
+    internal static bool IsAndroid()
     {
         return Environment.OSVersion.Platform == PlatformID.Unix && Environment.GetEnvironmentVariable("ANDROID_ROOT") != null;
     }
@@ -42,70 +43,84 @@ internal static class OpenVINOLibraryLoader
         // stub to ensure static constructor executed at least once.
     }
 
+    internal static bool Is202302OrGreater() => VersionAbbr >= 2320;
+
+    internal static int VersionAbbr;
+
 #if LINQPad || NETCOREAPP3_1_OR_GREATER
 
     static OpenVINOLibraryLoader()
     {
         NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), OpenVINOImportResolver);
+        VersionAbbr = OVCore.Version.GetAbbreviatedVersion();
     }
 
     private static IntPtr OpenVINOImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
         if (libraryName == Dll)
         {
-            const string ver = "2310";
+            string[] allowedVersions = new[] { "2320", "2310" };
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return LoadWithDeps("openvino_c.dll", assembly, searchPath, new string[]
+                return LoadWithDeps(assembly, searchPath, new LibDeps("openvino_c.dll", new string[]
                 {
                     "openvino.dll",
-                });
+                }));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return LoadWithDeps($"libopenvino_c.{ver}.dylib", assembly, searchPath, new string[]
+                return LoadWithDeps(assembly, searchPath, allowedVersions.Select(v => new LibDeps($"libopenvino_c.{v}.dylib", new string[]
                 {
-                    $"libopenvino.{ver}.dylib",
-                });
+                    $"libopenvino.{v}.dylib",
+                })).ToArray());
             }
-            else if (IsXamarinAndroid())
+            else if (IsAndroid())
             {
-                return LoadWithDeps($"libopenvino_c.so", assembly, searchPath, new string[]
+                return LoadWithDeps(assembly, searchPath, new LibDeps($"libopenvino_c.so", new string[]
                 {
                     $"libopenvino.so",
-                });
+                }));
             }
             else
             {
                 /* linux or others */
-                return LoadWithDeps($"libopenvino_c.so.{ver}", assembly, searchPath, new string[]
+                return LoadWithDeps(assembly, searchPath, allowedVersions.Select(v => new LibDeps($"libopenvino_c.so.{v}", new string[]
                 {
-                    $"libopenvino.so.{ver}",
-                });
+                    $"libopenvino.so.{v}",
+                })).ToArray());
             }
         }
         return IntPtr.Zero;
     }
 
-    static IntPtr LoadWithDeps(string libraryName, Assembly assembly, DllImportSearchPath? searchPath, string[] knownDependencies)
+    static IntPtr LoadWithDeps(Assembly assembly, DllImportSearchPath? searchPath, params LibDeps[] libDeps)
     {
-        string dependenciesLoadStatus = string.Join(Environment.NewLine, knownDependencies
-            .Select(knownDll =>
-            {
-                bool loadOk = NativeLibrary.TryLoad(knownDll, assembly, searchPath, out IntPtr handle);
-                string loadStatus = loadOk ? "OK" : "FAIL";
-                return $"{knownDll}: {loadStatus}, handle={handle:x}";
-            }));
+        StringBuilder loadErrorMessage = new();
 
-        try
+        foreach (LibDeps ld in libDeps)
         {
-            return NativeLibrary.Load(libraryName, assembly, searchPath);
+            Dictionary<string, IntPtr> loadStatus = ld.KnownDependencies
+                .ToDictionary(k => k, knownDll =>
+                {
+                    NativeLibrary.TryLoad(knownDll, assembly, searchPath, out IntPtr handle);
+                    return handle;
+                });
+            bool ok = NativeLibrary.TryLoad(ld.LibraryName, assembly, searchPath, out IntPtr handle);
+
+            if (ok)
+            {
+                return handle;
+            }
+            else
+            {
+                loadErrorMessage.AppendLine($"Unable to load native library: {ld.LibraryName}, dependencies status: ");
+                loadErrorMessage.AppendLine(String.Join("\n", loadStatus.Select(x => $"{x.Key}:{x.Value}")));
+            }
         }
-        catch (DllNotFoundException ex)
-        {
-            throw new DllNotFoundException(
-                $"Unable to load shared library '{libraryName}', dependencies load status:{Environment.NewLine}{dependenciesLoadStatus}", ex);
-        }
+
+        throw new DllNotFoundException(loadErrorMessage.ToString());
     }
 #endif
 }
+
+internal record LibDeps(string LibraryName, string[] KnownDependencies);

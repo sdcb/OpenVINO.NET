@@ -199,7 +199,10 @@ public class OVCore : CppPtrObject
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
-        if (!File.Exists(modelPath)) throw new FileNotFoundException($"Model path not found: {modelPath}", modelPath);
+        if (!OpenVINOLibraryLoader.Is202302OrGreater())
+        {
+            if (!File.Exists(modelPath)) throw new FileNotFoundException($"Model path not found: {modelPath}", modelPath);
+        }
 
         ov_model* model;
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -236,7 +239,10 @@ public class OVCore : CppPtrObject
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
-        if (!File.Exists(modelPath)) throw new FileNotFoundException($"File not found: {modelPath}", modelPath);
+        if (!OpenVINOLibraryLoader.Is202302OrGreater())
+        {
+            if (!File.Exists(modelPath)) throw new FileNotFoundException($"Model path not found: {modelPath}", modelPath);
+        }
 
         properties ??= new();
         GCHandle[] gchs = new GCHandle[properties.Count * 2];

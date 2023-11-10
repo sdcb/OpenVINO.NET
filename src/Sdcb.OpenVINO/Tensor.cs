@@ -89,7 +89,7 @@ public class Tensor : CppPtrObject
         {
             ov_element_type_e.U8 => 1,
             ov_element_type_e.F32 => 4,
-            ov_element_type_e.BOOLEAN => 1,
+            ov_element_type_e.OV_BOOLEAN => 1,
             ov_element_type_e.BF16 => 2,
             ov_element_type_e.F16 => 2,
             ov_element_type_e.F64 => 8,

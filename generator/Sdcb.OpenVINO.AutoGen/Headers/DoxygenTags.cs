@@ -73,12 +73,10 @@ public class DoxygenTags
         }
     }
 
-    private static string? XmlEscape(string? name) => SecurityElement.Escape(name);
-
     public static DoxygenTags Parse(string? comment)
     {
         if (comment == null) return new DoxygenTags();
-        if (comment.StartsWith("//!< ")) return new DoxygenTags(comment.Substring("//!< ".Length));
+        if (comment.StartsWith("//!< ")) return new DoxygenTags(comment["//!< ".Length..]);
 
         string[] lines = comment.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
         List<DoxygenTag> tags = new();
@@ -101,7 +99,7 @@ public class DoxygenTags
                     tags.Add(currentTag);
                 }
 
-                var tagParts = trimmedLine.Substring(3).Split(new[] { ' ' }, 2);
+                var tagParts = trimmedLine[3..].Split(new[] { ' ' }, 2);
 
                 var name = tagParts[0];
 
