@@ -72,6 +72,18 @@ public class Tensor : CppPtrObject
     }
 
     /// <summary>
+    /// Creates a new <see cref="Tensor"/> from an input array and given shape.
+    /// </summary>
+    /// <param name="array">The input array.</param>
+    /// <returns>A new <see cref="Tensor"/> object with data copied from the input array.</returns>
+    /// <exception cref="ArgumentException">Thrown if the input array does not have enough elements to fill the desired shape.</exception>
+    /// <exception cref="NotSupportedException">Thrown if the type of the input data cannot be converted to a <see cref="Tensor"/> object.</exception>
+    public static unsafe Tensor FromByteArray(byte[] array)
+    {
+        return new Tensor(new ArrayTensorBuffer<byte>(array), new Shape(1, array.Length), owned: true);
+    }
+
+    /// <summary>
     /// Creates a tensor from the provided data.
     /// This function shares the memory of the input data. 
     /// Callers should ensure that the data remains valid until the infer request has been completed.

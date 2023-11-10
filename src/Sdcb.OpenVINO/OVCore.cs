@@ -411,10 +411,17 @@ public class OVCore : CppPtrObject
         return CompileModel(model, deviceOptions.DeviceName, deviceOptions.Properties);
     }
 
-    /// <summary>Reads models from IR / ONNX / PDPD / TF / TFLite formats.</summary>
+    /// <summary>
+    /// Reads models from IR / ONNX / PDPD / TF / TFLite formats. 
+    /// <para>
+    /// Starting from version 2023.2, this method will invoke a newer interface <see cref="ov_core_read_model_from_memory_buffer"/>,
+    /// which supports models including '\0' character in the file. This is particularly useful for binary format models like PaddlePaddle, ONNX, etc.
+    /// </para>
+    /// <para>In previous versions, such binary files were interpreted as strings, leading to an early termination at encountering '\0', thus limiting the scope of usage.</para>
+    /// </summary>
     /// <param name="modelData">Data with a model in IR / ONNX / PDPD / TF / TFLite format.</param>
     /// <param name="weights">Shared pointer to a constant <see cref="Tensor"/> with weights.</param>
-    /// <returns>The <see cref="Model"/> that read from memory.</returns>
+    /// <returns>The <see cref="Model"/> that is read from memory.</returns>
     /// <exception cref="ObjectDisposedException" />
     /// <exception cref="OpenVINOException" />
     public unsafe Model ReadModel(byte[] modelData, Tensor? weights = null)
@@ -425,9 +432,41 @@ public class OVCore : CppPtrObject
         ov_model* model;
         fixed (byte* modelDataPtr = modelData)
         {
-            OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory((ov_core*)Handle, modelDataPtr, (ov_tensor*)weights?.DangerousGetHandle(), &model));
+            if (OpenVINOLibraryLoader.Is202302OrGreater())
+            {
+                OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory_buffer(
+                    (ov_core*)Handle, modelDataPtr, modelData.Length, (ov_tensor*)weights?.DangerousGetHandle(), &model));
+            }
+            else
+            {
+                OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory(
+                    (ov_core*)Handle, modelDataPtr, (ov_tensor*)weights?.DangerousGetHandle(), &model));
+            }
         }
         return new Model(model, owned: true);
+    }
+
+    /// <summary>
+    /// Reads models from IR / ONNX / PDPD / TF / TFLite formats using model data and optional weights data. Starting from version 2023.2, this method will invoke a newer interface 'ov_core_read_model_from_memory_buffer',
+    /// which supports models including '\0' character in the file. This is particularly useful for binary format models like PaddlePaddle, ONNX, etc.
+    /// In earlier versions, such binary files were interpreted as strings leading to an early termination at encountering '\0', thus limiting the scope of usage. 
+    /// </summary>
+    /// <param name="modelData">ByteArray with a model in IR / ONNX / PDPD / TF / TFLite format.</param>
+    /// <param name="weightsData">Optional byte array of weights data. If provided, this will be converted to a Tensor.</param>
+    /// <returns>The <see cref="Model"/> that is read from memory.</returns>
+    /// <exception cref="ObjectDisposedException" />
+    public unsafe Model ReadModel(byte[] modelData, byte[]? weightsData = null)
+    {
+        ThrowIfDisposed();
+
+        Tensor? weights = null;
+        if (weightsData != null)
+        {
+            weights = Tensor.FromByteArray(weightsData);
+        }
+
+        using Tensor? _ = weights;
+        return ReadModel(modelData, weights);
     }
 
     /// <summary>

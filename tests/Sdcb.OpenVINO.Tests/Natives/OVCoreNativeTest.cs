@@ -34,6 +34,22 @@ public class OVCoreNativeTest
         return modelFile;
     }
 
+    internal static (byte[] modelData, byte[] tensorData) PrepareModelData(string model = "ch_PP_OCRv3_det")
+    {
+        Assembly asm = Assembly.LoadFrom("Sdcb.PaddleOCR.Models.LocalV3.dll");
+        return (
+            ReadModelData(asm, $"Sdcb.PaddleOCR.Models.LocalV3.models.{model}.inference.pdmodel"),
+            ReadModelData(asm, $"Sdcb.PaddleOCR.Models.LocalV3.models.{model}.inference.pdiparams"));
+    }
+
+    private static byte[] ReadModelData(Assembly asm, string resourceName)
+    {
+        using Stream asmStream = asm.GetManifestResourceStream(resourceName)!;
+        byte[] data = new byte[asmStream.Length];
+        asmStream.Read(data, 0, data.Length);
+        return data;
+    }
+
     private static void WriteStreamToLocal(Assembly asm, string resourceName, string localDir, string localFile)
     {
         Directory.CreateDirectory(localDir);
