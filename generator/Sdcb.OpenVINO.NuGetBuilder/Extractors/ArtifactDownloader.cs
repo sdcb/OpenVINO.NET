@@ -15,10 +15,18 @@ public class ArtifactDownloader
 
     public async Task<Stream> Download(ArtifactInfo artifact, CancellationToken cancellationToken = default)
     {
-        byte[] sha256 = await ReadSha256(artifact.Sha256Url, _http, cancellationToken);
-        Stream stream = await _http.DownloadAsStream(artifact.DownloadUrl, cancellationToken);
-        VerifyStreamHash(artifact.DownloadUrl, sha256, stream);
-        return stream;
+        if (artifact.Sha256Url == null)
+        {
+            Stream stream = await _http.DownloadAsStream(artifact.DownloadUrl, cancellationToken);
+            return stream;
+        }
+        else
+        {
+            byte[] sha256 = await ReadSha256(artifact.Sha256Url, _http, cancellationToken);
+            Stream stream = await _http.DownloadAsStream(artifact.DownloadUrl, cancellationToken);
+            VerifyStreamHash(artifact.DownloadUrl, sha256, stream);
+            return stream;
+        }
     }
 
     public async Task<ExtractedInfo> DownloadAndExtract(ArtifactInfo artifact, string destinationFolder, ILibFilter filter, bool flatten, CancellationToken cancellationToken = default)

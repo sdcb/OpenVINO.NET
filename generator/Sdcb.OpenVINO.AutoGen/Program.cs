@@ -10,7 +10,10 @@ using Sdcb.OpenVINO.AutoGen.Headers;
 using Sdcb.OpenVINO.AutoGen.Writers;
 
 IServiceProvider services = ConfigureServices();
-ExtractedInfo info = (await services.GetRequiredService<HeadersDownloader>().DownloadAsync());
+//ExtractedInfo info = (await services.GetRequiredService<HeadersDownloader>().DownloadAsync());
+AppSettings appSettings = services.GetRequiredService<AppSettings>();
+ExtractedInfo info = await HeadersDownloader.DirectDownloadAsync("https://io.starworks.cc:88/paddlesharp/ov-lib/w_openvino_toolkit_windows_2023.2.0.dev20231110_x86_64.zip", 
+    services.GetRequiredService<ArtifactDownloader>(), appSettings.DownloadFolder);
 ParsedInfo parsed = HeadersParser.Parse(info);
 GeneratedAll all = GeneratedAll.Generate(parsed);
 TransformWriter.WriteAll(all, TransformWriter.DestinationFolder, "Sdcb.OpenVINO.Natives");

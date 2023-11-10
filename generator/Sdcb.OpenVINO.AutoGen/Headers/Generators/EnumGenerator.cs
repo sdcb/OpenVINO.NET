@@ -39,7 +39,7 @@ public class EnumGenerator
             for (int i = 0; i < @enum.Items.Count; i++)
             {
                 Enumeration.Item item = @enum.Items[i];
-                DoxygenTags itemTags = DoxygenTags.Parse(item.Comment.Text);
+                DoxygenTags itemTags = DoxygenTags.Parse(item.Comment?.Text);
                 w.WriteLines(itemTags.ToBriefComment());
                 w.WriteLine($"{item.Name} = {ConvertValue(item.Value, @enum.BuiltinType.Type)},");
                 if (i != @enum.Items.Count - 1) w.WriteLine();

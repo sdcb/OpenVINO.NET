@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 
-public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch, SemanticVersion Version, DateTime UpdateTime, string ArchiveType, string DownloadUrl, string Sha256Url)
+public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch, SemanticVersion Version, DateTime UpdateTime, string ArchiveType, string DownloadUrl, string? Sha256Url)
 {
     public static ArtifactInfo FromPath(StorageNode sha256Node, SemanticVersion providedVersion)
     {

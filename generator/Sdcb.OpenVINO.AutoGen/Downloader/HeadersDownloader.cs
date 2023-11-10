@@ -1,4 +1,5 @@
-﻿using Sdcb.OpenVINO.NuGetBuilder.Extractors;
+﻿using NuGet.Versioning;
+using Sdcb.OpenVINO.NuGetBuilder.Extractors;
 using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 
@@ -36,11 +37,26 @@ public class HeadersDownloader
             flatten: false,
             cancellationToken: cancellationToken);
     }
+
+    public static async Task<ExtractedInfo> DirectDownloadAsync(
+        string url, 
+        ArtifactDownloader downloader,
+        string downloadFolder,
+        CancellationToken cancellationToken = default)
+    {
+        var artifact = new ArtifactInfo(KnownOS.Windows, "windows", "x64", SemanticVersion.Parse("2023.2.20231110"), new DateTime(2023, 11, 10), "zip", url, null);
+        return await downloader.DownloadAndExtract(
+            artifact,
+            downloadFolder,
+            new WindowsHeadersLibFilter(),
+            flatten: false,
+            cancellationToken: cancellationToken);
+    }
 }
 
 internal class WindowsHeadersLibFilter : ILibFilter
 {
-    WindowsLibFilter _w = new();
+    readonly WindowsLibFilter _w = new();
 
     public bool Filter(string key)
     {
