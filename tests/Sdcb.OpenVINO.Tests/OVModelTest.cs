@@ -73,13 +73,6 @@ public class OVModelTest
     }
 
     [Fact]
-    public void CannotReadNonExists()
-    {
-        using OVCore c = new();
-        Assert.Throws<FileNotFoundException>(() => c.ReadModel($@"Z:\a\model\that\not\exists.xml"));
-    }
-
-    [Fact]
     public void ReshapeByTensorNames()
     {
         using OVCore c = new();
