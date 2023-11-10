@@ -1,20 +1,12 @@
-﻿using OpenCvSharp;
-using Sdcb.OpenVINO.Natives;
+﻿using Sdcb.OpenVINO.Natives;
 using Sdcb.OpenVINO.Tests.Natives;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace Sdcb.OpenVINO.Tests;
 
 public class InferRequestTest
 {
-#pragma warning disable IDE0052 // 删除未读的私有成员
     private readonly ITestOutputHelper _console;
-#pragma warning restore IDE0052 // 删除未读的私有成员
     private readonly string _modelFile;
 
     public InferRequestTest(ITestOutputHelper console)
@@ -73,6 +65,29 @@ public class InferRequestTest
         Assert.Equal(new Shape(1, 1, 32, 64), output.Shape);
         Assert.Equal(32 * 64, output.GetData<float>().Length);
         Assert.Equal(ov_element_type_e.F32, output.ElementType);
+    }
+
+    [Fact]
+    public void WaitSuccess()
+    {
+        if (!OpenVINOLibraryLoader.Is202302OrGreater())
+        {
+            _console.WriteLine($"Version < 2023.2 not support determin wait success or not");
+            return;
+        }
+
+        using OVCore c = new();
+        using CompiledModel cm = c.CompileModel(_modelFile);
+        using InferRequest r = cm.CreateInferRequest();
+        using Tensor input = Tensor.FromArray(new float[32 * 64 * 3], new Shape(1, 3, 32, 64));
+        r.Inputs.Primary = input;
+
+        r.StartAsyncRun();
+        bool wait1ms = r.WaitAsyncRun(TimeSpan.FromMilliseconds(1));
+        bool wait1m = r.WaitAsyncRun(TimeSpan.FromMinutes(1));
+
+        Assert.False(wait1ms);
+        Assert.True(wait1m);
     }
 
     [Fact]
