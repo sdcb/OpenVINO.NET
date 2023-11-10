@@ -13,14 +13,14 @@ public struct ov_compiled_model
 
 
 /// <summary>type define ov_core_t from ov_core</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 26, 26, "ov_core_c_api")]
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 27, 27, "ov_core_c_api")]
 public struct ov_core
 {
 }
 
 
 /// <summary>Represents OpenVINO version information</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 33, 36, "ov_core_c_api")]
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 34, 37, "ov_core_c_api")]
 public unsafe struct ov_version
 {
     /// <summary>A string representing OpenVINO version</summary>
@@ -32,7 +32,7 @@ public unsafe struct ov_version
 
 
 /// <summary> Represents version information that describes device and ov runtime library</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 43, 46, "ov_core_c_api")]
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 44, 47, "ov_core_c_api")]
 public unsafe struct ov_core_version_t
 {
     /// <summary>A device name</summary>
@@ -44,7 +44,7 @@ public unsafe struct ov_core_version_t
 
 
 /// <summary> Represents version information that describes all devices and ov runtime library</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 53, 56, "ov_core_c_api")]
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 54, 57, "ov_core_c_api")]
 public unsafe struct ov_core_version_list_t
 {
     /// <summary>An array of device versions</summary>
@@ -56,7 +56,7 @@ public unsafe struct ov_core_version_list_t
 
 
 /// <summary>Represent all available devices.</summary>
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 63, 66, "ov_core_c_api")]
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_core.h", 64, 67, "ov_core_c_api")]
 public unsafe struct ov_available_devices_t
 {
     /// <summary>devices&apos; name</summary>

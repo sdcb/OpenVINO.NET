@@ -66,7 +66,7 @@ public enum ov_status_e
 
 
 /// <summary>This enum contains codes for element type.</summary>
-[CSourceInfo("ov_common.h", 170, 189, "ov_base_c_api")]
+[CSourceInfo("ov_common.h", 170, 190, "ov_base_c_api")]
 public enum ov_element_type_e
 {
     /// <summary>Undefined element type</summary>
@@ -75,8 +75,7 @@ public enum ov_element_type_e
     /// <summary>Dynamic element type</summary>
     DYNAMIC = 1,
 
-    /// <summary>boolean element type</summary>
-    BOOLEAN = 2,
+    OV_BOOLEAN = 2,
 
     /// <summary>bf16 element type</summary>
     BF16 = 3,
@@ -122,6 +121,9 @@ public enum ov_element_type_e
 
     /// <summary>u64 element type</summary>
     U64 = 17,
+
+    /// <summary>nf4 element type</summary>
+    NF4 = 18,
 }
 
 
