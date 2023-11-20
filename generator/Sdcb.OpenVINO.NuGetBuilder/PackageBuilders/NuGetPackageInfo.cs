@@ -12,7 +12,7 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, SemanticVersion Ve
         string ridOs = info.Distribution switch
         {
             "centos7" => "centos.7",
-            "debian9" => "debian.9",
+            "debian9" => "linux", // debian9 on linux arm64 supports ubuntu 22.04, so should effectively equals to linux
             "ubuntu18" => "ubuntu.18.04",
             "ubuntu20" => "ubuntu.20.04",
             "ubuntu22" => "ubuntu.22.04",
