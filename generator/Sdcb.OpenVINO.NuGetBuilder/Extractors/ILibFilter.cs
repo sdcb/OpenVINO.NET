@@ -24,6 +24,7 @@ public class LinuxLibFilter : ILibFilter
 
         _libs = new[]
         {
+            "libtbb.so.12",
             "libgna.so.3",
             "libnpu_driver_compiler_adapter.so",
             "libnpu_level_zero_backend.so",
