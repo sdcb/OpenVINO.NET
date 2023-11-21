@@ -86,6 +86,7 @@ internal static class OpenVINOLibraryLoader
                 /* linux or others */
                 return LoadWithDeps(assembly, searchPath, allowedVersions.Select(v => new LibDeps($"libopenvino_c.so.{v}", new string[]
                 {
+                    $"libtbb.so.12",
                     $"libopenvino.so.{v}",
                 })).ToArray());
             }

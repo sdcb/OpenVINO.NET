@@ -9,9 +9,9 @@
     //  "wslDistribution": "Ubuntu"
     //},
     {
-      "name": "Docker dotnet7-openvino-base",
+      "name": "dotnet8",
       "type": "docker",
-      "dockerImage": "sdflysha/openvino-base"
+      "dockerImage": "mcr.microsoft.com/dotnet/sdk:8.0-jammy"
     }
   ]
 }
