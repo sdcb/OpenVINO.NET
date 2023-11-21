@@ -6,7 +6,6 @@ using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using Sdcb.OpenVINO.NuGetBuilders.PackageBuilder;
 using Sdcb.OpenVINO.NuGetBuilders.Utils;
-using System;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Sdcb.OpenVINO.NuGetBuilder.Tests")]

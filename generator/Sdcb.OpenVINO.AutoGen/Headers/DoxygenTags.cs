@@ -1,7 +1,5 @@
 ﻿using Sdcb.OpenVINO.AutoGen.Headers.Generators;
-using SharpCompress.Common;
 using System.Security;
-using Vanara.Extensions.Reflection;
 
 namespace Sdcb.OpenVINO.AutoGen.Headers;
 
