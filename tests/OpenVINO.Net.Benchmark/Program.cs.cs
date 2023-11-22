@@ -1,10 +1,12 @@
-﻿namespace OpenVINO.Net.Benchmark
+﻿using BenchmarkDotNet.Running;
+
+namespace OpenVINO.Net.Benchmark
 {
     internal class Program
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
         }
     }
 }
