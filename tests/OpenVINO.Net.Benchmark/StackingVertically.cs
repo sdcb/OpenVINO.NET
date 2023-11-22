@@ -4,6 +4,7 @@ using OpenCvSharp;
 
 namespace OpenVINO.Net.Benchmark
 {
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net70, launchCount: 1, warmupCount: 1, iterationCount: 5)]
     public class StackingVertically
     {
         static readonly string baseDir = AppContext.BaseDirectory;
@@ -51,6 +52,15 @@ namespace OpenVINO.Net.Benchmark
             Cv2.VConcat(this.Mats, combinedMat);
         }
 
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            this.Mat?.Dispose();
+            foreach (Mat mat in this.Mats)
+            {
+                mat.Dispose();
+            }
+        }
     }
 }
 

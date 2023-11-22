@@ -14,4 +14,11 @@
     <PackageReference Include="OpenCvSharp4.slim.runtime.windows-x64" Version="4.8.0.20230708" />
   </ItemGroup>  
 
+  <ItemGroup>
+    <None Update="images\test.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    
+  </ItemGroup>
+
 </Project>
