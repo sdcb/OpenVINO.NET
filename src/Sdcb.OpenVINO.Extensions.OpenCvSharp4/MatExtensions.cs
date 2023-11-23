@@ -79,23 +79,15 @@ public static class MatExtensions
     /// The resulted Mat is made by vertically stacking the input Mats, each having the same type and specified height and width.
     /// </summary>
     /// <param name="srcs">An array of Mats that are to be stacked. It's assumed that all provided Mats are having the same type.</param>
-    /// <param name="height">The desired height for each Mat. All Matrices should have the same height.</param>
-    /// <param name="width">The desired width for all Matrices. This width will also apply to resulted stacked Mat.</param>
     /// <returns>Returns a new Mat that is a vertical stack of all input Mats, each having the specified height and width.</returns>
     /// <exception cref="ArgumentException">Thrown when srcs is null or empty, or when any of the Mats in srcs does not match the specified type.</exception>
     /// <remarks>
     /// This method utilizes OpenCvSharp4 for operations on Mats. Pay attention to match correctly the type of Mats in the 'srcs' array.
     /// </remarks>
-    public static Mat StackingVertically(this Mat[] srcs, int height, int width)
+    public static Mat StackingVertically(this Mat[] srcs)
     {
-        MatType matType = srcs[0].Type();
-        Mat combinedMat = new(height * srcs.Length, width, matType, Scalar.Black);
-        for (int i = 0; i < srcs.Length; i++)
-        {
-            Mat src = srcs[i];
-            using Mat dest = combinedMat[i * height, (i + 1) * height, 0, src.Width];
-            src.CopyTo(dest);
-        }
+        Mat combinedMat = new();
+        Cv2.VConcat(this.Mats, combinedMat);
         return combinedMat;
     }
 }
