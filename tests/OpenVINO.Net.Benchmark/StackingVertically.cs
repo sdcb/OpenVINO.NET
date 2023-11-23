@@ -4,7 +4,11 @@ using OpenCvSharp;
 
 namespace OpenVINO.Net.Benchmark
 {
-    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net70, launchCount: 1, warmupCount: 1, iterationCount: 5)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net70, launchCount: 1, warmupCount: 1, iterationCount: 10)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net80, launchCount: 1, warmupCount: 1, iterationCount: 10)]
+    [MemoryDiagnoser]
+    [HtmlExporter]
+    [MarkdownExporterAttribute.GitHub]
     public class StackingVertically
     {
         static readonly string baseDir = AppContext.BaseDirectory;
@@ -13,7 +17,7 @@ namespace OpenVINO.Net.Benchmark
 
         public List<Mat> Mats;
 
-        [Params("test_1.jpg")]
+        [Params("test_1.jpg", "test_2.jpg", "test_3.jpg", "test_4.jpg")]
         public string FileName { get; set; }
 
         [GlobalSetup]
