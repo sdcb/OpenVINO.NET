@@ -11,7 +11,7 @@ public static partial class NativeMethods
 {
     static NativeMethods()
     {
-#if LINQPAD || NET6_0_OR_GREATER
+#if LINQPAD || NETCOREAPP3_1_OR_GREATER
         OpenVINOLibraryLoader.Init();
 #elif NETSTANDARD2_0_OR_GREATER || NET45_OR_GREATER
 		OpenVINOLibraryLoader.WindowsNetFXLoad();
