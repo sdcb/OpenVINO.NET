@@ -527,13 +527,13 @@ public class OVCoreNativeTest
         }
     }
 
-    unsafe static void Check(ov_status_e e, [CallerArgumentExpression(nameof(e))] string? expr = null)
+    unsafe static void Check(ov_status_e e)
     {
         if (e != ov_status_e.OK)
         {
             byte* errorInfoPtr = ov_get_error_info(e);
             string? errorInfo = Marshal.PtrToStringAnsi((IntPtr)errorInfoPtr);
-            Assert.Fail($"{e}({errorInfo})\nSource: {expr}");
+            Assert.Fail($"{e}({errorInfo})");
         }
     }
 
