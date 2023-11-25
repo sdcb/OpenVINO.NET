@@ -69,7 +69,7 @@ public sealed class PackageBuilder
                 new XElement(XName.Get("CopyToOutputDirectory", ns), "PreserveNewest")))
                 );
 
-        string propsFile = Path.Combine(local.Directory, $"{pkgInfo.NamePrefix}.runtime.{pkgInfo.Rid}.props");
+        string propsFile = Path.Combine(local.Directory, $"{pkgInfo.NamePrefix}.runtime.{pkgInfo.TitleRid}.props");
         props.Save(propsFile);
         return propsFile;
     }
@@ -82,11 +82,11 @@ public sealed class PackageBuilder
             <metadata>
             <id>{pkgInfo.Name}</id>
             <version>0.1</version>
-            <title>{pkgInfo.NamePrefix} native bindings for {pkgInfo.Rid}</title>
+            <title>{pkgInfo.NamePrefix} native bindings for {pkgInfo.TitleRid}</title>
             <authors>sdcb</authors>
             <requireLicenseAcceptance>true</requireLicenseAcceptance>
-            <description>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.Rid}.</description>
-            <summary>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.Rid}.</summary>
+            <description>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.TitleRid}.</description>
+            <summary>Native binding for {pkgInfo.NamePrefix} to work on {pkgInfo.TitleRid}.</summary>
             <releaseNotes></releaseNotes>
             <copyright>Copyright {DateTime.Now.Year}</copyright>
 

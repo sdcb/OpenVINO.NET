@@ -17,7 +17,7 @@ class Program
         ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
         string purpose = args.Length > 0 ? args[0] : "linux";
-        string? versionSuffix = "preview.1"; // null or "preview.1", can't be ""
+        string? versionSuffix = null; // null or "preview.1", can't be ""
         string dir = Path.Combine(DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo("."), "OpenVINO.NET.sln").DirectoryName!,
             "build", "nupkgs");
 
@@ -52,14 +52,14 @@ class Program
             "https://io.starworks.cc:88/paddlesharp/ov-lib/w_openvino_toolkit_windows_2023.2.0.dev20231110_x86_64.zip", 
             null);
         NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
-        string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), pkgInfo.Rid);
+        string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), pkgInfo.TitleRid);
         ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new WindowsLibFilter(), flatten: true);
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
     }
 
     private static void BuildAndroid(string? versionSuffix, string dir)
     {
-        NuGetPackageInfo pkgInfo = new(NuGetPackageInfo.GetNamePrefix(), "android-arm64", new SemanticVersion(2023, 1, 0));
+        NuGetPackageInfo pkgInfo = new(NuGetPackageInfo.GetNamePrefix(), "android-arm64", "android-arm64", new SemanticVersion(2023, 1, 0));
         string destinationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "android-arm64", "2023.1");
         ExtractedInfo local = new(destinationFolder, "", Directory.EnumerateFiles(destinationFolder, "*.so", SearchOption.TopDirectoryOnly).ToArray());
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
@@ -69,7 +69,7 @@ class Program
     {
         ArtifactInfo artifact = root.LatestStableVersion.Artifacts.First(x => x.OS == KnownOS.Windows);
         NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
-        string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), pkgInfo.Rid);
+        string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), pkgInfo.TitleRid);
         ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new WindowsLibFilter(), flatten: true);
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
     }
@@ -79,7 +79,7 @@ class Program
         foreach (ArtifactInfo artifact in root.LatestStableVersion.Artifacts.Where(x => x.OS == KnownOS.Linux))
         {
             NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
-            string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), $"{pkgInfo.Rid}");
+            string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), $"{pkgInfo.TitleRid}");
             ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new LinuxLibFilter(pkgInfo.Version), flatten: true);
             PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
         }

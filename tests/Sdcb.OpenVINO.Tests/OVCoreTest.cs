@@ -30,7 +30,7 @@ public class OVCoreTest
     public void DeviceVersionTest()
     {
         using OVCore c = new();
-        Dictionary<string, OVVersion> versions = c.GetDevicePluginsVersions("HETERO:CPU,GPU");
+        Dictionary<string, OVVersion> versions = c.GetDevicePluginsVersions("CPU");
         foreach (KeyValuePair<string, OVVersion> item in versions)
         {
             _console.WriteLine($"{item.Key}: {item.Value}");

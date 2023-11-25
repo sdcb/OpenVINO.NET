@@ -36,7 +36,7 @@ void Refresh()
 {
 	string dir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath)!, "nupkgs");
 	IEnumerable<string> pkgs = Directory.EnumerateFiles(dir, "*.nupkg")
-		.Where(x => x.Contains("-preview.1"));
+		.Where(x => x.Contains("-preview.2"));
 	dc.Content = new
 	{
 		Functions = Util.HorizontalRun(true,
