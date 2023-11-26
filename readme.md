@@ -2,7 +2,11 @@
 
 High quality .NET wrapper for OpenVINO™ toolkit.
 
-Please check my cnblogs blog for more details: [20231015-sdcb-openvino-net](https://www.cnblogs.com/sdflysha/p/20231015-sdcb-openvino-net.html).
+Please check my cnblogs blog for more details:
+* 博客园 [20231015-sdcb-openvino-net](https://www.cnblogs.com/sdflysha/p/20231015-sdcb-openvino-net.html)
+* PaddleOCR tutoria video:
+  * B站: https://www.bilibili.com/video/BV1bM411f74Z/?vd_source=3e5b05900c55682cc85ae77f73036eff
+  * youtube: https://www.youtube.com/watch?v=gG4iYgSbEXo
 
 ## Packages
 
@@ -11,8 +15,8 @@ Please check my cnblogs blog for more details: [20231015-sdcb-openvino-net](http
 | Sdcb.OpenVINO                          | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.svg)](https://nuget.org/packages/Sdcb.OpenVINO)                                                   | .NET PInvoke interface       |
 | Sdcb.OpenVINO.Extensions.OpenCvSharp4  | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.Extensions.OpenCvSharp4.svg)](https://nuget.org/packages/Sdcb.OpenVINO.Extensions.OpenCvSharp4)   | OpenVINO OpenCvSharp4 exts   |
 | Sdcb.OpenVINO.runtime.centos.7-x64     | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.centos.7-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.centos.7-x64)         | Runtime for CentOS 7 x64     |
-| Sdcb.OpenVINO.runtime.debian.9-arm     | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.debian.9-arm.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.debian.9-arm)         | Runtime for Debian 9 ARM     |
-| Sdcb.OpenVINO.runtime.debian.9-arm64   | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.debian.9-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.debian.9-arm64)     | Runtime for Debian 9 ARM64   |
+| Sdcb.OpenVINO.runtime.linux-arm        | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.linux-arm.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.linux-arm)               | Runtime for Debian 9+ ARM    |
+| Sdcb.OpenVINO.runtime.linux-arm64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.linux-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.linux-arm64)           | Runtime for Debian 9+ ARM64  |
 | Sdcb.OpenVINO.runtime.rhel.8-x64       | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.rhel.8-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.rhel.8-x64)             | Runtime for RHEL 8 x64       |
 | Sdcb.OpenVINO.runtime.ubuntu.18.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64) | Runtime for Ubuntu 18.04 x64 |
 | Sdcb.OpenVINO.runtime.ubuntu.20.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.20.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.20.04-x64) | Runtime for Ubuntu 20.04 x64 |
