@@ -79,7 +79,7 @@ public class InferRequestTest
         using OVCore c = new();
         using CompiledModel cm = c.CompileModel(_modelFile);
         using InferRequest r = cm.CreateInferRequest();
-        using Tensor input = Tensor.FromArray(new float[32 * 64 * 3], new Shape(1, 3, 32, 64));
+        using Tensor input = Tensor.FromArray(new float[320 * 256 * 3], new Shape(1, 3, 320, 256));
         r.Inputs.Primary = input;
 
         r.StartAsyncRun();
