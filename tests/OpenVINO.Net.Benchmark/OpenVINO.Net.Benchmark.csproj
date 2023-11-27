@@ -15,19 +15,16 @@
   </ItemGroup>  
 
   <ItemGroup>
-    <None Update="images\test.jpg">
+    <None Update="images\test_1.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="images\test01.jpg">
+    <None Update="images\test_2.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="images\test02.jpg">
+    <None Update="images\test_3.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="images\test03.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="images\test04.jpg">
+    <None Update="images\test_4.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
