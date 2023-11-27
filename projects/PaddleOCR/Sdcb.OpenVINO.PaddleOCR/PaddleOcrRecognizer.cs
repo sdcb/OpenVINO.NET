@@ -240,6 +240,10 @@ public class PaddleOcrRecognizer : IDisposable
 
     internal static Mat ResizePadding(Mat src, int modelHeight, int targetWidth)
     {
+        //final image size
+        var dstSize = new Size(targetWidth, modelHeight);
+        var result = new Mat(dstSize, src.Type(), Scalar.Black);
+
         // Calculate scaling factor
         double scale = Math.Min((double)modelHeight / src.Height, (double)targetWidth / src.Width);
 
@@ -252,17 +256,18 @@ public class PaddleOcrRecognizer : IDisposable
 
         if (padTop > 0)
         {
-            // Add padding. If padding needs to be added to top and bottom we divide it equally,
-            // but if there is an odd number we add the extra pixel to the bottom.
-            Mat result = new();
-            int remainder = (modelHeight - resized.Height) % 2;
-            Cv2.CopyMakeBorder(resized, result, padTop, padTop + remainder, 0, 0, BorderTypes.Constant, Scalar.Black);
-            resized.Dispose();
-            return result;
+           // Add padding. If padding needs to be added to top and bottom we divide it equally,
+           // but if there is an odd number we add the extra pixel to the bottom.                
+           int remainder = (modelHeight - resized.Height) % 2;
+           Cv2.CopyMakeBorder(resized, result, padTop, padTop + remainder, 0, dstSize.Width - resized.Width, BorderTypes.Constant, Scalar.Black);
+           resized.Dispose();
+           return result;
         }
         else
         {
-            return resized;
+           result[0, resized.Height, 0, resized.Width] = resized;
+           resized.Dispose();
+           return result;
         }
     }
 }
