@@ -1,7 +1,5 @@
 ﻿using OpenCvSharp;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 
@@ -101,28 +99,20 @@ public static class MatExtensions
     }
 
     /// <summary>
-    /// Stacks an array of Mats into a single Mat by placing them vertically with optional padding to meet a minimal width.
-    /// This method takes an array of Mats and vertically concatenates them to produce a single Mat.
-    /// If the resulting Mat's width is less than the specified minimum width, padding is applied to the right side.
+    /// Stacks an array of Mats into a single Mat by placing them vertically.
+    /// This version of StackingVertically is optimized for speed and requires the Mats to have the same width.
     /// </summary>
-    /// <param name="srcs">An array of Mats that are to be stacked vertically.</param>
-    /// <param name="leastWidth">The minimum desired width for the resulting Mat. If the actual width is less, padding will be applied to reach this width. Default is 0, which means no padding will be applied.</param>
-    /// <returns>Returns a new Mat that is a vertical stack of all input Mats with the width resized to at least 'leastWidth' if necessary.</returns>
+    /// <param name="srcs">An array of Mats that are to be stacked. All Mats must have the same width and type.</param>
+    /// <returns>Returns a new Mat that is a vertical stack of all input Mats.</returns>
+    /// <exception cref="OpenCVException">Thrown when the Mats within srcs have differing widths.</exception>
     /// <remarks>
-    /// This method leverages OpenCvSharp4's vertical concatenation function. If padding is required, a border with a constant value is added to the right side of the Mat to meet the specified leastWidth.
+    /// This method is an optimized version of vertical stacking where it is assumed that all Mats have the same width. 
+    /// It straightly stacks the Mats in the given order, therefore the widths must be consistent to avoid issues.
     /// </remarks>
-    public static Mat StackingVertically(this Mat[] srcs, int leastWidth = 0)
+    public static Mat StackingVertically(this Mat[] srcs)
     {
-        // TODO: resize srcs into max possible width in this code instead of outside of function
         Mat combinedMat = new();
-        Cv2.VConcat(srcs, combinedMat); // Vertically concatenate the Mat arrays into one Mat.
-        int padRight = leastWidth - combinedMat.Width; // Calculate the padding needed to reach the least width.
-
-        if (padRight > 0) // If padding is needed,
-        {
-            // Apply the padding to the right side of the Mat.
-            Cv2.CopyMakeBorder(combinedMat, combinedMat, 0, 0, 0, padRight, BorderTypes.Constant, Scalar.Black);
-        }
-        return combinedMat; // Return the vertically stacked Mat with or without padding as per 'leastWidth'.
+        Cv2.VConcat(srcs, combinedMat);
+        return combinedMat;
     }
 }

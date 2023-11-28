@@ -37,7 +37,7 @@
     </PackageReference>
 
     <PackageReference Include="Sdcb.OpenVINO" Version="0.5.1" Condition="'$(Configuration)' != 'Debug'" />
-    <PackageReference Include="Sdcb.OpenVINO.Extensions.OpenCvSharp4" Version="0.2.0" Condition="'$(Configuration)' != 'Debug'"/>
+    <PackageReference Include="Sdcb.OpenVINO.Extensions.OpenCvSharp4" Version="0.2.0" Condition="'$(Configuration)' != 'Debug'" />
 
     <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'" />
     <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO.Extensions.OpenCvSharp4\Sdcb.OpenVINO.Extensions.OpenCvSharp4.csproj" Condition="'$(Configuration)' == 'Debug'" />
