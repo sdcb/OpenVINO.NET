@@ -49,8 +49,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.PaddleOCR.Mod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.Extensions.OpenCvSharp4", "src\Sdcb.OpenVINO.Extensions.OpenCvSharp4\Sdcb.OpenVINO.Extensions.OpenCvSharp4.csproj", "{57CE7EF4-962F-4730-922F-E150F85DCA23}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sdcb.OpenVINO.Benchmarks", "tests\Sdcb.OpenVINO.Benchmarks\Sdcb.OpenVINO.Benchmarks.csproj", "{718421D0-CBF7-4B58-BC51-CD4B42B2D83B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,10 +95,6 @@ Global
 		{57CE7EF4-962F-4730-922F-E150F85DCA23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57CE7EF4-962F-4730-922F-E150F85DCA23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57CE7EF4-962F-4730-922F-E150F85DCA23}.Release|Any CPU.Build.0 = Release|Any CPU
-		{718421D0-CBF7-4B58-BC51-CD4B42B2D83B}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{718421D0-CBF7-4B58-BC51-CD4B42B2D83B}.Debug|Any CPU.Build.0 = Release|Any CPU
-		{718421D0-CBF7-4B58-BC51-CD4B42B2D83B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{718421D0-CBF7-4B58-BC51-CD4B42B2D83B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,7 +112,6 @@ Global
 		{920A7881-AB99-497B-A995-A6AD29360767} = {A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0}
 		{C34C36F8-5844-4B43-B0FB-591039460182} = {A5A721E0-6DEF-4B0F-88F5-BD36D7AAE0D0}
 		{57CE7EF4-962F-4730-922F-E150F85DCA23} = {FF193ABD-7BEF-48A8-A256-478FBF0ABBC8}
-		{718421D0-CBF7-4B58-BC51-CD4B42B2D83B} = {CF0B0CBC-EA90-486E-A006-50B76FE5C628}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E5CE293-BD62-4ACF-B872-285B8C995E38}
