@@ -47,13 +47,15 @@ internal static class OpenVINOLibraryLoader
 
     internal static int VersionAbbr;
 
-#if LINQPad || NETCOREAPP3_1_OR_GREATER
-
     static OpenVINOLibraryLoader()
     {
+#if LINQPad || NETCOREAPP3_1_OR_GREATER
         NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), OpenVINOImportResolver);
+#endif
         VersionAbbr = OVCore.Version.GetAbbreviatedVersion();
     }
+
+#if LINQPad || NETCOREAPP3_1_OR_GREATER
 
     private static IntPtr OpenVINOImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
