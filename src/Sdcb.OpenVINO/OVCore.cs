@@ -498,4 +498,13 @@ public class OVCore : CppPtrObject
             _sharedCore = new Lazy<OVCore>(() => new OVCore());
         }
     }
+
+    /// <summary>
+    /// Shut down the OpenVINO by deleting all static-duration objects allocated by the library and releasing dependent resources
+    /// </summary>
+    public static void Shutdown()
+    {
+        ov_shutdown();
+    }
 }
+
