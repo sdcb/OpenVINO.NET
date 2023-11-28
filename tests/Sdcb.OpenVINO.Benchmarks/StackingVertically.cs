@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Jobs;
 using OpenCvSharp;
 
-namespace OpenVINO.Net.Benchmark
+namespace Sdcb.OpenVINO.Benchmarks
 {
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Net70, launchCount: 1, warmupCount: 1, iterationCount: 10)]
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Net80, launchCount: 1, warmupCount: 1, iterationCount: 10)]
@@ -13,21 +13,21 @@ namespace OpenVINO.Net.Benchmark
     {
         static readonly string baseDir = AppContext.BaseDirectory;
 
-        public Mat Mat;
+        private Mat mat;
 
-        public List<Mat> Mats;
+        private List<Mat> mats;
 
 
         [GlobalSetup]
         public void GlobalSetup()
         {
-            var imageList = new List<string>() { "test_1.jpg", "test_2.jpg", "test_3.jpg", "test_4.jpg" };
-            this.Mats = new List<Mat>(imageList.Count); 
+            List<string> imageList = new(){ "test_1.jpg", "test_2.jpg", "test_3.jpg", "test_4.jpg" };
+            this.mats = new(imageList.Count); 
             
             for (int i = 0; i < imageList.Count; i++)
             {
-                this.Mat = new Mat(Path.Combine(baseDir, "images", imageList[i]));
-                this.Mats.Add(this.Mat);
+                this.mat = new(Path.Combine(baseDir, "images", imageList[i]));
+                this.mats.Add(this.mat);
             }
         }
 
@@ -36,16 +36,16 @@ namespace OpenVINO.Net.Benchmark
         [Arguments(48, 512)]
         public void StackingVerticallyBySdcb(int modelHeight, int maxWidth)
         {
-            var paddingMats = new List<Mat>(this.Mats.Count);
+            List<Mat> paddingMats = new(this.mats.Count);
 
-            for (var i = 0; i < this.Mats.Count; i++)
+            for (var i = 0; i < this.mats.Count; i++)
             {
-                paddingMats.Add(ResizePaddingSdcb(this.Mats[i], modelHeight, maxWidth));
+                paddingMats.Add(ResizePaddingSdcb(this.mats[i], modelHeight, maxWidth));
             }
 
             MatType matType = paddingMats[0].Type();
-            using Mat combinedMat = new(modelHeight * this.Mats.Count, maxWidth, matType, Scalar.Black);
-            for (var i = 0; i < this.Mats.Count; i++)
+            using Mat combinedMat = new(modelHeight * this.mats.Count, maxWidth, matType, Scalar.Black);
+            for (var i = 0; i < this.mats.Count; i++)
             {
                 Mat src = paddingMats[i];
                 using Mat dest = combinedMat[i * modelHeight, (i + 1) * modelHeight, 0, src.Width];
@@ -59,22 +59,22 @@ namespace OpenVINO.Net.Benchmark
         [Arguments(48, 512)]
         public void StackingVerticallyByAven(int modelHeight, int maxWidth)
         {
-            var paddingMats = new List<Mat>(this.Mats.Count);
+            List<Mat> paddingMats = new(this.mats.Count);
 
-            for (var i = 0; i < this.Mats.Count; i++)
+            for (var i = 0; i < this.mats.Count; i++)
             {
-                paddingMats.Add(ResizePaddingAven(this.Mats[i], modelHeight, maxWidth));
+                paddingMats.Add(ResizePaddingAven(this.mats[i], modelHeight, maxWidth));
             }
             MatType matType = paddingMats[0].Type();
-            using Mat combinedMat = new(modelHeight * this.Mats.Count, maxWidth, matType, Scalar.Black);
+            using Mat combinedMat = new(modelHeight * this.mats.Count, maxWidth, matType, Scalar.Black);
             Cv2.VConcat(paddingMats, combinedMat);
         }
 
         [GlobalCleanup]
         public void GlobalCleanup()
         {
-            this.Mat?.Dispose();
-            foreach (Mat mat in this.Mats)
+            this.mat?.Dispose();
+            foreach (Mat mat in this.mats)
             {
                 mat.Dispose();
             }
@@ -110,8 +110,8 @@ namespace OpenVINO.Net.Benchmark
         private static Mat ResizePaddingAven(Mat src, int modelHeight, int targetWidth)
         {
             //final image size
-            var dstSize = new Size(targetWidth, modelHeight);
-            var result = new Mat(dstSize, src.Type(), Scalar.Black);
+            Size dstSize = new(targetWidth, modelHeight);
+            Mat result = new(dstSize, src.Type(), Scalar.Black);
 
             // Calculate scaling factor
             double scale = Math.Min((double)modelHeight / src.Height, (double)targetWidth / src.Width);

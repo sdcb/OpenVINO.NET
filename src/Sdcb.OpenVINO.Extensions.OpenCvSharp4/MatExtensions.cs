@@ -79,17 +79,50 @@ public static class MatExtensions
     /// The resulted Mat is made by vertically stacking the input Mats, each having the same type and specified height and width.
     /// </summary>
     /// <param name="srcs">An array of Mats that are to be stacked. It's assumed that all provided Mats are having the same type.</param>
-    /// <param name="height">no need anymore,keep it just for compatibility</param>
-    /// <param name="width">no need anymore,keep it just for compatibility</param>
+    /// <param name="height">The desired height for each Mat. All Matrices should have the same height.</param>
+    /// <param name="width">The desired width for all Matrices. This width will also apply to resulted stacked Mat.</param>
     /// <returns>Returns a new Mat that is a vertical stack of all input Mats, each having the specified height and width.</returns>
     /// <exception cref="ArgumentException">Thrown when srcs is null or empty, or when any of the Mats in srcs does not match the specified type.</exception>
     /// <remarks>
     /// This method utilizes OpenCvSharp4 for operations on Mats. Pay attention to match correctly the type of Mats in the 'srcs' array.
     /// </remarks>
+    [Obsolete("You can use another overloading method for better performance.")]
     public static Mat StackingVertically(this Mat[] srcs, int height, int width)
     {
-        Mat combinedMat = new();
-        Cv2.VConcat(this.Mats, combinedMat);
+        MatType matType = srcs[0].Type();
+        Mat combinedMat = new(height * srcs.Length, width, matType, Scalar.Black);
+        for (int i = 0; i < srcs.Length; i++)
+        {
+            Mat src = srcs[i];
+            using Mat dest = combinedMat[i * height, (i + 1) * height, 0, src.Width];
+            src.CopyTo(dest);
+        }
         return combinedMat;
+    }
+
+    /// <summary>
+    /// Stacks an array of Mats into a single Mat by placing them vertically with optional padding to meet a minimal width.
+    /// This method takes an array of Mats and vertically concatenates them to produce a single Mat.
+    /// If the resulting Mat's width is less than the specified minimum width, padding is applied to the right side.
+    /// </summary>
+    /// <param name="srcs">An array of Mats that are to be stacked vertically.</param>
+    /// <param name="leastWidth">The minimum desired width for the resulting Mat. If the actual width is less, padding will be applied to reach this width. Default is 0, which means no padding will be applied.</param>
+    /// <returns>Returns a new Mat that is a vertical stack of all input Mats with the width resized to at least 'leastWidth' if necessary.</returns>
+    /// <remarks>
+    /// This method leverages OpenCvSharp4's vertical concatenation function. If padding is required, a border with a constant value is added to the right side of the Mat to meet the specified leastWidth.
+    /// </remarks>
+    public static Mat StackingVertically(this Mat[] srcs, int leastWidth = 0)
+    {
+        // TODO: resize srcs into max possible width in this code instead of outside of function
+        Mat combinedMat = new();
+        Cv2.VConcat(srcs, combinedMat); // Vertically concatenate the Mat arrays into one Mat.
+        int padRight = leastWidth - combinedMat.Width; // Calculate the padding needed to reach the least width.
+
+        if (padRight > 0) // If padding is needed,
+        {
+            // Apply the padding to the right side of the Mat.
+            Cv2.CopyMakeBorder(combinedMat, combinedMat, 0, 0, 0, padRight, BorderTypes.Constant, Scalar.Black);
+        }
+        return combinedMat; // Return the vertically stacked Mat with or without padding as per 'leastWidth'.
     }
 }

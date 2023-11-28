@@ -241,8 +241,8 @@ public class PaddleOcrRecognizer : IDisposable
     internal static Mat ResizePadding(Mat src, int modelHeight, int targetWidth)
     {
         //final image size
-        var dstSize = new Size(targetWidth, modelHeight);
-        var result = new Mat(dstSize, src.Type(), Scalar.Black);
+        Size dstSize = new(targetWidth, modelHeight);
+        Mat result = new(dstSize, src.Type(), Scalar.Black);
 
         // Calculate scaling factor
         double scale = Math.Min((double)modelHeight / src.Height, (double)targetWidth / src.Width);

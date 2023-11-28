@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
 
-namespace OpenVINO.Net.Benchmark
+namespace Sdcb.OpenVINO.Benchmarks
 {
     internal class Program
     {
