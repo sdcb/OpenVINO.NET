@@ -1,7 +1,5 @@
 ﻿using OpenCvSharp;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 
@@ -86,6 +84,7 @@ public static class MatExtensions
     /// <remarks>
     /// This method utilizes OpenCvSharp4 for operations on Mats. Pay attention to match correctly the type of Mats in the 'srcs' array.
     /// </remarks>
+    [Obsolete("You can use another overloading method for better performance.")]
     public static Mat StackingVertically(this Mat[] srcs, int height, int width)
     {
         MatType matType = srcs[0].Type();
@@ -96,6 +95,24 @@ public static class MatExtensions
             using Mat dest = combinedMat[i * height, (i + 1) * height, 0, src.Width];
             src.CopyTo(dest);
         }
+        return combinedMat;
+    }
+
+    /// <summary>
+    /// Stacks an array of Mats into a single Mat by placing them vertically.
+    /// This version of StackingVertically is optimized for speed and requires the Mats to have the same width.
+    /// </summary>
+    /// <param name="srcs">An array of Mats that are to be stacked. All Mats must have the same width and type.</param>
+    /// <returns>Returns a new Mat that is a vertical stack of all input Mats.</returns>
+    /// <exception cref="OpenCVException">Thrown when the Mats within srcs have differing widths.</exception>
+    /// <remarks>
+    /// This method is an optimized version of vertical stacking where it is assumed that all Mats have the same width. 
+    /// It straightly stacks the Mats in the given order, therefore the widths must be consistent to avoid issues.
+    /// </remarks>
+    public static Mat StackingVertically(this Mat[] srcs)
+    {
+        Mat combinedMat = new();
+        Cv2.VConcat(srcs, combinedMat);
         return combinedMat;
     }
 }

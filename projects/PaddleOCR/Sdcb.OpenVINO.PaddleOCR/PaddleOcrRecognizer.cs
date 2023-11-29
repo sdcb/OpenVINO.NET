@@ -224,7 +224,7 @@ public class PaddleOcrRecognizer : IDisposable
                     return ResizePadding(channel3, modelHeight, maxWidth);
                 })
                 .ToArray();
-            using Mat combined = normalizeds.StackingVertically(modelHeight, maxWidth);
+            using Mat combined = normalizeds.StackingVertically();
             combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
         }
         finally
@@ -246,17 +246,16 @@ public class PaddleOcrRecognizer : IDisposable
         // Resize image
         Mat resized = new();
         Cv2.Resize(src, resized, new Size(), scale, scale);
-
         // Compute padding for height and width
-        int padTop = Math.Max(0, (modelHeight - resized.Height) / 2);
+        int padH = modelHeight - resized.Height;
+        int padRight = targetWidth - resized.Width;
 
-        if (padTop > 0)
+        if (padH > 0 || padRight > 0)
         {
-            // Add padding. If padding needs to be added to top and bottom we divide it equally,
-            // but if there is an odd number we add the extra pixel to the bottom.
             Mat result = new();
-            int remainder = (modelHeight - resized.Height) % 2;
-            Cv2.CopyMakeBorder(resized, result, padTop, padTop + remainder, 0, 0, BorderTypes.Constant, Scalar.Black);
+            int padTop = padH / 2;
+            int padBottom = padH - padTop;
+            Cv2.CopyMakeBorder(resized, result, padTop, padBottom, 0, padRight, BorderTypes.Constant, Scalar.Black);
             resized.Dispose();
             return result;
         }

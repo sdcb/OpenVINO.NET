@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sdcb.OpenVINO.PaddleOCR.Models.Online\Sdcb.OpenVINO.PaddleOCR.Models.Online.csproj" />
+    <ProjectReference Include="..\Sdcb.OpenVINO.PaddleOCR\Sdcb.OpenVINO.PaddleOCR.csproj" />
   </ItemGroup>
 
 </Project>
