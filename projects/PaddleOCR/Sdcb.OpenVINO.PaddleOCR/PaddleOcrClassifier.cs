@@ -141,7 +141,7 @@ public class PaddleOcrClassifier : IDisposable
                     return ResizePadding(channel3, Shape);
                 })
                 .ToArray();
-            using Mat combined = normalizeds.StackingVertically(Shape.Height, Shape.Width);
+            using Mat combined = normalizeds.StackingVertically();
             combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
         }
         finally

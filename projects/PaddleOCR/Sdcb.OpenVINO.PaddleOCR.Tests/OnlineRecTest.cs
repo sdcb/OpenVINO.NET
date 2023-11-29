@@ -91,4 +91,18 @@ public class OnlineRecTest
             Assert.True(result.Score > 0.9);
         }
     }
+
+    [Theory]
+    [InlineData(27, 294)]
+    [InlineData(48, 1024)]
+    [InlineData(30, 512)]
+    public void ResizePaddingTests(int srcHeight, int srcWidth)
+    {
+        int modelHeight = 48;
+        int targetWidth = 512;
+        using Mat src = new(srcHeight, srcWidth, MatType.CV_8UC1);
+        using Mat res = PaddleOcrRecognizer.ResizePadding(src, modelHeight, targetWidth);
+        Assert.Equal(targetWidth, res.Width);
+        Assert.Equal(modelHeight, res.Height);
+    }
 }
