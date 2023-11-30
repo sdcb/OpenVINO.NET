@@ -1,4 +1,4 @@
-﻿using OpenCvSharp;
+using OpenCvSharp;
 using System;
 
 namespace Sdcb.OpenVINO.PaddleOCR;
@@ -7,19 +7,15 @@ internal static class RectHelper
 {
     public static float Distance(in Rect box1, in Rect box2)
     {
-        int x1_1 = box1.X;
-        int y1_1 = box1.Y;
-        int x2_1 = box1.Right;
-        int y2_1 = box1.Bottom;
+        int dx1 = Math.Abs(box2.X - box1.X);
+        int dy1 = Math.Abs(box2.Y - box1.Y);
+        int dx2 = Math.Abs(box2.Right - box1.Right);
+        int dy2 = Math.Abs(box2.Bottom - box1.Bottom);
 
-        int x1_2 = box2.X;
-        int y1_2 = box2.Y;
-        int x2_2 = box2.Right;
-        int y2_2 = box2.Bottom;
+        float dis = dx1 + dy1 + dx2 + dy2;
+        float dis_2 = dx1 + dy1;
+        float dis_3 = dx2 + dy2;
 
-        float dis = Math.Abs(x1_2 - x1_1) + Math.Abs(y1_2 - y1_1) + Math.Abs(x2_2 - x2_1) + Math.Abs(y2_2 - y2_1);
-        float dis_2 = Math.Abs(x1_2 - x1_1) + Math.Abs(y1_2 - y1_1);
-        float dis_3 = Math.Abs(x2_2 - x2_1) + Math.Abs(y2_2 - y2_1);
         return dis + Math.Min(dis_2, dis_3);
     }
 
