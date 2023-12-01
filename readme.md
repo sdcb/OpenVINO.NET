@@ -70,6 +70,23 @@ Please refer to [this project](https://github.com/sdcb/mini-openvino-paddleocr)
 | Sdcb.OpenVINO.PaddleOCR               | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.PaddleOCR.svg)](https://nuget.org/packages/Sdcb.OpenVINO.PaddleOCR)                             | OpenVINO Paddle OCR Toolkit           |
 | Sdcb.OpenVINO.PaddleOCR.Models.Online | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.PaddleOCR.Models.Online.svg)](https://nuget.org/packages/Sdcb.OpenVINO.PaddleOCR.Models.Online) | Online Models for OpenVINO Paddle OCR |
 
+## OpenCvSharp4 mini runtime
+
+| Id                                     | Version | Size      | OS      | Arch |
+| -------------------------------------- | ----- | -------- | ------------ | ----- |
+| Sdcb.OpenCvSharp4.mini.runtime.centos.7-arm64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.centos.7-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.centos.7-arm64) | 3.23MB  | CentOS 7     | ARM64 |
+| Sdcb.OpenCvSharp4.mini.runtime.centos.7-x64       | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.centos.7-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.centos.7-x64) | 16.75MB | CentOS 7     | x64   |
+| Sdcb.OpenCvSharp4.mini.runtime.debian.11-arm64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.11-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.11-arm64) | 4.05MB  | Debian 11    | ARM64 |
+| Sdcb.OpenCvSharp4.mini.runtime.debian.11-x64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.11-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.11-x64) | 18.13MB | Debian 11    | x64   |
+| Sdcb.OpenCvSharp4.mini.runtime.debian.12-arm64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.12-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.12-arm64) | 4.18MB  | Debian 12    | ARM64 |
+| Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64) | 17.47MB | Debian 12    | x64   |
+| Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-arm64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-arm64) | 4.18MB  | Ubuntu 22.04 | ARM64 |
+| Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64   | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64) | 17.47MB | Ubuntu 22.04 | x64   |
+| Sdcb.OpenCvSharp4.mini.runtime.android-arm64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.android-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.android-arm64) | 4.04MB  | Android      | ARM64 |
+| Sdcb.OpenCvSharp4.mini.runtime.android-x64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.android-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.android-x64) | 5.9MB  | Android      | x64 |
+
+The build instructions/docs is in this [opencvsharp-mini-runtime](https://github.com/sdcb/opencvsharp-mini-runtime) repository.
+
 ### Usage
 
 You can refer to this github for mini-openvino-paddleocr demo: https://github.com/sdcb/mini-openvino-paddleocr
