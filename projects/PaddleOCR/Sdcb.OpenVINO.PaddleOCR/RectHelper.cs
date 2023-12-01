@@ -41,7 +41,8 @@ internal static class RectHelper
 
     public static Rect Extend(in Rect rect, int extendLength)
     {
-        rect.Inflate(extendLength, extendLength);
-        return rect;
+        Rect dst = new(rect.TopLeft, rect.Size);
+        dst.Inflate(extendLength, extendLength);
+        return dst;
     }
 }
