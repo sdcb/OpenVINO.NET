@@ -39,10 +39,9 @@ internal static class RectHelper
         return (float)intersectArea / unionArea;
     }
 
-    public static Rect Extend(in Rect rect, int extendLength)
+    public static Rect Extend(Rect rect, int extendLength)
     {
-        Rect dst = new(rect.TopLeft, rect.Size);
-        dst.Inflate(extendLength, extendLength);
-        return dst;
+        rect.Inflate(extendLength, extendLength);
+        return rect;
     }
 }
