@@ -142,7 +142,7 @@ public class PaddleOcrClassifier : IDisposable
                 })
                 .ToArray();
             using Mat combined = normalizeds.StackingVertically();
-            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
+            final = Normalize(combined);
         }
         finally
         {
@@ -201,5 +201,28 @@ public class PaddleOcrClassifier : IDisposable
             Cv2.CopyMakeBorder(resized, resized, 0, 0, 0, shape.Width - resized.Width, BorderTypes.Constant, Scalar.Black);
         }
         return resized;
+    }
+
+    private static Mat Normalize(Mat src)
+    {
+        using Mat normalized = new();
+        src.ConvertTo(normalized, MatType.CV_32FC3, 1.0 / 255);
+        Mat[] bgr = normalized.Split();
+        float[] scales = new[] { 1 / 0.5f, 1 / 0.5f, 1 / 0.5f };
+        float[] means = new[] { 0.5f, 0.5f, 0.5f };
+        for (int i = 0; i < bgr.Length; ++i)
+        {
+            bgr[i].ConvertTo(bgr[i], MatType.CV_32FC1, 1.0 * scales[i], (0.0 - means[i]) * scales[i]);
+        }
+
+        Mat dest = new();
+        Cv2.Merge(bgr, dest);
+
+        foreach (Mat channel in bgr)
+        {
+            channel.Dispose();
+        }
+
+        return dest;
     }
 }
