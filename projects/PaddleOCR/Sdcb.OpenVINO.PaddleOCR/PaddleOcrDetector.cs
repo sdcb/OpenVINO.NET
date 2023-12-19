@@ -12,6 +12,16 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 /// </summary>
 public class PaddleOcrDetector : IDisposable
 {
+    static readonly Vec3f meanValues = new(
+            255.0f * 0.485f,
+            255.0f * 0.456f,
+            255.0f * 0.406f);
+
+    static readonly Vec3f stdValues = new(
+        1 / (255.0f * 0.229f),
+        1 / (255.0f * 0.224f),
+        1 / (255.0f * 0.225f));
+
     readonly CompiledModel _compiledModel;
 
     /// <summary>
@@ -316,26 +326,42 @@ public class PaddleOcrDetector : IDisposable
         return src.CopyMakeBorder(0, newSize.Height - size.Height, 0, newSize.Width - size.Width, BorderTypes.Constant, Scalar.Black);
     }
 
-    private static Mat Normalize(Mat src)
+    private static unsafe Mat Normalize(Mat src)
     {
-        using Mat normalized = new();
-        src.ConvertTo(normalized, MatType.CV_32FC3, 1.0 / 255);
-        Mat[] bgr = normalized.Split();
-        float[] scales = new[] { 1 / 0.229f, 1 / 0.224f, 1 / 0.225f };
-        float[] means = new[] { 0.485f, 0.456f, 0.406f };
-        for (int i = 0; i < bgr.Length; ++i)
+        if (src.Type() != MatType.CV_32SC3)
         {
-            bgr[i].ConvertTo(bgr[i], MatType.CV_32FC1, 1.0 * scales[i], (0.0 - means[i]) * scales[i]);
+            src.ConvertTo(src, MatType.CV_32FC3);
         }
 
-        Mat dest = new();
-        Cv2.Merge(bgr, dest);
+        int height = src.Height;
+        int width = src.Width;
+        int channel = src.Channels();
+        float[] dstFloat = new float[width * height * channel];
 
-        foreach (Mat channel in bgr)
+        src.GetArray(out Vec3f[]? pixels);
+        ref float srcFloat = ref Unsafe.As<Vec3f, float>(ref pixels[0]);
+
+        fixed (float* pSrc = &srcFloat)
+        fixed (float* pDst = &dstFloat[0])
         {
-            channel.Dispose();
+            Unsafe.CopyBlockUnaligned(pDst, pSrc, (uint)dstFloat.Length * sizeof(float));
+
+            float* pointer = pDst;
+
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    *pointer = (*pointer - meanValues.Item0) * stdValues.Item0;
+                    pointer += 1;
+                    *pointer = (*pointer - meanValues.Item1) * stdValues.Item1;
+                    pointer += 1;
+                    *pointer = (*pointer - meanValues.Item2) * stdValues.Item2;
+                    pointer += 1;
+                }
+            }
         }
 
-        return dest;
+        return new Mat(height, width, MatType.CV_32FC(channel), dstFloat);
     }
 }
