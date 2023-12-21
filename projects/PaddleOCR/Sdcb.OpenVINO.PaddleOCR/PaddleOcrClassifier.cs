@@ -16,7 +16,7 @@ public class PaddleOcrClassifier : IDisposable
     /// <summary>
     /// Rotation threshold value used to determine if the image should be rotated.
     /// </summary>
-    public double RotateThreshold { get; init; } = 0.5;
+    public double RotateThreshold { get; set; } = 0.5;
 
     /// <summary>
     /// The OcrShape used for the model.
