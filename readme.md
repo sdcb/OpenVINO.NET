@@ -5,8 +5,11 @@ High quality .NET wrapper for OpenVINO™ toolkit.
 Please check my cnblogs blog for more details:
 * 博客园 [20231015-sdcb-openvino-net](https://www.cnblogs.com/sdflysha/p/20231015-sdcb-openvino-net.html)
 * PaddleOCR tutoria video:
-  * B站: https://www.bilibili.com/video/BV1bM411f74Z/?vd_source=3e5b05900c55682cc85ae77f73036eff
-  * youtube: https://www.youtube.com/watch?v=gG4iYgSbEXo
+  * How to use, run offline, GPU inference, performance tuning:
+    * bilibili: https://www.bilibili.com/video/BV1bM411f74Z
+    * youtube: https://www.youtube.com/watch?v=gG4iYgSbEXo
+  * Deploy on different Linux platforms including OrangePI-4 LTS:
+    * bilibili: https://www.bilibili.com/video/BV1R64y1L7Sv
 
 ## Packages
 
