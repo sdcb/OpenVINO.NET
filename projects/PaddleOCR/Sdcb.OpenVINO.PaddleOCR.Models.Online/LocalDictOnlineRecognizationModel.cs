@@ -18,7 +18,7 @@ public record LocalDictOnlineRecognizationModel(string Name, string DictName, Ur
     /// <summary>
     /// Gets or sets the root directory for the downloaded models.
     /// </summary>
-    public string RootDirectory = Path.Combine(Settings.GlobalModelDirectory, Name);
+    public string RootDirectory => Path.Combine(Settings.GlobalModelDirectory, Name);
 
     /// <summary>
     /// Downloads and extracts a RecognizationModel asynchronously.
