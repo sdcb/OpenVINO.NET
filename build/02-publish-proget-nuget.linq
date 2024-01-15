@@ -29,6 +29,7 @@ void PublishNuGet(string path)
 	QueryCancelToken.ThrowIfCancellationRequested();
 	string nugetApiUrl = "nuget.org";
 	string nugetApiKey = Util.GetPassword("nuget-api-key");
+	//DotNetRun($@"nuget push {path} -k {nugetApiKey} -s {nugetApiUrl}");
 	DotNetRun($@"nuget push {path} -k {nugetApiKey} -s {nugetApiUrl}");
 }
 
