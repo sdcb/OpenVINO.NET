@@ -16,7 +16,7 @@ class Program
         IServiceProvider sp = ConfigureServices();
         ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
-        string purpose = args.Length > 0 ? args[0] : "linux";
+        string purpose = args.Length > 0 ? args[0] : "win64";
         string? versionSuffix = null; // null or "preview.1", can't be ""
         string dir = Path.Combine(DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo("."), "OpenVINO.NET.sln").DirectoryName!,
             "build", "nupkgs");
