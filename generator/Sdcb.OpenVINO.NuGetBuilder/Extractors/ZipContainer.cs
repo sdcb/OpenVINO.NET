@@ -4,9 +4,14 @@ using System.Text;
 
 namespace Sdcb.OpenVINO.NuGetBuilders.Extractors;
 
-public record ZipContainer(ZipEntrySlim[] Entries)
+public record ZipContainer(string ZipType, ZipEntrySlim[] Entries)
 {
-    public string RootFolderName => Entries.First().Key;
+    public string RootFolderName => ZipType switch
+    {
+        "gz" => Entries[0].Key,
+        "zip" => Entries[0].Key[..Entries[0].Key.IndexOf('/')],
+        _ => throw new Exception($"Unknown archive type: {ZipType}")
+    };
 
     public static ZipContainer Open(Stream stream)
     {
@@ -28,12 +33,12 @@ public record ZipContainer(ZipEntrySlim[] Entries)
                     }
                 }
             }
-            return new ZipContainer(entries);
+            return new ZipContainer(fileType, entries);
         }
         else if (fileType == "zip")
         {
             using ZipArchive zipArchive = new(stream, ZipArchiveMode.Read);
-            return new ZipContainer(zipArchive.Entries
+            return new ZipContainer(fileType, zipArchive.Entries
                 .Select(x =>
                 {
                     using MemoryStream ms = new();

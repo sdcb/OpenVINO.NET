@@ -7,7 +7,7 @@ namespace Sdcb.OpenVINO.NuGetBuilders.Tests;
 
 public class CachedAssetCreator
 {
-    [Fact(Skip = Reason)]
+    [Fact]
     public async Task CreateFileTree()
     {
         string url = $"{StorageNodeRoot.BaseUrl}/filetree.json";

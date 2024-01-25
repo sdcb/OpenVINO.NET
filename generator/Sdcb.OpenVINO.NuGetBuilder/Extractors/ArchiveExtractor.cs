@@ -29,6 +29,7 @@ public class ArchiveExtractor
             foreach (ZipEntrySlim entry in dynamicLibs)
             {
                 string destFile = Path.Combine(destinationFolder, flatten ? Path.GetFileName(entry.Key) : entry.Key.Replace(reader.RootFolderName, ""));
+                Directory.CreateDirectory(Path.GetDirectoryName(destFile)!);
 
                 if (entry.Data.Length > 0)
                 {
