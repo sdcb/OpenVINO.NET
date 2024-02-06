@@ -25,8 +25,8 @@
     <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.8.0.20230708" />
     <PackageReference Include="Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64" Version="4.8.0.20231125" />
-    <PackageReference Include="Sdcb.OpenVINO.runtime.ubuntu.22.04-x64" Version="2023.2.0" />
-    <PackageReference Include="Sdcb.OpenVINO.runtime.win-x64" Version="2023.2.0" />
+    <PackageReference Include="Sdcb.OpenVINO.runtime.ubuntu.22.04-x64" Version="2023.3.0" />
+    <PackageReference Include="Sdcb.OpenVINO.runtime.win-x64" Version="2023.3.0" />
     <PackageReference Include="Sdcb.PaddleOCR.Models.LocalV3" Version="2.7.0.1" />
     <PackageReference Include="xunit" Version="2.6.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">

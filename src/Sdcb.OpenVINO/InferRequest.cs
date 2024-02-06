@@ -149,7 +149,11 @@ public class InferRequest : CppPtrObject
         if (OpenVINOLibraryLoader.Is202302OrGreater())
         {
             ov_status_e res = ov_infer_request_wait_for((ov_infer_request*)Handle, (long)duration.TotalMilliseconds);
-            if (res == ov_status_e.UNEXPECTED)
+            if (res == ov_status_e.RESULT_NOT_READY) // 2023.3
+            {
+                return false;
+            }
+            else if (res == ov_status_e.UNEXPECTED) // 2023.2
             {
                 return false;
             }
