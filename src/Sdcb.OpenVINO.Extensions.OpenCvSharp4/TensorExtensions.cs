@@ -22,7 +22,7 @@ public static class TensorExtensions
     {
         if (mat == null) throw new ArgumentNullException(nameof(mat));
 
-        return new Tensor(new MatTensorBuffer(mat), new NCHW(1, mat.Height, mat.Width, mat.Type().Channels));
+        return new Tensor(new MatTensorBuffer(mat), new Shape(1, mat.Height, mat.Width, mat.Type().Channels));
     }
 
     /// <summary>
