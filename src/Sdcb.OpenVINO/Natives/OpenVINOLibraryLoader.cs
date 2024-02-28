@@ -61,7 +61,7 @@ internal static class OpenVINOLibraryLoader
     {
         if (libraryName == Dll)
         {
-            string[] allowedVersions = new[] { "2320", "2310" };
+            string[] allowedVersions = new[] { "2330", "2320", "2310" };
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return LoadWithDeps(assembly, searchPath, new LibDeps("openvino_c.dll", new string[]
