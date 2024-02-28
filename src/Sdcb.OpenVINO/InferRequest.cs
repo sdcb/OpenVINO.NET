@@ -73,6 +73,7 @@ public class InferRequest : CppPtrObject
     /// Use it with caution and make sure you understand the risks before invoking this function.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous inference operation.</returns>
+    [Obsolete("This method contains some unstable and hacky mechanisms that may potentially lead to crashes in your program. Use it with caution and make sure you understand the risks before invoking this function.")]
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
         if (cancellationToken.IsCancellationRequested)
