@@ -17,7 +17,7 @@ class Program
         ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
         string purpose = args.Length > 0 ? args[0] : "win64";
-        string? versionSuffix = null; // null or "preview.1", can't be ""
+        string? versionSuffix = "preview.1"; // null or "preview.1", can't be ""
         string dir = Path.Combine(DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo("."), "OpenVINO.NET.sln").DirectoryName!,
             "build", "nupkgs");
 
@@ -85,7 +85,7 @@ class Program
         }
     }
 
-    static IServiceProvider ConfigureServices()
+    static ServiceProvider ConfigureServices()
     {
         return new ServiceCollection()
             .AddSingleton<ICachedHttpGetService>(_ => new CachedHttpGetService("cache"))

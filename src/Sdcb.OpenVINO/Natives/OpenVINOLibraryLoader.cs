@@ -57,11 +57,19 @@ internal static class OpenVINOLibraryLoader
 
 #if LINQPad || NETCOREAPP3_1_OR_GREATER
 
+    public static List<string> SupportedVersionSuffixes { get; set; } = new()
+    {
+        "2410",
+        "2400",
+        "2330",
+        "2320",
+        "2310",
+    };
+
     private static IntPtr OpenVINOImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
         if (libraryName == Dll)
         {
-            string[] allowedVersions = new[] { "2400", "2330", "2320", "2310" };
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return LoadWithDeps(assembly, searchPath, new LibDeps("openvino_c.dll", new string[]
@@ -71,7 +79,7 @@ internal static class OpenVINOLibraryLoader
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return LoadWithDeps(assembly, searchPath, allowedVersions.Select(v => new LibDeps($"libopenvino_c.{v}.dylib", new string[]
+                return LoadWithDeps(assembly, searchPath, SupportedVersionSuffixes.Select(v => new LibDeps($"libopenvino_c.{v}.dylib", new string[]
                 {
                     $"libopenvino.{v}.dylib",
                 })).ToArray());
@@ -86,7 +94,7 @@ internal static class OpenVINOLibraryLoader
             else
             {
                 /* linux or others */
-                return LoadWithDeps(assembly, searchPath, allowedVersions.Select(v => new LibDeps($"libopenvino_c.so.{v}", new string[]
+                return LoadWithDeps(assembly, searchPath, SupportedVersionSuffixes.Select(v => new LibDeps($"libopenvino_c.so.{v}", new string[]
                 {
                     $"libtbb.so.12",
                     $"libopenvino.so.{v}",
