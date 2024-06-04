@@ -48,6 +48,12 @@ public abstract class TableRecognitionModel : BaseModel
         }
     }
 
+    /// <inheritdoc/>
+    public override void AfterReadModel(Model model)
+    {
+        model.ReshapePrimaryInput(new PartialShape(1, 3, 488, 488));
+    }
+
     /// <summary>
     /// Creates a new instance of the <see cref="FileTableRecognizationModel"/> class from a specified directory path and label path.
     /// </summary>
