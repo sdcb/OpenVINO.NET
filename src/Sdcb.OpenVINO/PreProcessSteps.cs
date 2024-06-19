@@ -40,10 +40,20 @@ public class PreProcessSteps : CppPtrObject
     /// <summary>
     /// Scales the preprocess steps by the specified divide value.
     /// </summary>
-    /// <param name="divideValue">The value to divide the preprocess steps with.</param>
-    public unsafe void Scale(float divideValue)
+    /// <param name="scalingValue">The value to divide the preprocess steps with.</param>
+    public unsafe void Scale(float scalingValue)
     {
-        OpenVINOException.ThrowIfFailed(ov_preprocess_preprocess_steps_scale((ov_preprocess_preprocess_steps*)Handle, divideValue));
+        OpenVINOException.ThrowIfFailed(ov_preprocess_preprocess_steps_scale((ov_preprocess_preprocess_steps*)Handle, scalingValue));
+    }
+
+    /// <summary>Add scale preprocess operation. Divide each channel element of input by different specified value.</summary>
+    /// <param name="scalingValues">Scaling values array for each channels</param>
+    public unsafe void Scale(float[] scalingValues)
+    {
+        fixed (float* scaleChannelsPtr = scalingValues)
+        {
+            OpenVINOException.ThrowIfFailed(ov_preprocess_preprocess_steps_scale_multi_channels((ov_preprocess_preprocess_steps*)Handle, scaleChannelsPtr, scalingValues.Length));
+        }
     }
 
     /// <summary>
@@ -53,6 +63,16 @@ public class PreProcessSteps : CppPtrObject
     public unsafe void Mean(float subtractValue)
     {
         OpenVINOException.ThrowIfFailed(ov_preprocess_preprocess_steps_mean((ov_preprocess_preprocess_steps*)Handle, subtractValue));
+    }
+
+    /// <summary>Add mean preprocess operation. Subtract each channel element of input by different specified value.</summary>
+    /// <param name="subtractValues">Value array to subtract from each element.</param>
+    public unsafe void Mean(float[] subtractValues)
+    {
+        fixed (float* meanChannelsPtr = subtractValues)
+        {
+            OpenVINOException.ThrowIfFailed(ov_preprocess_preprocess_steps_mean_multi_channels((ov_preprocess_preprocess_steps*)Handle, meanChannelsPtr, subtractValues.Length));
+        }
     }
 
     /// <summary>

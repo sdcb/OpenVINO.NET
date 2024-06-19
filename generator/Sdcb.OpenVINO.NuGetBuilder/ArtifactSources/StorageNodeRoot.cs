@@ -32,12 +32,11 @@ public record StorageNodeRoot : StorageNode
         get
         {
             return EnumerateDirectories(VersionFolder.Prefix)
-                .Where(x => x.Name != "nightly")
-                .GroupBy(x => x.Name == "master")
-                .SelectMany(x => x.Key switch
+                .Where(x => x.Name != "master")
+                .SelectMany(x => x.Name.StartsWith("202") switch
                 {
-                    true => x.First().EnumerateDirectories("").Select(x => VersionFolder.FromFolder(x)),
-                    false => x.Select(x => VersionFolder.FromFolder(x))
+                    true => [VersionFolder.FromFolder(x)], 
+                    false => x.EnumerateDirectories("").Select(x => VersionFolder.FromFolder(x)),
                 });
         }
     }

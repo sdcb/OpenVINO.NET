@@ -65,8 +65,11 @@ public enum ov_status_e
 }
 
 
-/// <summary>This enum contains codes for element type.</summary>
-[CSourceInfo("ov_common.h", 170, 190, "ov_base_c_api")]
+/// <summary>
+/// <para>This enum contains codes for element type, which is aligned with ov::element::Type_t in</para>
+/// <para>src/core/include/openvino/core/type/element_type.hpp</para>
+/// </summary>
+[CSourceInfo("ov_common.h", 171, 197, "ov_base_c_api")]
 public enum ov_element_type_e
 {
     /// <summary>Undefined element type</summary>
@@ -107,23 +110,41 @@ public enum ov_element_type_e
     /// <summary>binary element type</summary>
     U1 = 12,
 
+    /// <summary>u2 element type</summary>
+    U2 = 13,
+
+    /// <summary>u3 element type</summary>
+    U3 = 14,
+
     /// <summary>u4 element type</summary>
-    U4 = 13,
+    U4 = 15,
+
+    /// <summary>u6 element type</summary>
+    U6 = 16,
 
     /// <summary>u8 element type</summary>
-    U8 = 14,
+    U8 = 17,
 
     /// <summary>u16 element type</summary>
-    U16 = 15,
+    U16 = 18,
 
     /// <summary>u32 element type</summary>
-    U32 = 16,
+    U32 = 19,
 
     /// <summary>u64 element type</summary>
-    U64 = 17,
+    U64 = 20,
 
     /// <summary>nf4 element type</summary>
-    NF4 = 18,
+    NF4 = 21,
+
+    /// <summary>f8e4m3 element type</summary>
+    F8E4M3 = 22,
+
+    /// <summary>f8e5m2 element type</summary>
+    F8E5M3 = 23,
+
+    /// <summary>string element type</summary>
+    STRING = 24,
 }
 
 

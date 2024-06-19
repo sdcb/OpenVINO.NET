@@ -1,5 +1,4 @@
 ﻿using NuGet.Versioning;
-using System.Text.RegularExpressions;
 
 namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 
@@ -16,37 +15,85 @@ public partial record VersionFolder(string Path, StorageNode Folder, SemanticVer
         return new VersionFolder(path, Folder, ver);
     }
 
-    static SemanticVersion ParseOpenVINOVersion(string versionString)
+    /// <summary>
+    /// Supported formats:
+    /// <list type="bullet">
+    /// <item>2024.3.0-15549-ae01c973d53</item>
+    /// <item>2022.1</item>
+    /// <item>2022.3.1</item>
+    /// <item>2024.2.0rc1</item>
+    /// </list>
+    /// </summary>
+    /// <exception cref="ArgumentException"></exception>
+    public static SemanticVersion ParseOpenVINOVersion(string versionString)
     {
-        string[] versionParts = versionString.Split('.');
+        // Split into major, minor, patch and optional additional label parts
+        string[] parts = versionString.Split('.');
 
-        // If the version string is in the format 'major.minor', e.g., '2014.7'
-        if (versionParts.Length == 2)
+        if (parts.Length < 2)
         {
-            // Append '.0' to convert it into a valid Semantic Version format (major.minor.patch)
-            versionString += ".0";
+            throw new ArgumentException("Invalid version string");
         }
 
-        // If the version string is in the format 'major.minor.0.0.dev+time', e.g., '2022.7.0.0.dev20220714'
-        else if (versionParts.Length == 4 && versionParts[3].StartsWith("dev"))
+        // Parse the major and minor versions
+        int major = int.Parse(parts[0]);
+        int minor = int.Parse(parts[1]);
+
+        // Initialize patch and label
+        int patch = 0;
+        string? releaseLabel = null;
+
+        if (parts.Length > 2)
         {
-            // Remove 'dev' part and convert the last part (time) into a valid build metadata part
-            versionString = OpenVINODevVersionRegex().Replace(versionString, "$1-$2.$3");
+            // Possible formats can be "patch", "patch-...", "patchrc..."
+            // Split third part further by '-' to separate patch and prerelease label if exists
+            string[] subParts = parts[2].Split(['-'], 2);
+
+            // Parse patch version which is always the first part
+            // Handle cases where the patch part might have a release candidate or similar suffix directly attached
+            string patchPart = subParts[0];
+            int releaseLabelIndex = FindFirstNonNumericIndex(patchPart);
+
+            if (releaseLabelIndex != -1)
+            {
+                // Separate the numeric patch from the non-numeric release label
+                patch = int.Parse(patchPart[..releaseLabelIndex]);
+                releaseLabel = patchPart[releaseLabelIndex..];
+            }
+            else
+            {
+                patch = int.Parse(patchPart);
+            }
+
+            // If there is any further information after a '-', it is part of the release label
+            if (subParts.Length > 1)
+            {
+                releaseLabel = (releaseLabel != null ? releaseLabel + "-" : "") + subParts[1];
+            }
         }
 
-        // Try to parse the version string into a SemanticVersion object
-        if (SemanticVersion.TryParse(versionString, out SemanticVersion? semVersion))
+        // Create the SemanticVersion based on extracted information
+        if (releaseLabel != null)
         {
-            return semVersion;
+            return new SemanticVersion(major, minor, patch, releaseLabel);
         }
         else
         {
-            throw new FormatException($"{versionString} is not a known OpenVINO Version");
+            return new SemanticVersion(major, minor, patch);
+        }
+
+        static int FindFirstNonNumericIndex(string str)
+        {
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (!char.IsDigit(str[i]))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
-
-    [GeneratedRegex("(.+)\\.(dev)(\\d{8})")]
-    private static partial Regex OpenVINODevVersionRegex();
 
     public IEnumerable<ArtifactInfo> Artifacts => ArtifactInfo.FromFolder(this);
 }
