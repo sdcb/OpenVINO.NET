@@ -29,10 +29,11 @@ Please check my cnblogs blog for more details:
 | Sdcb.OpenVINO.runtime.linux-arm64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.linux-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.linux-arm64)           | Runtime for Debian 9+ ARM64  |
 | Sdcb.OpenVINO.runtime.rhel.8-x64       | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.rhel.8-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.rhel.8-x64)             | Runtime for RHEL 8 x64       |
 | Sdcb.OpenVINO.runtime.debian.10-x64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.debian.10-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.debian.10-x64)       | Runtime for Debian.10 x64    |
-| Sdcb.OpenVINO.runtime.ubuntu.18.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64) | Runtime for Ubuntu 18.04 x64 |
+| Sdcb.OpenVINO.runtime.ubuntu.18.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.18.04-x64) | (Maintenance stopped) |
 | Sdcb.OpenVINO.runtime.ubuntu.20.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.20.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.20.04-x64) | Runtime for Ubuntu 20.04 x64 |
 | Sdcb.OpenVINO.runtime.ubuntu.22.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.22.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.22.04-x64) | Runtime for Ubuntu 22.04 x64 |
-| Sdcb.OpenVINO.runtime.android-arm64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.android-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.android-arm64)       | Runtime for Android ARM64    |
+| Sdcb.OpenVINO.runtime.ubuntu.24.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.24.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.24.04-x64) | Runtime for Ubuntu 24.04 x64 |
+| Sdcb.OpenVINO.runtime.android-arm64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.android-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.android-arm64)       | (preview)    |
 | Sdcb.OpenVINO.runtime.win-x64          | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.win-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.win-x64)                   | Runtime for Windows x64      |
 
 ### OpenCvSharp4 mini runtime
