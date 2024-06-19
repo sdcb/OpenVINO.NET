@@ -177,7 +177,7 @@ public record DeviceOptions
     public required Dictionary<string, string> Properties { get; init; }
 
     /// <summary>
-    /// The default device name to be AUTO.
+    /// The default device name to be CPU.
     /// </summary>
-    public const string DefaultDeviceName = "AUTO";
+    public const string DefaultDeviceName = "CPU";
 }
