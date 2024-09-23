@@ -18,7 +18,7 @@ public class MatExtensionsTest
     {
         byte* dataPtr = stackalloc byte[10];
         IntPtr data = (IntPtr)dataPtr;
-        using Mat src = new(1, 10, MatType.CV_8SC1, data);
+        using Mat src = Mat.FromPixelData(1, 10, MatType.CV_8SC1, data);
         using Mat src2 = src.FastClone();
         Assert.Equal(src.Data, src2.Data);
     }
@@ -31,7 +31,7 @@ public class MatExtensionsTest
         dataPtr[1] = 2;
         dataPtr[9] = 10;
         IntPtr data = (IntPtr)dataPtr;
-        using Mat src = new(1, 10, MatType.CV_8SC1, data);
+        using Mat src = Mat.FromPixelData(1, 10, MatType.CV_8SC1, data);
         using (Mat src2 = src.FastClone())
         {
         }
@@ -51,7 +51,7 @@ public class MatExtensionsTest
         dataPtr[1] = 2;
         dataPtr[9] = 10;
         IntPtr data = (IntPtr)dataPtr;
-        using Mat src = new(2, 5, MatType.CV_8SC1, data);
+        using Mat src = Mat.FromPixelData(2, 5, MatType.CV_8SC1, data);
         using Mat srcRoi = src[0, 2, 4, 5];
         using Mat mat = srcRoi.FastClone();
         Assert.Equal(10, mat.At<byte>(1, 0));

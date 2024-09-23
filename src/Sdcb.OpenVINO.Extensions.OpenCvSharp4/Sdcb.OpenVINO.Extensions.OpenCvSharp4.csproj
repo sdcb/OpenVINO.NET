@@ -29,11 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <PackageReference Include="OpenCvSharp4" Version="4.10.0.20240616" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'"/>
+    <ProjectReference Include="..\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="Sdcb.OpenVINO" Version="0.6.1" Condition="'$(Configuration)' != 'Debug'" />
   </ItemGroup>
 

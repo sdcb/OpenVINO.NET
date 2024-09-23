@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NuGet.Versioning;
 using System.Text.Json;
 
 namespace Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
@@ -39,6 +40,12 @@ public record StorageNodeRoot : StorageNode
                     false => x.EnumerateDirectories("").Select(x => VersionFolder.FromFolder(x)),
                 });
         }
+    }
+
+    public VersionFolder For(SemanticVersion version)
+    {
+        return VersionFolders
+            .SingleOrDefault(x => x.Version == version) ?? throw new Exception($"Version {version} not found.");
     }
 
     public VersionFolder LatestStableVersion => VersionFolders

@@ -16,18 +16,19 @@ class Program
         IServiceProvider sp = ConfigureServices();
         ArtifactDownloader w = sp.GetRequiredService<ArtifactDownloader>();
         StorageNodeRoot root = sp.GetRequiredService<StorageNodeRoot>();
-        string purpose = args.Length > 0 ? args[0] : "linux";
-        string? versionSuffix = "preview.1"; // null or "preview.1", can't be ""
+        string purpose = args.Length > 0 ? args[0] : "win64";
+        string? versionSuffix = null; // null or "preview.1", can't be ""
         string dir = Path.Combine(DirectoryUtils.SearchFileInCurrentAndParentDirectories(new DirectoryInfo("."), "OpenVINO.NET.sln").DirectoryName!,
             "build", "nupkgs");
+        VersionFolder vf = root.For(SemanticVersion.Parse("2024.3.0"));
 
         switch (purpose)
         {
             case "win64":
-                await Build_Win_x64(w, root, versionSuffix, dir);
+                await Build_Win_x64(w, vf, versionSuffix, dir);
                 break;
             case "linux":
-                await Build_Linuxs(w, root, versionSuffix, dir);
+                await Build_Linuxs(w, vf, versionSuffix, dir);
                 break;
             case "android":
                 BuildAndroid(versionSuffix, dir);
@@ -65,18 +66,18 @@ class Program
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
     }
 
-    private static async Task Build_Win_x64(ArtifactDownloader w, StorageNodeRoot root, string? versionSuffix, string dir)
+    private static async Task Build_Win_x64(ArtifactDownloader w, VersionFolder root, string? versionSuffix, string dir)
     {
-        ArtifactInfo artifact = root.LatestStableVersion.Artifacts.First(x => x.OS == KnownOS.Windows);
+        ArtifactInfo artifact = root.Artifacts.First(x => x.OS == KnownOS.Windows);
         NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
         string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), pkgInfo.TitleRid);
         ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new WindowsLibFilter(), flatten: true);
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
     }
 
-    private static async Task Build_Linuxs(ArtifactDownloader w, StorageNodeRoot root, string? versionSuffix, string dir)
+    private static async Task Build_Linuxs(ArtifactDownloader w, VersionFolder root, string? versionSuffix, string dir)
     {
-        foreach (ArtifactInfo artifact in root.LatestStableVersion.Artifacts.Where(x => x.OS == KnownOS.Linux))
+        foreach (ArtifactInfo artifact in root.Artifacts.Where(x => x.OS == KnownOS.Linux))
         {
             NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
             string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), $"{pkgInfo.TitleRid}");

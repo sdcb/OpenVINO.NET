@@ -506,7 +506,7 @@ public class OVCoreNativeTest
                 Check(ov_tensor_data(outputTensor, &data));
                 nint dataSize;
                 Check(ov_tensor_get_byte_size(outputTensor, &dataSize));
-                using Mat result = new(960, 960, MatType.CV_32FC1, (IntPtr)data);
+                using Mat result = Mat.FromPixelData(960, 960, MatType.CV_32FC1, (IntPtr)data);
                 result.ConvertTo(result, MatType.CV_8SC1, 255);
             }
         }

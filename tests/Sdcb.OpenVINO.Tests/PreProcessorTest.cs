@@ -63,7 +63,7 @@ public class PreProcessorTest
         r.Run();
         using Tensor output = r.Outputs.Primary;
         NCHW outputNCHW = output.Shape.ToNCHW();
-        using Mat mat = new(outputNCHW.Height, outputNCHW.Width, MatType.CV_32FC1, output.DangerousGetDataPtr());
+        using Mat mat = Mat.FromPixelData(outputNCHW.Height, outputNCHW.Width, MatType.CV_32FC1, output.DangerousGetDataPtr());
         using Mat u8 = new();
         mat.ConvertTo(u8, MatType.CV_8SC1, 255);
         //u8.ImWrite("test.png");

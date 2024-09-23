@@ -246,7 +246,7 @@ public class PaddleOcrDetector : IDisposable
             Span<float> data = output.GetData<float>();
             NCHW shape = output.Shape.ToNCHW();
 
-            return new Mat(shape.Height, shape.Width, MatType.CV_32FC1, data.ToArray());
+            return Mat.FromPixelData(shape.Height, shape.Width, MatType.CV_32FC1, data.ToArray());
         }
     }
 
@@ -363,6 +363,6 @@ public class PaddleOcrDetector : IDisposable
             }
         }
 
-        return new Mat(height, width, MatType.CV_32FC(channel), dstFloat);
+        return Mat.FromPixelData(height, width, MatType.CV_32FC(channel), dstFloat);
     }
 }

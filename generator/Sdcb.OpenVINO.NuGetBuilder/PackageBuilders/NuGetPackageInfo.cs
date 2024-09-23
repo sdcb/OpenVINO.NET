@@ -13,6 +13,7 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, string TitleRid, S
         {
             "centos7" => "centos.7",
             "debian9" => "linux", // debian9 on linux arm64 supports ubuntu 22.04, so should effectively equals to linux
+            "debian10" => "linux", // debian9 on linux arm64 supports ubuntu 22.04, so should effectively equals to linux
             "ubuntu18" => "ubuntu.18.04",
             "ubuntu20" => "ubuntu.20.04",
             "ubuntu22" => "ubuntu.22.04",
@@ -27,6 +28,7 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, string TitleRid, S
         {
             "centos7" => "linux",
             "debian9" => "linux", 
+            "debian10" => "linux",
             "ubuntu18" => "linux",
             "ubuntu20" => "linux",
             "ubuntu22" => "linux",

@@ -22,6 +22,7 @@ public partial record VersionFolder(string Path, StorageNode Folder, SemanticVer
     /// <item>2022.1</item>
     /// <item>2022.3.1</item>
     /// <item>2024.2.0rc1</item>
+    /// <item>2024.3.0.dev20240807</item>
     /// </list>
     /// </summary>
     /// <exception cref="ArgumentException"></exception>
@@ -45,30 +46,40 @@ public partial record VersionFolder(string Path, StorageNode Folder, SemanticVer
 
         if (parts.Length > 2)
         {
-            // Possible formats can be "patch", "patch-...", "patchrc..."
-            // Split third part further by '-' to separate patch and prerelease label if exists
-            string[] subParts = parts[2].Split(['-'], 2);
+            // Possible formats can be "patch", "patch-...", "patchrc...", "patch.dev..."
+            string lastPart = parts.Last();
 
-            // Parse patch version which is always the first part
-            // Handle cases where the patch part might have a release candidate or similar suffix directly attached
-            string patchPart = subParts[0];
-            int releaseLabelIndex = FindFirstNonNumericIndex(patchPart);
-
-            if (releaseLabelIndex != -1)
+            // Check for "dev" in thirdPart
+            if (lastPart.StartsWith("dev"))
             {
-                // Separate the numeric patch from the non-numeric release label
-                patch = int.Parse(patchPart[..releaseLabelIndex]);
-                releaseLabel = patchPart[releaseLabelIndex..];
+                releaseLabel = lastPart; // Set releaseLabel to the entire third part
             }
             else
             {
-                patch = int.Parse(patchPart);
-            }
+                // Split third part further by '-' to separate patch and prerelease label if exists
+                string[] subParts = lastPart.Split(['-'], 2);
 
-            // If there is any further information after a '-', it is part of the release label
-            if (subParts.Length > 1)
-            {
-                releaseLabel = (releaseLabel != null ? releaseLabel + "-" : "") + subParts[1];
+                // Parse patch version which is always the first part
+                // Handle cases where the patch part might have a release candidate or similar suffix directly attached
+                string patchPart = subParts[0];
+                int releaseLabelIndex = FindFirstNonNumericIndex(patchPart);
+
+                if (releaseLabelIndex != -1)
+                {
+                    // Separate the numeric patch from the non-numeric release label
+                    patch = int.Parse(patchPart[..releaseLabelIndex]);
+                    releaseLabel = patchPart[releaseLabelIndex..];
+                }
+                else
+                {
+                    patch = int.Parse(patchPart);
+                }
+
+                // If there is any further information after a '-', it is part of the release label
+                if (subParts.Length > 1)
+                {
+                    releaseLabel = (releaseLabel != null ? releaseLabel + "-" : "") + subParts[1];
+                }
             }
         }
 

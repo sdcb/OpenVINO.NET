@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.Versioning;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sdcb.OpenVINO.AutoGen;
 using Sdcb.OpenVINO.AutoGen.Downloader;
@@ -9,10 +10,12 @@ using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using Sdcb.OpenVINO.AutoGen.Headers;
 using Sdcb.OpenVINO.AutoGen.Writers;
 
+[assembly: SupportedOSPlatform("windows")]
+
 IServiceProvider services = ConfigureServices();
 //ExtractedInfo info = (await services.GetRequiredService<HeadersDownloader>().DownloadAsync());
 AppSettings appSettings = services.GetRequiredService<AppSettings>();
-string url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/2024.2/windows/w_openvino_toolkit_windows_2024.2.0.15519.5c0f38f83f6_x86_64.zip";
+string url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/2024.3/windows/w_openvino_toolkit_windows_2024.3.0.16041.1e3b88e4e3f_x86_64.zip";
 ExtractedInfo info = await HeadersDownloader.DirectDownloadAsync(url, services.GetRequiredService<ArtifactDownloader>(), appSettings.DownloadFolder);
 ParsedInfo parsed = HeadersParser.Parse(info);
 GeneratedAll all = GeneratedAll.Generate(parsed);

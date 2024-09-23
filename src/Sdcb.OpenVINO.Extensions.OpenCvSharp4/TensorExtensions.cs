@@ -75,6 +75,6 @@ public static class TensorExtensions
             _ => throw new NotSupportedException($"ElementType ({tensor.ElementType}) is not supported.")
         };
         MatType matType = MatType.MakeType(depth, nchw.Channels);
-        return new Mat(nchw.Height, nchw.Width, matType, tensor.DangerousGetHandle());
+        return Mat.FromPixelData(nchw.Height, nchw.Width, matType, tensor.DangerousGetHandle());
     }
 }
