@@ -21,8 +21,8 @@ static void DotNetRun(string args) => Run("dotnet", args.Dump(), Encoding.GetEnc
 static void Run(string exe, string args, Encoding encoding) => Util.Cmd(exe, args, encoding);
 static ProjectVersion[] Projects = new[]
 {
-	new ProjectVersion("Sdcb.OpenVINO", "0.6.6"),
-	new ProjectVersion("Sdcb.OpenVINO.Extensions.OpenCvSharp4", "0.6.1"),
+	new ProjectVersion("Sdcb.OpenVINO", "0.6.7"),
+	new ProjectVersion("Sdcb.OpenVINO.Extensions.OpenCvSharp4", "0.6.7"),
 	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR", "0.6.3"),
 	new ProjectVersion("Sdcb.OpenVINO.PaddleOCR.Models.Online", "0.6.2"),
 };
