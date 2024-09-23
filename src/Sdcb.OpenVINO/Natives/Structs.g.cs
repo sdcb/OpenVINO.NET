@@ -5,6 +5,15 @@ namespace Sdcb.OpenVINO.Natives;
 
 
 
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_common.h", 215, 218, "")]
+public unsafe struct ov_encryption_callbacks
+{
+    public delegate*<byte*,nint,byte*,nint*, void>* encrypt_func;
+
+    public delegate*<byte*,nint,byte*,nint*, void>* decrypt_func;
+}
+
+
 /// <summary>type define ov_compiled_model_t from ov_compiled_model</summary>
 [StructLayout(LayoutKind.Sequential), CSourceInfo("ov_compiled_model.h", 26, 26, "ov_compiled_model_c_api")]
 public struct ov_compiled_model

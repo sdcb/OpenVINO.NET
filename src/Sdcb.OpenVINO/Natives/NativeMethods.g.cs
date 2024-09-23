@@ -11,18 +11,18 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Print the error info.</summary>
     /// <param name="status">a status code.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 206, 207, "ov_base_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 225, 226, "ov_base_c_api")]
     public static extern byte* ov_get_error_info(ov_status_e status);
     
 
     /// <summary>free char</summary>
     /// <param name="content">The pointer to the char to free.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 214, 215, "ov_base_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 233, 234, "ov_base_c_api")]
     public static extern void ov_free(byte* content);
     
 
     /// <summary>Get the last error msg.</summary>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 221, 222, "ov_base_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 240, 241, "ov_base_c_api")]
     public static extern byte* ov_get_last_err_msg();
     
 

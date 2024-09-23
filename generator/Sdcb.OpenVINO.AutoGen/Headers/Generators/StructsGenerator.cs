@@ -39,7 +39,7 @@ public class StructsGenerator
             for (int i = 0; i < @class.Fields.Count; i++)
             {
                 Field field = @class.Fields[i];
-                DoxygenTags itemTags = DoxygenTags.Parse(field.Comment.Text);
+                DoxygenTags itemTags = DoxygenTags.Parse(field.Comment?.Text);
                 w.WriteLines(itemTags.ToBriefComment());
                 w.WriteLine($"public {CSharpUtils.TypeTransform(field.Type)} {CSharpUtils.CSharpKeywordTransform(field.Name)};");
                 if (i != @class.Fields.Count - 1) w.WriteLine();
