@@ -217,3 +217,21 @@ public enum ov_preprocess_resize_algorithm_e
     /// <summary>nearest algorithm</summary>
     RESIZE_NEAREST = 2,
 }
+
+
+/// <summary>This enum contains enumeration for  padding mode.</summary>
+[CSourceInfo("ov_prepostprocess.h", 101, 106, "ov_prepostprocess_c_api")]
+public enum ov_padding_mode_e
+{
+    /// <summary>Pads with given constant value.</summary>
+    CONSTANT = 0,
+
+    /// <summary>Pads with tensor edge values.</summary>
+    EDGE = 1,
+
+    /// <summary>Pads with reflection of tensor data along axis. Values on the edges are not duplicated.</summary>
+    REFLECT = 2,
+
+    /// <summary> Pads similar like `REFLECT` but values on the edges are duplicated.</summary>
+    SYMMETRIC = 3,
+}

@@ -17,20 +17,20 @@ public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch,
             throw new FormatException($"{fileNode.Name} failed to detected as {nameof(ArtifactInfo)}.");
         }
 
-        KnownOS os = ParseKnownOSChar(match.Groups["os"].Value);
+        KnownOS os = ParseKnownOSChar(match.Groups["dist"].Value);
 
         return new ArtifactInfo(os, match.Groups["dist"].Value, match.Groups["arch"].Value, providedVersion, sha256Node.LastModified, match.Groups["ext"].Value,
             fileNode.FullPath, sha256Node.FullPath);
     }
 
-    private static KnownOS ParseKnownOSChar(string osChar)
+    private static KnownOS ParseKnownOSChar(string dist)
     {
-        return osChar switch
+        return dist switch
         {
-            "l" => KnownOS.Linux,
-            "m" => KnownOS.MacOS,
-            "w" => KnownOS.Windows,
-            _ => throw new FormatException($"Failed to parse {osChar} as {nameof(KnownOS)}.")
+            "debian10" or "rhel8" or "ubuntu22" or "centos7" or "ubuntu20" or "ubuntu24" => KnownOS.Linux,
+            "macos_12_6" => KnownOS.MacOS,
+            "windows" => KnownOS.Windows,
+            _ => throw new FormatException($"Failed to parse {dist} as {nameof(KnownOS)}.")
         };
     }
 
@@ -38,7 +38,7 @@ public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch,
     internal static string ArtifactFileExtractor(string name) => name[..(^HashSuffix.Length)];
     private const string HashSuffix = ".sha256";
 
-    [GeneratedRegex(@"^(?<os>[m|w|l])_openvino_toolkit_(?<dist>\w+)_(?<version>\d{4}\.\d\.\d\.[\w\.]+)_(?<arch>armhf|x86_64|arm64)\.(?<ext>\w+)$")]
+    [GeneratedRegex(@"^openvino_toolkit_(?<dist>\w+)_(?<version>\d{4}\.\d\.\d\.[\w\.]+)_(?<arch>armhf|x86_64|arm64)\.(?<ext>\w+)$")]
     private static partial Regex OpenVINOArtifactNameRegex();
 
     internal static IEnumerable<ArtifactInfo> FromFolder(VersionFolder vf)

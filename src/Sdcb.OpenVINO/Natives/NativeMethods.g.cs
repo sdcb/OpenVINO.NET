@@ -1052,13 +1052,13 @@ public static unsafe partial class NativeMethods
     /// <param name="model">A pointer to the ov_model_t.</param>
     /// <param name="preprocess">A pointer to the ov_preprocess_prepostprocessor_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 103, 104, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 115, 116, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_create(ov_model* model, ov_preprocess_prepostprocessor** preprocess);
     
 
     /// <summary>Release the memory allocated by ov_preprocess_prepostprocessor_t.</summary>
     /// <param name="preprocess">A pointer to the ov_preprocess_prepostprocessor_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 111, 112, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 123, 124, "ov_prepostprocess_c_api")]
     public static extern void ov_preprocess_prepostprocessor_free(ov_preprocess_prepostprocessor* preprocess);
     
 
@@ -1066,7 +1066,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess">A pointer to the ov_preprocess_prepostprocessor_t.</param>
     /// <param name="preprocess_input_info">A pointer to the ov_preprocess_input_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 121, 123, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 133, 135, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_get_input_info(ov_preprocess_prepostprocessor* preprocess, ov_preprocess_input_info** preprocess_input_info);
     
 
@@ -1075,7 +1075,7 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor_name">The name of input.</param>
     /// <param name="preprocess_input_info">A pointer to the ov_preprocess_input_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 133, 136, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 145, 148, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_get_input_info_by_name(ov_preprocess_prepostprocessor* preprocess, byte* tensor_name, ov_preprocess_input_info** preprocess_input_info);
     
 
@@ -1084,13 +1084,13 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor_index">The order of input.</param>
     /// <param name="preprocess_input_info">A pointer to the ov_preprocess_input_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 146, 149, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 158, 161, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_get_input_info_by_index(ov_preprocess_prepostprocessor* preprocess, nint tensor_index, ov_preprocess_input_info** preprocess_input_info);
     
 
     /// <summary>Release the memory allocated by ov_preprocess_input_info_t.</summary>
     /// <param name="preprocess_input_info">A pointer to the ov_preprocess_input_info_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 156, 157, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 168, 169, "ov_prepostprocess_c_api")]
     public static extern void ov_preprocess_input_info_free(ov_preprocess_input_info* preprocess_input_info);
     
 
@@ -1098,13 +1098,13 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_info">A pointer to the ov_preprocess_input_info_t.</param>
     /// <param name="preprocess_input_tensor_info">A pointer to ov_preprocess_input_tensor_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 166, 168, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 178, 180, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_info_get_tensor_info(ov_preprocess_input_info* preprocess_input_info, ov_preprocess_input_tensor_info** preprocess_input_tensor_info);
     
 
     /// <summary>Release the memory allocated by ov_preprocess_input_tensor_info_t.</summary>
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 175, 176, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 187, 188, "ov_prepostprocess_c_api")]
     public static extern void ov_preprocess_input_tensor_info_free(ov_preprocess_input_tensor_info* preprocess_input_tensor_info);
     
 
@@ -1112,13 +1112,13 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_info">A pointer to the ov_preprocess_input_info_t.</param>
     /// <param name="preprocess_input_steps">A pointer to ov_preprocess_preprocess_steps_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 185, 187, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 197, 199, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_info_get_preprocess_steps(ov_preprocess_input_info* preprocess_input_info, ov_preprocess_preprocess_steps** preprocess_input_steps);
     
 
     /// <summary>Release the memory allocated by ov_preprocess_preprocess_steps_t.</summary>
     /// <param name="preprocess_input_process_steps">A pointer to the ov_preprocess_preprocess_steps_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 194, 195, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 206, 207, "ov_prepostprocess_c_api")]
     public static extern void ov_preprocess_preprocess_steps_free(ov_preprocess_preprocess_steps* preprocess_input_process_steps);
     
 
@@ -1126,7 +1126,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_process_steps">A pointer to ov_preprocess_preprocess_steps_t.</param>
     /// <param name="resize_algorithm">A ov_preprocess_resizeAlgorithm instance</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 204, 206, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 216, 218, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_resize(ov_preprocess_preprocess_steps* preprocess_input_process_steps, ov_preprocess_resize_algorithm_e resize_algorithm);
     
 
@@ -1134,7 +1134,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_process_steps">A pointer to ov_preprocess_preprocess_steps_t.</param>
     /// <param name="value">Scaling value</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 215, 216, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 227, 228, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_scale(ov_preprocess_preprocess_steps* preprocess_input_process_steps, float value);
     
 
@@ -1143,7 +1143,7 @@ public static unsafe partial class NativeMethods
     /// <param name="values">Scaling values array for each channels</param>
     /// <param name="value_size">Scaling value size</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 226, 229, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 238, 241, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_scale_multi_channels(ov_preprocess_preprocess_steps* preprocess_input_process_steps, float* values, int value_size);
     
 
@@ -1151,7 +1151,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_process_steps">A pointer to ov_preprocess_preprocess_steps_t.</param>
     /// <param name="value">Value to subtract from each element.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 238, 239, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 250, 251, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_mean(ov_preprocess_preprocess_steps* preprocess_input_process_steps, float value);
     
 
@@ -1160,7 +1160,7 @@ public static unsafe partial class NativeMethods
     /// <param name="values">Value array to subtract from each element.</param>
     /// <param name="value_size">Mean value size</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 249, 252, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 261, 264, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_mean_multi_channels(ov_preprocess_preprocess_steps* preprocess_input_process_steps, float* values, int value_size);
     
 
@@ -1178,7 +1178,7 @@ public static unsafe partial class NativeMethods
     /// </param>
     /// <param name="end_size">The size of end array</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 267, 272, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 279, 284, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_crop(ov_preprocess_preprocess_steps* preprocess_input_process_steps, int* begin, int begin_size, int* end, int end_size);
     
 
@@ -1186,14 +1186,14 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_process_steps">A pointer to ov_preprocess_preprocess_steps_t.</param>
     /// <param name="layout">A point to ov_layout_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 281, 283, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 293, 295, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_convert_layout(ov_preprocess_preprocess_steps* preprocess_input_process_steps, ov_layout* layout);
     
 
     /// <summary>Reverse channels operation.</summary>
     /// <param name="preprocess_input_process_steps">A pointer to ov_preprocess_preprocess_steps_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 291, 292, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 303, 304, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_reverse_channels(ov_preprocess_preprocess_steps* preprocess_input_process_steps);
     
 
@@ -1201,7 +1201,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t.</param>
     /// <param name="element_type">A point to element_type</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 301, 303, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 313, 315, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_element_type(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_element_type_e element_type);
     
 
@@ -1209,7 +1209,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t.</param>
     /// <param name="colorFormat">The enumerate of colorFormat</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 312, 314, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 324, 326, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_color_format(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_color_format_e colorFormat);
     
 
@@ -1219,7 +1219,7 @@ public static unsafe partial class NativeMethods
     /// <param name="sub_names_size">The size of sub_names</param>
     /// <remarks>variadic params sub_names Optional list of sub-names assigned for each plane (e.g. &quot;Y&quot;, &quot;UV&quot;).</remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 325, 330, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 337, 342, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_color_format_with_subname(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_color_format_e colorFormat, nint sub_names_size);
     [DllImport(Dll, EntryPoint = nameof(ov_preprocess_input_tensor_info_set_color_format_with_subname), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_preprocess_input_tensor_info_set_color_format_with_subname(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_color_format_e colorFormat, nint sub_names_size, IntPtr varg1);
     [DllImport(Dll, EntryPoint = nameof(ov_preprocess_input_tensor_info_set_color_format_with_subname), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_preprocess_input_tensor_info_set_color_format_with_subname(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_color_format_e colorFormat, nint sub_names_size, IntPtr varg1, IntPtr varg2);
@@ -1238,7 +1238,7 @@ public static unsafe partial class NativeMethods
     /// <param name="input_height">The height of input</param>
     /// <param name="input_width">The width of input</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 340, 344, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 352, 356, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_spatial_static_shape(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, nint input_height, nint input_width);
     
 
@@ -1246,7 +1246,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t.</param>
     /// <param name="mem_type">Memory type. Refer to ov_remote_context.h to get memory type string info.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 353, 355, "prepostprocess")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 365, 367, "prepostprocess")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_memory_type(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, byte* mem_type);
     
 
@@ -1254,7 +1254,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_process_steps">A pointer to the ov_preprocess_preprocess_steps_t.</param>
     /// <param name="element_type">preprocess input element type.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 364, 366, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 376, 378, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_convert_element_type(ov_preprocess_preprocess_steps* preprocess_input_process_steps, ov_element_type_e element_type);
     
 
@@ -1262,7 +1262,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_process_steps">A pointer to the ov_preprocess_preprocess_steps_t.</param>
     /// <param name="colorFormat">The enumerate of colorFormat.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 375, 377, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 387, 389, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_preprocess_steps_convert_color(ov_preprocess_preprocess_steps* preprocess_input_process_steps, ov_color_format_e colorFormat);
     
 
@@ -1270,7 +1270,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t.</param>
     /// <param name="tensor">A point to ov_tensor_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 386, 388, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 398, 400, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_from(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_tensor* tensor);
     
 
@@ -1278,7 +1278,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_tensor_info">A pointer to the ov_preprocess_input_tensor_info_t.</param>
     /// <param name="layout">A point to ov_layout_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 397, 399, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 409, 411, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_tensor_info_set_layout(ov_preprocess_input_tensor_info* preprocess_input_tensor_info, ov_layout* layout);
     
 
@@ -1286,7 +1286,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess">A pointer to the ov_preprocess_prepostprocessor_t.</param>
     /// <param name="preprocess_output_info">A pointer to the ov_preprocess_output_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 408, 410, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 420, 422, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_get_output_info(ov_preprocess_prepostprocessor* preprocess, ov_preprocess_output_info** preprocess_output_info);
     
 
@@ -1295,7 +1295,7 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor_index">The tensor index</param>
     /// <param name="preprocess_output_info">A pointer to the ov_preprocess_output_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 420, 423, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 432, 435, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_get_output_info_by_index(ov_preprocess_prepostprocessor* preprocess, nint tensor_index, ov_preprocess_output_info** preprocess_output_info);
     
 
@@ -1304,13 +1304,13 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor_name">The name of input.</param>
     /// <param name="preprocess_output_info">A pointer to the ov_preprocess_output_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 433, 436, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 445, 448, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_get_output_info_by_name(ov_preprocess_prepostprocessor* preprocess, byte* tensor_name, ov_preprocess_output_info** preprocess_output_info);
     
 
     /// <summary>Release the memory allocated by ov_preprocess_output_info_t.</summary>
     /// <param name="preprocess_output_info">A pointer to the ov_preprocess_output_info_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 443, 444, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 455, 456, "ov_prepostprocess_c_api")]
     public static extern void ov_preprocess_output_info_free(ov_preprocess_output_info* preprocess_output_info);
     
 
@@ -1318,13 +1318,13 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_output_info">A pointer to the ov_preprocess_output_info_t.</param>
     /// <param name="preprocess_output_tensor_info">A pointer to the ov_preprocess_output_tensor_info_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 453, 455, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 465, 467, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_output_info_get_tensor_info(ov_preprocess_output_info* preprocess_output_info, ov_preprocess_output_tensor_info** preprocess_output_tensor_info);
     
 
     /// <summary>Release the memory allocated by ov_preprocess_output_tensor_info_t.</summary>
     /// <param name="preprocess_output_tensor_info">A pointer to the ov_preprocess_output_tensor_info_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 462, 463, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 474, 475, "ov_prepostprocess_c_api")]
     public static extern void ov_preprocess_output_tensor_info_free(ov_preprocess_output_tensor_info* preprocess_output_tensor_info);
     
 
@@ -1332,7 +1332,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_output_tensor_info">A pointer to the ov_preprocess_output_tensor_info_t.</param>
     /// <param name="element_type">A point to element_type</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 472, 474, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 484, 486, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_output_set_element_type(ov_preprocess_output_tensor_info* preprocess_output_tensor_info, ov_element_type_e element_type);
     
 
@@ -1340,13 +1340,13 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_info">A pointer to the ov_preprocess_input_info_t.</param>
     /// <param name="preprocess_input_model_info">A pointer to the ov_preprocess_input_model_info_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 483, 485, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 495, 497, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_info_get_model_info(ov_preprocess_input_info* preprocess_input_info, ov_preprocess_input_model_info** preprocess_input_model_info);
     
 
     /// <summary>Release the memory allocated by ov_preprocess_input_model_info_t.</summary>
     /// <param name="preprocess_input_model_info">A pointer to the ov_preprocess_input_model_info_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 492, 493, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 504, 505, "ov_prepostprocess_c_api")]
     public static extern void ov_preprocess_input_model_info_free(ov_preprocess_input_model_info* preprocess_input_model_info);
     
 
@@ -1354,7 +1354,7 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess_input_model_info">A pointer to the ov_preprocess_input_model_info_t</param>
     /// <param name="layout">A point to ov_layout_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 502, 504, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 514, 516, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_input_model_info_set_layout(ov_preprocess_input_model_info* preprocess_input_model_info, ov_layout* layout);
     
 
@@ -1362,8 +1362,20 @@ public static unsafe partial class NativeMethods
     /// <param name="preprocess">A pointer to the ov_preprocess_prepostprocessor_t.</param>
     /// <param name="model">A pointer to the ov_model_t.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 513, 514, "ov_prepostprocess_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 525, 526, "ov_prepostprocess_c_api")]
     public static extern ov_status_e ov_preprocess_prepostprocessor_build(ov_preprocess_prepostprocessor* preprocess, ov_model** model);
+    
+
+    /// <summary>Add pad preprocess operation. Extends an input tensor on edges with constants.</summary>
+    /// <param name="preprocess_input_process_steps"> A pointer to the ov_preprocess_preprocess_steps_t.</param>
+    /// <param name="pads_begin">                     Number of padding elements to add at the beginning of each axis.</param>
+    /// <param name="pads_begin_size">                Pads begin size (number of axes).</param>
+    /// <param name="pads_end">                       Number of padding elements to add at the end of each axis.</param>
+    /// <param name="pads_end_size">                  Pads end size (number of axes).</param>
+    /// <param name="value">                          Value to be populated in the padded area (mode=CONSTANT)</param>
+    /// <param name="mode">                           Padding mode.</param>
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_prepostprocess.h", 539, 546, "")]
+    public static extern ov_status_e ov_preprocess_preprocess_steps_pad(ov_preprocess_preprocess_steps* preprocess_input_process_steps, int* pads_begin, nint pads_begin_size, int* pads_end, nint pads_end_size, float value, ov_padding_mode_e mode);
     
 
     /// <summary>Check this rank whether is dynamic</summary>
