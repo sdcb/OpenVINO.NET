@@ -30,11 +30,12 @@ public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch,
             "debian10" or "rhel8" or "ubuntu22" or "centos7" or "ubuntu20" or "ubuntu24" => KnownOS.Linux,
             "macos_12_6" => KnownOS.MacOS,
             "windows" => KnownOS.Windows,
+            "windows_vc_mt" => KnownOS.Windows, // This is a special case for Windows artifacts with MT (Multi-threaded) runtime
             _ => throw new FormatException($"Failed to parse {dist} as {nameof(KnownOS)}.")
         };
     }
 
-    internal static bool NameIdentifier(string name) => name.EndsWith(HashSuffix);
+    internal static bool NameIdentifier(string name) => name.EndsWith(HashSuffix) && !name.StartsWith("pdb_");
     internal static string ArtifactFileExtractor(string name) => name[..(^HashSuffix.Length)];
     private const string HashSuffix = ".sha256";
 

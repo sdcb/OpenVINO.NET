@@ -15,7 +15,7 @@ using Sdcb.OpenVINO.AutoGen.Writers;
 IServiceProvider services = ConfigureServices();
 //ExtractedInfo info = (await services.GetRequiredService<HeadersDownloader>().DownloadAsync());
 AppSettings appSettings = services.GetRequiredService<AppSettings>();
-string url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/2025.0/windows/openvino_toolkit_windows_2025.0.0.17942.1f68be9f594_x86_64.zip";
+string url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/2025.1/windows/openvino_toolkit_windows_2025.1.0.18503.6fec06580ab_x86_64.zip";
 ExtractedInfo info = await HeadersDownloader.DirectDownloadAsync(url, services.GetRequiredService<ArtifactDownloader>(), appSettings.DownloadFolder);
 ParsedInfo parsed = HeadersParser.Parse(info);
 GeneratedAll all = GeneratedAll.Generate(parsed);

@@ -59,6 +59,7 @@ internal static class OpenVINOLibraryLoader
 
     public static List<string> SupportedVersionSuffixes { get; set; } = new()
     {
+        "2510",
         "2500",
         "2450",
         "2440",

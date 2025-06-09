@@ -21,6 +21,7 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, string TitleRid, S
             "macos_10_15" => "osx.10.15",
             "macos_11_0" => "osx.11.0",
             "windows" => "win",
+            "windows_vc_mt" => "win-mt",
             "rhel8" => "rhel.8",
             _ => throw new Exception($"Unknown distribution: {info.Distribution}")
         };
@@ -36,6 +37,7 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, string TitleRid, S
             "macos_10_15" => "osx",
             "macos_11_0" => "osx",
             "windows" => "win",
+            "windows_vc_mt" => "win", // This is a special case for Windows artifacts with MT (Multi-threaded) runtime
             "rhel8" => "linux",
             _ => throw new Exception($"Unknown distribution: {info.Distribution}")
         };

@@ -108,7 +108,7 @@ public class OVCoreNativeTest
             Check(ov_core_create(&core));
             fixed (char* modelPathPtr = _modelFile)
             {
-                Check(ov_core_read_model_unicode(core, modelPathPtr, null, &model));
+                Check(ov_core_read_model_unicode(core, (int*)modelPathPtr, null, &model));
             }
         }
         finally

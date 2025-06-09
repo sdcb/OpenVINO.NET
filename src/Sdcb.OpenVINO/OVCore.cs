@@ -210,7 +210,7 @@ public class OVCore : CppPtrObject
             fixed (char* modelPathPtr = modelPath)
             fixed (char* binPathPtr = binPath)
             {
-                OpenVINOException.ThrowIfFailed(ov_core_read_model_unicode((ov_core*)Handle, modelPathPtr, binPathPtr, &model));
+                OpenVINOException.ThrowIfFailed(ov_core_read_model_unicode((ov_core*)Handle, (int*)modelPathPtr, (int*)binPathPtr, &model));
             }
         }
         else
@@ -276,17 +276,17 @@ public class OVCore : CppPtrObject
                 {
                     OpenVINOException.ThrowIfFailed(properties.Count switch
                     {
-                        0 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model),
-                        1 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1]),
-                        2 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3]),
-                        3 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5]),
-                        4 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]),
-                        5 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]),
-                        6 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11]),
-                        7 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13]),
-                        8 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]),
-                        9 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17]),
-                        10 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17], v[18], v[19]),
+                        0 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model),
+                        1 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1]),
+                        2 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3]),
+                        3 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5]),
+                        4 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]),
+                        5 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]),
+                        6 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11]),
+                        7 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13]),
+                        8 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]),
+                        9 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17]),
+                        10 => ov_core_compile_model_from_file_unicode((ov_core*)Handle, (int*)modelPathPtr, deviceNamePtr, properties.Count * 2, &model, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15], v[16], v[17], v[18], v[19]),
                         _ => throw new ArgumentOutOfRangeException(nameof(properties), $"Properties count > 10 not supported, provided: {properties.Count}")
                     });
                 }

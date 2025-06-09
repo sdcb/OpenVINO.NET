@@ -33,12 +33,14 @@ public record StorageNodeRoot : StorageNode
         get
         {
             return EnumerateDirectories(VersionFolder.Prefix)
-                .Where(x => x.Name != "master")
-                .SelectMany(x => x.Name.StartsWith("202") switch
-                {
-                    true => [VersionFolder.FromFolder(x)], 
-                    false => x.EnumerateDirectories("").Select(x => VersionFolder.FromFolder(x)),
-                });
+                //.Where(x => x.Name != "master")
+                //.SelectMany(x => x.Name.StartsWith("202") switch
+                //{
+                //    true => [VersionFolder.FromFolder(x)], 
+                //    false => x.EnumerateDirectories("").Select(x => VersionFolder.FromFolder(x)),
+                //});
+                .Where(x => x.Name.StartsWith("202"))
+                .Select(VersionFolder.FromFolder);
         }
     }
 
