@@ -76,81 +76,81 @@ public enum ov_element_type_e
     UNDEFINED = 0,
 
     /// <summary>Dynamic element type</summary>
-    DYNAMIC = 0,
+    DYNAMIC = 1,
 
-    OV_BOOLEAN = 1,
+    OV_BOOLEAN = 2,
 
     /// <summary>bf16 element type</summary>
-    BF16 = 2,
+    BF16 = 3,
 
     /// <summary>f16 element type</summary>
-    F16 = 3,
+    F16 = 4,
 
     /// <summary>f32 element type</summary>
-    F32 = 4,
+    F32 = 5,
 
     /// <summary>f64 element type</summary>
-    F64 = 5,
+    F64 = 6,
 
     /// <summary>i4 element type</summary>
-    I4 = 6,
+    I4 = 7,
 
     /// <summary>i8 element type</summary>
-    I8 = 7,
+    I8 = 8,
 
     /// <summary>i16 element type</summary>
-    I16 = 8,
+    I16 = 9,
 
     /// <summary>i32 element type</summary>
-    I32 = 9,
+    I32 = 10,
 
     /// <summary>i64 element type</summary>
-    I64 = 10,
+    I64 = 11,
 
     /// <summary>binary element type</summary>
-    U1 = 11,
+    U1 = 12,
 
     /// <summary>u2 element type</summary>
-    U2 = 12,
+    U2 = 13,
 
     /// <summary>u3 element type</summary>
-    U3 = 13,
+    U3 = 14,
 
     /// <summary>u4 element type</summary>
-    U4 = 14,
+    U4 = 15,
 
     /// <summary>u6 element type</summary>
-    U6 = 15,
+    U6 = 16,
 
     /// <summary>u8 element type</summary>
-    U8 = 16,
+    U8 = 17,
 
     /// <summary>u16 element type</summary>
-    U16 = 17,
+    U16 = 18,
 
     /// <summary>u32 element type</summary>
-    U32 = 18,
+    U32 = 19,
 
     /// <summary>u64 element type</summary>
-    U64 = 19,
+    U64 = 20,
 
     /// <summary>nf4 element type</summary>
-    NF4 = 20,
+    NF4 = 21,
 
     /// <summary>f8e4m3 element type</summary>
-    F8E4M3 = 21,
+    F8E4M3 = 22,
 
     /// <summary>f8e5m2 element type</summary>
-    F8E5M3 = 22,
+    F8E5M3 = 23,
 
     /// <summary>string element type</summary>
-    STRING = 23,
+    STRING = 24,
 
     /// <summary>f4e2m1 element type</summary>
-    F4E2M1 = 24,
+    F4E2M1 = 25,
 
     /// <summary>f8e8m0 element type</summary>
-    F8E8M0 = 25,
+    F8E8M0 = 26,
 }
 
 
