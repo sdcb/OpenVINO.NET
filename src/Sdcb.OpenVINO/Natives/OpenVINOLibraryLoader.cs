@@ -78,33 +78,33 @@ internal static class OpenVINOLibraryLoader
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return LoadWithDeps(assembly, searchPath, new LibDeps("openvino_c.dll", new string[]
-                {
+                return LoadWithDeps(assembly, searchPath, new LibDeps("openvino_c.dll",
+                [
                     "openvino.dll",
-                }));
+                ]));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return LoadWithDeps(assembly, searchPath, SupportedVersionSuffixes.Select(v => new LibDeps($"libopenvino_c.{v}.dylib", new string[]
-                {
+                return LoadWithDeps(assembly, searchPath, SupportedVersionSuffixes.Select(v => new LibDeps($"libopenvino_c.{v}.dylib",
+                [
                     $"libopenvino.{v}.dylib",
-                })).ToArray());
+                ])).ToArray());
             }
             else if (IsAndroid())
             {
-                return LoadWithDeps(assembly, searchPath, new LibDeps($"libopenvino_c.so", new string[]
-                {
+                return LoadWithDeps(assembly, searchPath, new LibDeps($"libopenvino_c.so",
+                [
                     $"libopenvino.so",
-                }));
+                ]));
             }
             else
             {
                 /* linux or others */
-                return LoadWithDeps(assembly, searchPath, SupportedVersionSuffixes.Select(v => new LibDeps($"libopenvino_c.so.{v}", new string[]
-                {
+                return LoadWithDeps(assembly, searchPath, [.. SupportedVersionSuffixes.Select(v => new LibDeps($"libopenvino_c.so.{v}",
+                [
                     $"libtbb.so.12",
                     $"libopenvino.so.{v}",
-                })).ToArray());
+                ]))]);
             }
         }
         return IntPtr.Zero;

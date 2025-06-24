@@ -2,7 +2,6 @@
 using System.Xml.Linq;
 using System.Xml;
 using System.Xml.XPath;
-using Sdcb.OpenVINO.NuGetBuilders.ArtifactSources;
 using Sdcb.OpenVINO.NuGetBuilders.Extractors;
 using Sdcb.OpenVINO.NuGetBuilders.Utils;
 
