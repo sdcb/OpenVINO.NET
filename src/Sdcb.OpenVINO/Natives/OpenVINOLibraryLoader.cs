@@ -59,17 +59,8 @@ internal static class OpenVINOLibraryLoader
 
     public static List<string> SupportedVersionSuffixes { get; set; } = new()
     {
+        "2520",
         "2510",
-        "2500",
-        "2450",
-        "2440",
-        "2430",
-        "2420",
-        "2410",
-        "2400",
-        "2330",
-        "2320",
-        "2310",
     };
 
     private static IntPtr OpenVINOImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
