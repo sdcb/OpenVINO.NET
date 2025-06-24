@@ -328,6 +328,14 @@ public static unsafe partial class NativeMethods
     [DllImport(Dll, EntryPoint = nameof(ov_core_compile_model_from_file), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_compile_model_from_file(ov_core* core, byte* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr varg1, IntPtr varg2, IntPtr varg3, IntPtr varg4, IntPtr varg5, IntPtr varg6, IntPtr varg7, IntPtr varg8, IntPtr varg9, IntPtr varg10, IntPtr varg11, IntPtr varg12, IntPtr varg13, IntPtr varg14, IntPtr varg15, IntPtr varg16, IntPtr varg17, IntPtr varg18, IntPtr varg19, IntPtr varg20);
     
 
+    /// <summary>Adds an extension to the core.</summary>
+    /// <param name="core">A pointer to the ov_core_t instance.</param>
+    /// <param name="path">Path to the extension.</param>
+    /// <returns>Status code of the operation: OK(0) for success.</returns>
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 247, 248, "ov_core_c_api")]
+    public static extern ov_status_e ov_core_add_extension(ov_core* core, byte* path);
+    
+
     /// <summary>
     /// <para>Reads a model and creates a compiled model from the IR/ONNX/PDPD file.</para>
     /// <para>This can be more efficient than using the ov_core_read_model_from_XXX + ov_core_compile_model flow,</para>
@@ -343,7 +351,7 @@ public static unsafe partial class NativeMethods
     /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
     /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 255, 261, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 265, 271, "ov_core_c_api")]
     public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, int* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model);
     [DllImport(Dll, EntryPoint = nameof(ov_core_compile_model_from_file_unicode), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, int* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr varg1, IntPtr varg2);
     [DllImport(Dll, EntryPoint = nameof(ov_core_compile_model_from_file_unicode), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_compile_model_from_file_unicode(ov_core* core, int* model_path, byte* device_name, nint property_args_size, ov_compiled_model** compiled_model, IntPtr varg1, IntPtr varg2, IntPtr varg3, IntPtr varg4);
@@ -365,7 +373,7 @@ public static unsafe partial class NativeMethods
     /// <para>Supported property key please see ov_property.h.</para>
     /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 274, 275, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 284, 285, "ov_core_c_api")]
     public static extern ov_status_e ov_core_set_property(ov_core* core, byte* device_name);
     [DllImport(Dll, EntryPoint = nameof(ov_core_set_property), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_set_property(ov_core* core, byte* device_name, IntPtr varg1, IntPtr varg2);
     [DllImport(Dll, EntryPoint = nameof(ov_core_set_property), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_set_property(ov_core* core, byte* device_name, IntPtr varg1, IntPtr varg2, IntPtr varg3, IntPtr varg4);
@@ -388,7 +396,7 @@ public static unsafe partial class NativeMethods
     /// <param name="property_key"> Property key.</param>
     /// <param name="property_value">A pointer to property value with string format.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 287, 288, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 297, 298, "ov_core_c_api")]
     public static extern ov_status_e ov_core_get_property(ov_core* core, byte* device_name, byte* property_key, byte** property_value);
     
 
@@ -399,14 +407,14 @@ public static unsafe partial class NativeMethods
     /// <para>Core objects go over all registered plugins and ask about available devices.</para>
     /// </param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 298, 299, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 308, 309, "ov_core_c_api")]
     public static extern ov_status_e ov_core_get_available_devices(ov_core* core, ov_available_devices_t* devices);
     
 
     /// <summary>Releases memory occpuied by ov_available_devices_t</summary>
     /// <param name="devices">A pointer to the ov_available_devices_t instance.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 307, 308, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 317, 318, "ov_core_c_api")]
     public static extern void ov_available_devices_free(ov_available_devices_t* devices);
     
 
@@ -417,7 +425,7 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Name of a device to import a compiled model for.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 320, 325, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 330, 335, "ov_core_c_api")]
     public static extern ov_status_e ov_core_import_model(ov_core* core, byte* content, nint content_size, byte* device_name, ov_compiled_model** compiled_model);
     
 
@@ -430,13 +438,13 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Device name to identify a plugin.</param>
     /// <param name="versions">A pointer to versions corresponding to device_name.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 337, 338, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 347, 348, "ov_core_c_api")]
     public static extern ov_status_e ov_core_get_versions_by_device_name(ov_core* core, byte* device_name, ov_core_version_list_t* versions);
     
 
     /// <summary>Releases memory occupied by ov_core_version_list_t.</summary>
     /// <param name="versions">A pointer to the ov_core_version_list_t to free memory.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 345, 346, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 355, 356, "ov_core_c_api")]
     public static extern void ov_core_versions_free(ov_core_version_list_t* versions);
     
 
@@ -450,7 +458,7 @@ public static unsafe partial class NativeMethods
     /// <param name="context">A pointer to the newly created remote context.</param>
     /// <remarks>variadic parmameters Actual context property parameter for remote context</remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 359, 364, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 369, 374, "ov_core_c_api")]
     public static extern ov_status_e ov_core_create_context(ov_core* core, byte* device_name, nint context_args_size, ov_remote_context** context);
     [DllImport(Dll, EntryPoint = nameof(ov_core_create_context), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_create_context(ov_core* core, byte* device_name, nint context_args_size, ov_remote_context** context, IntPtr varg1, IntPtr varg2);
     [DllImport(Dll, EntryPoint = nameof(ov_core_create_context), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_create_context(ov_core* core, byte* device_name, nint context_args_size, ov_remote_context** context, IntPtr varg1, IntPtr varg2, IntPtr varg3, IntPtr varg4);
@@ -472,7 +480,7 @@ public static unsafe partial class NativeMethods
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
     /// <remarks>variadic parmameters Actual property parameter for remote context</remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 377, 383, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 387, 393, "ov_core_c_api")]
     public static extern ov_status_e ov_core_compile_model_with_context(ov_core* core, ov_model* model, ov_remote_context* context, nint property_args_size, ov_compiled_model** compiled_model);
     [DllImport(Dll, EntryPoint = nameof(ov_core_compile_model_with_context), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_compile_model_with_context(ov_core* core, ov_model* model, ov_remote_context* context, nint property_args_size, ov_compiled_model** compiled_model, IntPtr varg1, IntPtr varg2);
     [DllImport(Dll, EntryPoint = nameof(ov_core_compile_model_with_context), CallingConvention = CallingConvention.Cdecl)] public static extern ov_status_e ov_core_compile_model_with_context(ov_core* core, ov_model* model, ov_remote_context* context, nint property_args_size, ov_compiled_model** compiled_model, IntPtr varg1, IntPtr varg2, IntPtr varg3, IntPtr varg4);
@@ -491,7 +499,7 @@ public static unsafe partial class NativeMethods
     /// <param name="device_name">Name of a device to get a default shared context from.</param>
     /// <param name="context">A pointer to the referenced remote context.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 393, 394, "ov_core_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 403, 404, "ov_core_c_api")]
     public static extern ov_status_e ov_core_get_default_context(ov_core* core, byte* device_name, ov_remote_context** context);
     
 
@@ -499,7 +507,7 @@ public static unsafe partial class NativeMethods
     /// <para>Shut down the OpenVINO by deleting all static-duration objects allocated by the library and releasing</para>
     /// <para>dependent resources</para>
     /// </summary>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 405, 405, "ov_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_core.h", 415, 415, "ov_c_api")]
     public static extern void ov_shutdown();
     
 
@@ -1523,11 +1531,21 @@ public static unsafe partial class NativeMethods
     public static extern ov_status_e ov_tensor_set_shape(ov_tensor* tensor, ov_shape_t shape);
     
 
+    /// <summary>Constructs a new tensor using a string array.</summary>
+    /// <param name="string_array">An array of strings</param>
+    /// <param name="array_size">The size of the string array</param>
+    /// <param name="shape">Tensor shape</param>
+    /// <param name="tensor">A point to ov_tensor_t</param>
+    /// <returns>Status code of the operation: OK(0) for success.</returns>
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 69, 73, "ov_tensor_c_api")]
+    public static extern ov_status_e ov_tensor_create_from_string_array(byte** string_array, nint array_size, ov_shape_t shape, ov_tensor** tensor);
+    
+
     /// <summary>Get shape for tensor.</summary>
     /// <param name="tensor">Tensor shape</param>
     /// <param name="shape">A point to ov_tensor_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 67, 68, "ov_tensor_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 82, 83, "ov_tensor_c_api")]
     public static extern ov_status_e ov_tensor_get_shape(ov_tensor* tensor, ov_shape_t* shape);
     
 
@@ -1535,15 +1553,23 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor">Tensor element type</param>
     /// <param name="type">A point to ov_tensor_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 77, 78, "ov_tensor_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 92, 93, "ov_tensor_c_api")]
     public static extern ov_status_e ov_tensor_get_element_type(ov_tensor* tensor, ov_element_type_e* type);
+    
+
+    /// <summary>Set string data for tensor</summary>
+    /// <param name="tensor">Array of strings</param>
+    /// <param name="string_array">Size of the array</param>
+    /// <param name="array_size">A point to ov_tensor_t</param>
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 102, 103, "ov_tensor_c_api")]
+    public static extern ov_status_e ov_tensor_set_string_data(ov_tensor* tensor, byte** string_array, nint array_size);
     
 
     /// <summary>the total number of elements (a product of all the dims or 1 for scalar).</summary>
     /// <param name="tensor">number of elements</param>
     /// <param name="elements_size">A point to ov_tensor_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 87, 88, "ov_tensor_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 112, 113, "ov_tensor_c_api")]
     public static extern ov_status_e ov_tensor_get_size(ov_tensor* tensor, nint* elements_size);
     
 
@@ -1551,7 +1577,7 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor">the size of the current Tensor in bytes.</param>
     /// <param name="byte_size">A point to ov_tensor_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 97, 98, "ov_tensor_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 122, 123, "ov_tensor_c_api")]
     public static extern ov_status_e ov_tensor_get_byte_size(ov_tensor* tensor, nint* byte_size);
     
 
@@ -1559,12 +1585,12 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor">A point to host memory.</param>
     /// <param name="data">A point to ov_tensor_t</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 107, 108, "ov_tensor_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 132, 133, "ov_tensor_c_api")]
     public static extern ov_status_e ov_tensor_data(ov_tensor* tensor, void** data);
     
 
     /// <summary>Free ov_tensor_t.</summary>
     /// <param name="tensor">A point to ov_tensor_t</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 115, 116, "ov_tensor_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 140, 141, "ov_tensor_c_api")]
     public static extern void ov_tensor_free(ov_tensor* tensor);
 }

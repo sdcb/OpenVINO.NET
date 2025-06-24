@@ -23,10 +23,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
+    <PackageReference Include="Sdcb.OpenCvSharp4.mini.runtime.linux-x64" Version="4.11.0.34" />
     <PackageReference Include="Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64" Version="4.8.0.20231125" />
-    <PackageReference Include="Sdcb.OpenVINO.runtime.ubuntu.22.04-x64" Version="2025.0.0" />
-    <PackageReference Include="Sdcb.OpenVINO.runtime.win-x64" Version="2025.0.0" />
+    <PackageReference Include="Sdcb.OpenCvSharp4.mini.runtime.win-x64" Version="4.11.0.34" />
+    <PackageReference Include="Sdcb.OpenVINO.runtime.ubuntu.22.04-x64" Version="2025.2.0" />
+    <PackageReference Include="Sdcb.OpenVINO.runtime.win-x64" Version="2025.2.0" />
     <PackageReference Include="Sdcb.PaddleOCR.Models.LocalV3" Version="2.7.0.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1">

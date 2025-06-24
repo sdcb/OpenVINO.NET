@@ -37,7 +37,7 @@ void Refresh()
 {
 	string dir = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath)!, "nupkgs");
 	IEnumerable<string> pkgs = Directory.EnumerateFiles(dir, "*.nupkg")
-		.Where(x => !x.Contains("2024.3.0"))
+		.Where(x => !x.Contains("2025.1.0"))
 		;
 	dc.Content = new
 	{
