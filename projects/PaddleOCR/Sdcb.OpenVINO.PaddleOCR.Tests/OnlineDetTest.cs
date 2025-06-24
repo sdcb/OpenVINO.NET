@@ -49,7 +49,7 @@ public class OnlineDetTest
         Assert.NotEmpty(results);
     }
 
-    [Fact]
+    [Fact(Skip = "GPU too slow")]
     public async Task DetectGPU()
     {
         using Mat src = Cv2.ImRead("./samples/vsext.png");

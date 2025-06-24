@@ -4,6 +4,7 @@ using Sdcb.OpenVINO.Extensions.OpenCvSharp4;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Sdcb.OpenVINO.PaddleOCR;
 
@@ -29,10 +30,7 @@ public class PaddleOcrDetector : IDisposable
     /// Gets or sets the maximum size for resizing the input image.
     /// <para>Note: this property is invalid when <see cref="IsDynamicGraph"/> = <c>false</c></para>
     /// </summary>
-    public int? MaxSize { get; set; } = 1536;
-
-    /// <summary>Gets or sets the size for dilation during preprocessing.</summary>
-    public int? DilatedSize { get; set; } = 2;
+    public int? MaxSize { get; set; } = 960;
 
     /// <summary>Gets or sets the score threshold for filtering out possible text boxes.</summary>
     public float? BoxScoreThreahold { get; set; } = 0.7f;
@@ -44,7 +42,7 @@ public class PaddleOcrDetector : IDisposable
     public int MinSize { get; set; } = 3;
 
     /// <summary>Gets or sets the ratio for enlarging text boxes during post-processing.</summary>
-    public float UnclipRatio { get; set; } = 2.0f;
+    public float UnclipRatio { get; set; } = 1.5f;
 
     /// <summary>
     /// Gets the static size of the input image for network infer.
@@ -76,8 +74,8 @@ public class PaddleOcrDetector : IDisposable
     /// <para>If this property is null, network can work with image of any size and h/w ratio (dynamic).</para>
     /// <para>Otherwise, network works with fixed size image (static).</para>
     /// </param>
-    public PaddleOcrDetector(DetectionModel model, 
-        DeviceOptions? options = null, 
+    public PaddleOcrDetector(DetectionModel model,
+        DeviceOptions? options = null,
         Size? staticShapeSize = null)
     {
         if (staticShapeSize != null)
@@ -144,55 +142,58 @@ public class PaddleOcrDetector : IDisposable
     /// <exception cref="Exception">Thrown when PaddlePredictor run fails.</exception>
     public RotatedRect[] Run(Mat src)
     {
-        using Mat pred = RunRaw(src, out Size resizedSize);
-        using Mat cbuf = new();
+        (int height, int width, float[] data) = RunRawCore(src, out Size resizedSize);
+        GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+        try
         {
-            using Mat roi = pred[0, resizedSize.Height, 0, resizedSize.Width];
-            roi.ConvertTo(cbuf, MatType.CV_8UC1, 255);
-        }
-        using Mat dilated = new();
-        {
+            using Mat pred = Mat.FromPixelData(height, width, MatType.CV_32FC1, data);
+            using Mat cbuf = new();
+            {
+                using Mat roi = pred[0, resizedSize.Height, 0, resizedSize.Width];
+                roi.ConvertTo(cbuf, MatType.CV_8UC1, 255);
+            }
             using Mat binary = BoxThreshold != null ?
                 cbuf.Threshold((int)(BoxThreshold * 255), 255, ThresholdTypes.Binary) :
                 cbuf;
 
-            if (DilatedSize != null)
-            {
-                using Mat ones = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(DilatedSize.Value, DilatedSize.Value));
-                Cv2.Dilate(binary, dilated, ones);
-            }
-            else
-            {
-                Cv2.CopyTo(binary, dilated);
-            }
+            Point[][] contours = binary.FindContoursAsArray(RetrievalModes.List, ContourApproximationModes.ApproxSimple);
+            Size size = src.Size();
+            double scaleRate = 1.0 * src.Width / resizedSize.Width;
+
+            RotatedRect[] rects = contours
+                .Where(x => BoxScoreThreahold == null || GetScore(x, pred) > BoxScoreThreahold)
+                .Select(x =>
+                {
+                    RotatedRect rect = Cv2.MinAreaRect(x);
+
+                    float area = (float)Math.Abs(Cv2.ContourArea(x));
+                    float perimeter = (float)Cv2.ArcLength(x, true);
+                    if (perimeter < 1e-6f)
+                        return null;
+
+                    float d = UnclipRatio * area / perimeter;
+
+                    Size2f newSize = new(
+                        (rect.Size.Width + 2 * d) * (float)scaleRate,
+                        (rect.Size.Height + 2 * d) * (float)scaleRate);
+
+                    RotatedRect enlarged = new(rect.Center * (float)scaleRate, newSize, rect.Angle);
+
+                    return (RotatedRect?)enlarged;
+                })
+                .Where(r => r.HasValue &&
+                            r.Value.Size.Width > MinSize &&
+                            r.Value.Size.Height > MinSize)
+                .Select(v => v!.Value)
+                .OrderBy(v => v.Center.Y)
+                .ThenBy(v => v.Center.X)
+                .ToArray();
+            return rects;
         }
-
-        Point[][] contours = dilated.FindContoursAsArray(RetrievalModes.List, ContourApproximationModes.ApproxSimple);
-        Size size = src.Size();
-        double scaleRate = 1.0 * src.Width / resizedSize.Width;
-
-        RotatedRect[] rects = contours
-            .Where(x => BoxScoreThreahold == null || GetScore(x, pred) > BoxScoreThreahold)
-            .Select(x => Cv2.MinAreaRect(x))
-            .Where(x => x.Size.Width > MinSize && x.Size.Height > MinSize)
-            .Select(rect =>
-            {
-                float minEdge = Math.Min(rect.Size.Width, rect.Size.Height);
-                Size2f newSize = new(
-                    (rect.Size.Width + UnclipRatio * minEdge) * scaleRate,
-                    (rect.Size.Height + UnclipRatio * minEdge) * scaleRate);
-                RotatedRect largerRect = new(rect.Center * scaleRate, newSize, rect.Angle);
-                return largerRect;
-            })
-            .OrderBy(v => v.Center.Y)
-            .ThenBy(v => v.Center.X)
-            .ToArray();
-        //{
-        //	using Mat demo = dilated.CvtColor(ColorConversionCodes.GRAY2RGB);
-        //	demo.DrawContours(contours, -1, Scalar.Red);
-        //	Image(demo).Dump();
-        //}
-        return rects;
+        finally
+        {
+            handle.Free();
+        }
     }
 
     /// <summary>
@@ -201,7 +202,24 @@ public class PaddleOcrDetector : IDisposable
     /// <param name="src">The input image to run detection model on.</param>
     /// <param name="resizedSize">The returned image actuall size without padding.</param>
     /// <returns>the detected image as a <see cref="MatType.CV_32FC1"/> <see cref="Mat"/> object.</returns>
-    public unsafe Mat RunRaw(Mat src, out Size resizedSize)
+    public Mat RunRaw(Mat src, out Size resizedSize)
+    {
+        (int height, int width, float[] data) = RunRawCore(src, out resizedSize);
+        GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+        try
+        {
+            using Mat mat = Mat.FromPixelData(height, width, MatType.CV_32FC1, data.ToArray());
+            {
+                return mat.Clone();
+            }
+        }
+        finally
+        {
+            handle.Free();
+        }
+    }
+
+    private (int height, int width, float[] data) RunRawCore(Mat src, out Size resizedSize)
     {
         if (src.Empty())
         {
@@ -246,7 +264,7 @@ public class PaddleOcrDetector : IDisposable
             Span<float> data = output.GetData<float>();
             NCHW shape = output.Shape.ToNCHW();
 
-            return Mat.FromPixelData(shape.Height, shape.Width, MatType.CV_32FC1, data.ToArray());
+            return (shape.Height, shape.Width, data.ToArray());
         }
     }
 
