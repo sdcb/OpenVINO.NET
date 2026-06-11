@@ -58,3 +58,21 @@ public class LinuxLibFilter : ILibFilter
         return _libs.Contains(fileName);
     }
 }
+
+public class AndroidLibFilter : ILibFilter
+{
+    public bool Filter(string key)
+    {
+        string fileName = Path.GetFileName(key);
+        return fileName.EndsWith(".so", StringComparison.OrdinalIgnoreCase) || fileName is "cache.json" or "plugins.xml";
+    }
+}
+
+public class MacOSLibFilter : ILibFilter
+{
+    public bool Filter(string key)
+    {
+        string fileName = Path.GetFileName(key);
+        return fileName.EndsWith(".dylib", StringComparison.OrdinalIgnoreCase) || fileName is "cache.json" or "plugins.xml";
+    }
+}

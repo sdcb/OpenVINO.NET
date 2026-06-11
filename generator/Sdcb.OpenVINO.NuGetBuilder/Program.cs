@@ -24,6 +24,9 @@ class Program
 
         switch (purpose)
         {
+            case "list":
+                PrintArtifacts(vf);
+                break;
             case "win64":
                 await Build_Win_x64(w, vf, versionSuffix, dir);
                 break;
@@ -31,13 +34,25 @@ class Program
                 await Build_Linuxs(w, vf, versionSuffix, dir);
                 break;
             case "android":
-                BuildAndroid(versionSuffix, dir);
+                await Build_Android(w, vf, versionSuffix, dir);
+                break;
+            case "macos":
+                await Build_MacOS(w, vf, versionSuffix, dir);
                 break;
             case "custom":
                 await BuildCustom(w, versionSuffix, dir);
                 break;
             default:
                 throw new ArgumentException($"Unknown purpose: {purpose}");
+        }
+    }
+
+    private static void PrintArtifacts(VersionFolder root)
+    {
+        Console.WriteLine($"Latest stable version: {root.Version}");
+        foreach (ArtifactInfo artifact in root.Artifacts.OrderBy(x => x.Distribution).ThenBy(x => x.Arch))
+        {
+            Console.WriteLine($"{artifact.Distribution}\t{artifact.Arch}\t{artifact.OS}\t{artifact.DownloadUrl}");
         }
     }
 
@@ -55,14 +70,6 @@ class Program
         NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
         string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), pkgInfo.TitleRid);
         ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new WindowsLibFilter(), flatten: true);
-        PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
-    }
-
-    private static void BuildAndroid(string? versionSuffix, string dir)
-    {
-        NuGetPackageInfo pkgInfo = new(NuGetPackageInfo.GetNamePrefix(), "android-arm64", "android-arm64", new SemanticVersion(2023, 1, 0));
-        string destinationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "android-arm64", "2023.1");
-        ExtractedInfo local = new(destinationFolder, "", Directory.EnumerateFiles(destinationFolder, "*.so", SearchOption.TopDirectoryOnly).ToArray());
         PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
     }
 
@@ -84,6 +91,28 @@ class Program
             NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
             string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), $"{pkgInfo.TitleRid}");
             ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new LinuxLibFilter(pkgInfo.Version), flatten: true);
+            PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
+        }
+    }
+
+    private static async Task Build_Android(ArtifactDownloader w, VersionFolder root, string? versionSuffix, string dir)
+    {
+        foreach (ArtifactInfo artifact in root.Artifacts.Where(x => x.OS == KnownOS.Android))
+        {
+            NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
+            string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), $"{pkgInfo.TitleRid}");
+            ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new AndroidLibFilter(), flatten: true);
+            PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
+        }
+    }
+
+    private static async Task Build_MacOS(ArtifactDownloader w, VersionFolder root, string? versionSuffix, string dir)
+    {
+        foreach (ArtifactInfo artifact in root.Artifacts.Where(x => x.OS == KnownOS.MacOS))
+        {
+            NuGetPackageInfo pkgInfo = NuGetPackageInfo.FromArtifact(artifact);
+            string destinationFolder = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).ToString(), $"{pkgInfo.TitleRid}");
+            ExtractedInfo local = await w.DownloadAndExtract(artifact, destinationFolder, new MacOSLibFilter(), flatten: true);
             PackageBuilder.BuildNuGet(local, pkgInfo, versionSuffix, dir);
         }
     }

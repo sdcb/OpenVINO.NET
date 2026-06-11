@@ -28,7 +28,7 @@ public class HeadersDownloader
         };
 
         Directory.CreateDirectory(_settings.DownloadFolder);
-        ArtifactInfo artifact = vf.Artifacts.Single(x => x.OS == KnownOS.Windows);
+        ArtifactInfo artifact = vf.Artifacts.Single(x => x.Distribution == "windows");
 
         return await _downloader.DownloadAndExtract(
             artifact,

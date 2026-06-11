@@ -12,6 +12,7 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, string TitleRid, S
         string titleRidOS = info.Distribution switch
         {
             "centos7" => "centos.7",
+            "centos8" => "centos.8",
             "debian9" => "linux", // debian9 on linux arm64 supports ubuntu 22.04, so should effectively equals to linux
             "debian10" => "linux", // debian9 on linux arm64 supports ubuntu 22.04, so should effectively equals to linux
             "ubuntu18" => "ubuntu.18.04",
@@ -20,14 +21,17 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, string TitleRid, S
             "ubuntu24" => "ubuntu.24.04",
             "macos_10_15" => "osx.10.15",
             "macos_11_0" => "osx.11.0",
+            "macos_12_6" => "osx.12.6",
             "windows" => "win",
             "windows_vc_mt" => "win-mt",
             "rhel8" => "rhel.8",
+            "android" => "android",
             _ => throw new Exception($"Unknown distribution: {info.Distribution}")
         };
         string ridOS = info.Distribution switch
         {
             "centos7" => "linux",
+            "centos8" => "linux",
             "debian9" => "linux", 
             "debian10" => "linux",
             "ubuntu18" => "linux",
@@ -36,9 +40,11 @@ public record NuGetPackageInfo(string NamePrefix, string Rid, string TitleRid, S
             "ubuntu24" => "linux",
             "macos_10_15" => "osx",
             "macos_11_0" => "osx",
+            "macos_12_6" => "osx",
             "windows" => "win",
             "windows_vc_mt" => "win", // This is a special case for Windows artifacts with MT (Multi-threaded) runtime
             "rhel8" => "linux",
+            "android" => "android",
             _ => throw new Exception($"Unknown distribution: {info.Distribution}")
         };
         string ridArch = info.Arch switch

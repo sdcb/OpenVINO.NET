@@ -17,22 +17,23 @@ public class CachedHttpGetService : ICachedHttpGetService
         string fileName = url.Split('/').Last();
         string localFilePath = Path.Combine(_cacheFolder, fileName);
 
-        if (!File.Exists(localFilePath))
+        if (!File.Exists(localFilePath) || new FileInfo(localFilePath).Length == 0)
         {
             Console.WriteLine($"Downloading {url} to {localFilePath}");
-            // If the file does not exist locally, download it from the url and save it to the cache folder
-            using HttpClient client = new();
-            HttpResponseMessage response = await client.GetAsync(url, cancellationToken);
+            string tempFilePath = localFilePath + ".download";
+            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+
+            using HttpClient client = new() { Timeout = Timeout.InfiniteTimeSpan };
+            using HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
             if (response.IsSuccessStatusCode)
             {
                 using Stream contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-                using FileStream file = File.Create(localFilePath);
-                using MemoryStream memoryStream = new();
-                await contentStream.CopyToAsync(memoryStream, cancellationToken);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                memoryStream.WriteTo(file);
+                using (FileStream file = File.Create(tempFilePath))
+                {
+                    await contentStream.CopyToAsync(file, cancellationToken);
+                }
+                File.Move(tempFilePath, localFilePath, overwrite: true);
             }
             else
             {

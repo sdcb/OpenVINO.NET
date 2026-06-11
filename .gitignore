@@ -362,3 +362,15 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /build/nuget.exe
+generator/Sdcb.OpenVINO.NuGetBuilder/android-x64/
+generator/Sdcb.OpenVINO.NuGetBuilder/cache/*
+generator/Sdcb.OpenVINO.NuGetBuilder/cache/*.sha256
+generator/Sdcb.OpenVINO.NuGetBuilder/centos.8-x64/
+generator/Sdcb.OpenVINO.NuGetBuilder/linux-arm/
+generator/Sdcb.OpenVINO.NuGetBuilder/osx.12.6-arm64/
+generator/Sdcb.OpenVINO.NuGetBuilder/rhel.8-x64/
+generator/Sdcb.OpenVINO.NuGetBuilder/ubuntu.22.04-arm64/
+generator/Sdcb.OpenVINO.NuGetBuilder/ubuntu.22.04-x64/
+generator/Sdcb.OpenVINO.NuGetBuilder/win-mt-x64/
+generator/Sdcb.OpenVINO.NuGetBuilder/win-x64/
+generator/Sdcb.OpenVINO.NuGetBuilder/ubuntu.24.04-x64/

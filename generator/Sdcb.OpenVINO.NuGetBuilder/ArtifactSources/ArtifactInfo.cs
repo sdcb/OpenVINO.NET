@@ -27,10 +27,11 @@ public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch,
     {
         return dist switch
         {
-            "debian10" or "rhel8" or "ubuntu22" or "centos7" or "ubuntu20" or "ubuntu24" => KnownOS.Linux,
-            "macos_12_6" => KnownOS.MacOS,
+            "debian9" or "debian10" or "rhel8" or "ubuntu18" or "ubuntu22" or "centos7" or "centos8" or "ubuntu20" or "ubuntu24" => KnownOS.Linux,
+            "macos_10_15" or "macos_11_0" or "macos_12_6" => KnownOS.MacOS,
             "windows" => KnownOS.Windows,
             "windows_vc_mt" => KnownOS.Windows, // This is a special case for Windows artifacts with MT (Multi-threaded) runtime
+            "android" => KnownOS.Android,
             _ => throw new FormatException($"Failed to parse {dist} as {nameof(KnownOS)}.")
         };
     }
@@ -39,7 +40,7 @@ public partial record ArtifactInfo(KnownOS OS, string Distribution, string Arch,
     internal static string ArtifactFileExtractor(string name) => name[..(^HashSuffix.Length)];
     private const string HashSuffix = ".sha256";
 
-    [GeneratedRegex(@"^openvino_toolkit_(?<dist>\w+)_(?<version>\d{4}\.\d\.\d\.[\w\.]+)_(?<arch>armhf|x86_64|arm64)\.(?<ext>\w+)$")]
+    [GeneratedRegex(@"^(?:[wlm]_)?openvino_toolkit_(?<dist>android|centos7|centos8|debian9|debian10|rhel8|ubuntu18|ubuntu20|ubuntu22|ubuntu24|macos_10_15|macos_11_0|macos_12_6|windows|windows_vc_mt)_(?<version>\d{4}\.\d+\.\d+\.[\w\.]+)_(?<arch>armhf|x86_64|arm64)\.(?<ext>\w+)$")]
     private static partial Regex OpenVINOArtifactNameRegex();
 
     internal static IEnumerable<ArtifactInfo> FromFolder(VersionFolder vf)
@@ -54,5 +55,6 @@ public enum KnownOS
 {
     Linux, 
     MacOS, 
-    Windows
+    Windows,
+    Android
 }
