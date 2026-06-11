@@ -1,6 +1,8 @@
 ﻿using SharpCompress.Archives;
 using SharpCompress.Archives.GZip;
+using SharpCompress.Archives.Tar;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -73,8 +75,19 @@ internal static class Utils
                     using MemoryStream ms = new();
                     stream.CopyTo(ms);
                     ms.Position = 0;
-                    IArchive inner = ArchiveFactory.Open(ms);
-                    inner.WriteToDirectory(rootDir);
+                    using IArchive inner = ArchiveFactory.Open(ms);
+                    if (inner is TarArchive innerTar)
+                    {
+                        ExtractTarArchiveToDirectory(innerTar, rootDir);
+                    }
+                    else
+                    {
+                        inner.WriteToDirectory(rootDir);
+                    }
+                }
+                else if (archive is TarArchive tar)
+                {
+                    ExtractTarArchiveToDirectory(tar, rootDir);
                 }
                 else
                 {
@@ -86,6 +99,96 @@ internal static class Utils
 
             File.Delete(localTarFile);
         }
+    }
+
+    private static void ExtractTarArchiveToDirectory(TarArchive archive, string rootDir)
+    {
+        List<IArchiveEntry> entries = archive.Entries
+            .Where(x => !string.IsNullOrWhiteSpace(x.Key))
+            .Cast<IArchiveEntry>()
+            .ToList();
+        string? commonTopLevelDirectory = GetCommonTopLevelDirectory(entries);
+
+        foreach (IArchiveEntry entry in entries)
+        {
+            string relativePath = GetTarRelativePath(entry.Key!, commonTopLevelDirectory);
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                continue;
+            }
+
+            string destinationPath = GetDestinationPath(rootDir, relativePath);
+            if (entry.IsDirectory)
+            {
+                Directory.CreateDirectory(destinationPath);
+                continue;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+            using Stream entryStream = entry.OpenEntryStream();
+            using FileStream fileStream = File.Create(destinationPath);
+            entryStream.CopyTo(fileStream);
+        }
+    }
+
+    private static string? GetCommonTopLevelDirectory(IEnumerable<IArchiveEntry> entries)
+    {
+        string? commonTopLevelDirectory = null;
+        foreach (IArchiveEntry entry in entries.Where(x => !x.IsDirectory))
+        {
+            string[] segments = entry.Key!.Replace('\\', '/').Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length <= 1)
+            {
+                return null;
+            }
+
+            if (commonTopLevelDirectory == null)
+            {
+                commonTopLevelDirectory = segments[0];
+            }
+            else if (!string.Equals(commonTopLevelDirectory, segments[0], StringComparison.Ordinal))
+            {
+                return null;
+            }
+        }
+
+        return commonTopLevelDirectory;
+    }
+
+    private static string GetTarRelativePath(string entryKey, string? commonTopLevelDirectory)
+    {
+        string normalizedPath = entryKey.Replace('\\', '/').Trim('/');
+        if (commonTopLevelDirectory == null)
+        {
+            return normalizedPath;
+        }
+
+        string prefix = commonTopLevelDirectory + "/";
+        if (string.Equals(normalizedPath, commonTopLevelDirectory, StringComparison.Ordinal))
+        {
+            return string.Empty;
+        }
+
+        if (normalizedPath.StartsWith(prefix, StringComparison.Ordinal))
+        {
+            return normalizedPath.Substring(prefix.Length);
+        }
+
+        return normalizedPath;
+    }
+
+    private static string GetDestinationPath(string rootDir, string relativePath)
+    {
+        string destinationPath = Path.GetFullPath(Path.Combine(rootDir, relativePath.Replace('/', Path.DirectorySeparatorChar)));
+        string normalizedRootDir = Path.GetFullPath(rootDir)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            + Path.DirectorySeparatorChar;
+        if (!destinationPath.StartsWith(normalizedRootDir, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException($"Archive entry extracts outside target directory: {relativePath}");
+        }
+
+        return destinationPath;
     }
 
     public static void CheckLocalOCRModel(string rootDir)
