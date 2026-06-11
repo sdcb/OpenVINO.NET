@@ -43,25 +43,16 @@ internal static class OpenVINOLibraryLoader
         // stub to ensure static constructor executed at least once.
     }
 
-    internal static bool Is202302OrGreater() => VersionAbbr >= 2320;
-
-    internal static int VersionAbbr;
-
     static OpenVINOLibraryLoader()
     {
 #if LINQPad || NETCOREAPP3_1_OR_GREATER
         NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), OpenVINOImportResolver);
 #endif
-        VersionAbbr = OVCore.Version.GetAbbreviatedVersion();
     }
 
 #if LINQPad || NETCOREAPP3_1_OR_GREATER
 
-    public static List<string> SupportedVersionSuffixes { get; set; } = new()
-    {
-        "2520",
-        "2510",
-    };
+    private static readonly string[] SupportedVersionSuffixes = ["2620"];
 
     private static IntPtr OpenVINOImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {

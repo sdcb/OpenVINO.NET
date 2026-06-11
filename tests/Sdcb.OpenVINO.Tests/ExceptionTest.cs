@@ -13,41 +13,14 @@ public class ExceptionTest
     }
 
     [Fact]
-    public void Exception2320()
+    public void InvalidModelPathThrowsOpenVINOException()
     {
-        if (OpenVINOLibraryLoader.Is202302OrGreater())
+        OpenVINOException ex = Assert.Throws<OpenVINOException>(() =>
         {
-            OpenVINOException ex = Assert.Throws<OpenVINOException>(() =>
-            {
-                using OVCore c = new();
-                using CompiledModel m = c.CompileModel("INVALID-MODEL");
-            });
-            _console.WriteLine(ex.Message);
-            Assert.Contains("INVALID-MODEL", ex.Message);
-        }
-        else
-        {
-            _console.WriteLine($"Case {nameof(Exception2320)} invalid in version {OpenVINOLibraryLoader.VersionAbbr}");
-        }
-    }
-
-    [Fact]
-    public void Exception2310()
-    {
-        if (!OpenVINOLibraryLoader.Is202302OrGreater())
-        {
-            _console.WriteLine($"Invalid test in version {OpenVINOLibraryLoader.VersionAbbr}");
-            FileNotFoundException ex = Assert.Throws<FileNotFoundException>(() =>
-            {
-                using OVCore c = new();
-                using CompiledModel m = c.CompileModel("INVALID-MODEL");
-            });
-            _console.WriteLine(ex.Message);
-            Assert.Contains("Model path not found", ex.Message);
-        }
-        else
-        {
-            _console.WriteLine($"Case {nameof(Exception2310)} invalid in version {OpenVINOLibraryLoader.VersionAbbr}");
-        }
+            using OVCore c = new();
+            using CompiledModel m = c.CompileModel("INVALID-MODEL");
+        });
+        _console.WriteLine(ex.Message);
+        Assert.Contains("INVALID-MODEL", ex.Message);
     }
 }

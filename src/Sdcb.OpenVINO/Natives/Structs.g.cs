@@ -5,7 +5,7 @@ namespace Sdcb.OpenVINO.Natives;
 
 
 
-[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_common.h", 215, 218, "")]
+[StructLayout(LayoutKind.Sequential), CSourceInfo("ov_common.h", 214, 217, "")]
 public unsafe struct ov_encryption_callbacks
 {
     public delegate*<byte*,nint,byte*,nint*, void>* encrypt_func;

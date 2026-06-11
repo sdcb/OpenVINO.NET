@@ -70,12 +70,6 @@ public class InferRequestTest
     [Fact]
     public void WaitSuccess()
     {
-        if (!OpenVINOLibraryLoader.Is202302OrGreater())
-        {
-            _console.WriteLine($"Version < 2023.2 not support determin wait success or not");
-            return;
-        }
-
         using OVCore c = new();
         using CompiledModel cm = c.CompileModel(_modelFile);
         using InferRequest r = cm.CreateInferRequest();

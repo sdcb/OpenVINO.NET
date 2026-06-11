@@ -25,7 +25,7 @@ internal class FunctionGenerator
         IndentedLinesWriter w = new();
 
         List<RealFuncParam> realParams = func.Parameters
-            .Select(x => (RealFuncParam)x)
+            .Select(x => RealFuncParam.FromParameter(func, x))
             .ToList();
         if (func.IsVariadic)
         {
@@ -71,6 +71,7 @@ internal class FunctionGenerator
         }
         return new GeneratedUnit(func.Name, group, func.LineNumberStart, func.LineNumberEnd, headerFile, w.Lines);
     }
+
 }
 
 public record RealFuncParam(string Type, string NameUnescaped)
@@ -78,6 +79,19 @@ public record RealFuncParam(string Type, string NameUnescaped)
     public string Name => CSharpUtils.CSharpKeywordTransform(NameUnescaped);
 
     public static explicit operator RealFuncParam(Parameter p) => new(CSharpUtils.TypeTransform(p.QualifiedType.Type), p.Name);
+
+    public static RealFuncParam FromParameter(Function func, Parameter p) => new(KnownTypeFix(func.Name, p.Name, CSharpUtils.TypeTransform(p.QualifiedType.Type)), p.Name);
+
+    private static string KnownTypeFix(string functionName, string parameterName, string type) => (functionName, parameterName) switch
+    {
+        ("ov_infer_request_wait_for", "timeout") => "long",
+        ("ov_shape_create", "rank") => "long",
+        ("ov_shape_create", "dims") => "long*",
+        ("ov_partial_shape_create", "rank") => "long",
+        ("ov_partial_shape_create_static", "rank") => "long",
+        ("ov_partial_shape_create_static", "dims") => "long*",
+        _ => type,
+    };
 
     public static RealFuncParam Variadic { get; } = new("__arglist", "");
 

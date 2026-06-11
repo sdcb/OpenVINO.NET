@@ -374,3 +374,4 @@ generator/Sdcb.OpenVINO.NuGetBuilder/ubuntu.22.04-x64/
 generator/Sdcb.OpenVINO.NuGetBuilder/win-mt-x64/
 generator/Sdcb.OpenVINO.NuGetBuilder/win-x64/
 generator/Sdcb.OpenVINO.NuGetBuilder/ubuntu.24.04-x64/
+generator/Sdcb.OpenVINO.AutoGen/cache/download/

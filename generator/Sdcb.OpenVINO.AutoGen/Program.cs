@@ -13,10 +13,7 @@ using Sdcb.OpenVINO.AutoGen.Writers;
 [assembly: SupportedOSPlatform("windows")]
 
 IServiceProvider services = ConfigureServices();
-//ExtractedInfo info = (await services.GetRequiredService<HeadersDownloader>().DownloadAsync());
-AppSettings appSettings = services.GetRequiredService<AppSettings>();
-string url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/2025.2/windows/openvino_toolkit_windows_2025.2.0.19140.c01cd93e24d_x86_64.zip";
-ExtractedInfo info = await HeadersDownloader.DirectDownloadAsync(url, services.GetRequiredService<ArtifactDownloader>(), appSettings.DownloadFolder);
+ExtractedInfo info = await services.GetRequiredService<HeadersDownloader>().DownloadAsync();
 ParsedInfo parsed = HeadersParser.Parse(info);
 GeneratedAll all = GeneratedAll.Generate(parsed);
 TransformWriter.WriteAll(all, TransformWriter.DestinationFolder, "Sdcb.OpenVINO.Natives");

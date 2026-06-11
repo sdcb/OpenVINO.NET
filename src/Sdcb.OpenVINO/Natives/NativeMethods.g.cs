@@ -11,18 +11,18 @@ public static unsafe partial class NativeMethods
 
     /// <summary>Print the error info.</summary>
     /// <param name="status">a status code.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 225, 226, "ov_base_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 224, 225, "ov_base_c_api")]
     public static extern byte* ov_get_error_info(ov_status_e status);
     
 
     /// <summary>free char</summary>
     /// <param name="content">The pointer to the char to free.</param>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 233, 234, "ov_base_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 232, 233, "ov_base_c_api")]
     public static extern void ov_free(byte* content);
     
 
     /// <summary>Get the last error msg.</summary>
-    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 240, 241, "ov_base_c_api")]
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_common.h", 239, 240, "ov_base_c_api")]
     public static extern byte* ov_get_last_err_msg();
     
 
@@ -281,7 +281,7 @@ public static unsafe partial class NativeMethods
     /// <param name="property_args_size">How many properties args will be passed, each property contains 2 args: key and value.</param>
     /// <param name="compiled_model">A pointer to the newly created compiled_model.</param>
     /// <remarks>
-    /// <para>property paramater: Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
+    /// <para>property parameter: Optional pack of pairs: &lt;char* property_key, char* property_value&gt; relevant only</para>
     /// <para>for this load operation operation. Supported property key please see ov_property.h.</para>
     /// </remarks>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
@@ -515,7 +515,7 @@ public static unsafe partial class NativeMethods
     /// <param name="dim">The dimension pointer that will be checked.</param>
     /// <returns>Boolean, true is dynamic and false is static.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_dimension.h", 31, 32, "ov_dimension_c_api")]
-    public static extern bool ov_dimension_is_dynamic(ov_dimension dim);
+    public static extern int ov_dimension_is_dynamic(ov_dimension dim);
     
 
     /// <summary>Set an input/output tensor to infer on by the name of tensor.</summary>
@@ -867,7 +867,7 @@ public static unsafe partial class NativeMethods
     /// <param name="model">A pointer to the ov_model_t.</param>
     /// <returns>true if model contains dynamic shapes</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_model.h", 185, 186, "")]
-    public static extern bool ov_model_is_dynamic(ov_model* model);
+    public static extern int ov_model_is_dynamic(ov_model* model);
     
 
     /// <summary>Do reshape in model with a list of &lt;name, partial shape&gt;.</summary>
@@ -1046,7 +1046,7 @@ public static unsafe partial class NativeMethods
     /// <param name="partial_shape">The partial_shape pointer.</param>
     /// <returns>Status code of the operation: OK(0) for success.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_partial_shape.h", 119, 120, "ov_partial_shape_c_api")]
-    public static extern bool ov_partial_shape_is_dynamic(ov_partial_shape partial_shape);
+    public static extern int ov_partial_shape_is_dynamic(ov_partial_shape partial_shape);
     
 
     /// <summary>Helper function, convert a partial shape to readable string.</summary>
@@ -1390,7 +1390,7 @@ public static unsafe partial class NativeMethods
     /// <param name="rank">The rank pointer that will be checked.</param>
     /// <returns>bool The return value.</returns>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_rank.h", 28, 29, "ov_rank_c_api")]
-    public static extern bool ov_rank_is_dynamic(ov_dimension rank);
+    public static extern int ov_rank_is_dynamic(ov_dimension rank);
     
 
     /// <summary>
@@ -1593,4 +1593,18 @@ public static unsafe partial class NativeMethods
     /// <param name="tensor">A point to ov_tensor_t</param>
     [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_tensor.h", 140, 141, "ov_tensor_c_api")]
     public static extern void ov_tensor_free(ov_tensor* tensor);
+    
+
+    /// <summary>Sets user log message handling callback.</summary>
+    /// <param name="func">
+    /// <para>func The function pointer to user-defined message logging callback.</para>
+    /// <para>                 Null pointer is accepted (no logging).</para>
+    /// </param>
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_util.h", 20, 21, "")]
+    public static extern void ov_util_set_log_callback(delegate*<byte*, void>* func);
+    
+
+    /// <summary>Resets log message handling callback to its default (standard output).</summary>
+    [DllImport(Dll, CallingConvention = CallingConvention.Cdecl), CSourceInfo("ov_util.h", 26, 27, "")]
+    public static extern void ov_util_reset_log_callback();
 }

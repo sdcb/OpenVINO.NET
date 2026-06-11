@@ -136,39 +136,19 @@ public class InferRequest : CppPtrObject
 
     /// <summary>
     /// Blocks the current thread and waits for a specified time for the inference result to become available.
-    /// In version 2023.2 and later, the function may return <c>false</c> if the InferRequest has not been completed, 
-    /// or <c>true</c> if the InferRequest has been completed successfully.
-    /// In earlier versions, the completion status cannot be determined, hence the function always returns <c>true</c>.
     /// </summary>
     /// <param name="duration"> The TimeSpan object representing the duration to wait for the results. </param>
-    /// <returns>
-    /// For version 2023.2 and later, returns <c>false</c> if the InferRequest has not been completed, and <c>true</c> if it has.
-    /// For earlier versions, always returns <c>true</c> as the completion status cannot be determined.
-    /// </returns>
+    /// <returns>Returns <c>false</c> if the InferRequest has not completed, otherwise <c>true</c>.</returns>
     public unsafe bool WaitAsyncRun(TimeSpan duration)
     {
-        if (OpenVINOLibraryLoader.Is202302OrGreater())
+        ov_status_e res = ov_infer_request_wait_for((ov_infer_request*)Handle, (long)duration.TotalMilliseconds);
+        if (res == ov_status_e.RESULT_NOT_READY || res == ov_status_e.UNEXPECTED)
         {
-            ov_status_e res = ov_infer_request_wait_for((ov_infer_request*)Handle, (long)duration.TotalMilliseconds);
-            if (res == ov_status_e.RESULT_NOT_READY) // 2023.3
-            {
-                return false;
-            }
-            else if (res == ov_status_e.UNEXPECTED) // 2023.2
-            {
-                return false;
-            }
-            else
-            {
-                OpenVINOException.ThrowIfFailed(res);
-                return true;
-            }
+            return false;
         }
-        else
-        {
-            OpenVINOException.ThrowIfFailed(ov_infer_request_wait_for((ov_infer_request*)Handle, (long)duration.TotalMilliseconds));
-            return true;
-        }
+
+        OpenVINOException.ThrowIfFailed(res);
+        return true;
     }
 
     /// <summary>

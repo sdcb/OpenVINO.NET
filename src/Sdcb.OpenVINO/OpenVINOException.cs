@@ -42,11 +42,8 @@ public class OpenVINOException : Exception
     {
         if (e != ov_status_e.OK)
         {
-            if (OpenVINOLibraryLoader.Is202302OrGreater())
-            {
-                IntPtr lastError = (IntPtr)ov_get_last_err_msg();
-                message ??= StringUtils.UTF8PtrToString(lastError);
-            }
+            IntPtr lastError = (IntPtr)ov_get_last_err_msg();
+            message ??= StringUtils.UTF8PtrToString(lastError);
             
             throw new OpenVINOException(e, OVStatusToString(e, message, callerMemberName, callerExpression, callerFilePath, callerLineNumber));
         }

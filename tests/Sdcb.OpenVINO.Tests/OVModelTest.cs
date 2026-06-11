@@ -28,32 +28,9 @@ public class OVModelTest
         Assert.NotNull(m.FriendlyName);
     }
 
-    [Fact]
-    public void CannotReadMemory_202301()
-    {
-        if (OpenVINOLibraryLoader.Is202302OrGreater())
-        {
-            _console.WriteLine($"Case {nameof(CannotReadMemory_202301)} invalid in version {OpenVINOLibraryLoader.VersionAbbr}");
-            return;
-        }
-
-        Assert.Throws<OpenVINOException>(() =>
-        {
-            using OVCore c = new();
-            (byte[] modelData, byte[] tensorData) = OVCoreNativeTest.PrepareModelData();
-            using Model m = c.ReadModel(modelData, tensorData);
-        });
-    }
-
     [Fact(Skip = "Seems read from paddle is still not yet supported.")]
-    public void CannotReadMemory_202302()
+    public void CanReadMemoryWithWeights()
     {
-        if (!OpenVINOLibraryLoader.Is202302OrGreater())
-        {
-            _console.WriteLine($"Case {nameof(CannotReadMemory_202302)} invalid in version {OpenVINOLibraryLoader.VersionAbbr}");
-            return;
-        }
-
         using OVCore c = new();
         (byte[] modelData, byte[] tensorData) = OVCoreNativeTest.PrepareModelData();
         using Model m = c.ReadModel(modelData, tensorData);

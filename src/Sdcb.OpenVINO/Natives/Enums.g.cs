@@ -69,12 +69,9 @@ public enum ov_status_e
 /// <para>This enum contains codes for element type, which is aligned with ov::element::Type_t in</para>
 /// <para>src/core/include/openvino/core/type/element_type.hpp</para>
 /// </summary>
-[CSourceInfo("ov_common.h", 171, 199, "ov_base_c_api")]
+[CSourceInfo("ov_common.h", 171, 198, "ov_base_c_api")]
 public enum ov_element_type_e
 {
-    /// <summary>Undefined element type</summary>
-    UNDEFINED = 0,
-
     /// <summary>Dynamic element type</summary>
     DYNAMIC = 0,
 

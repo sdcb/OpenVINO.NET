@@ -1,7 +1,6 @@
 ﻿using Sdcb.OpenVINO.Natives;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -199,10 +198,6 @@ public class OVCore : CppPtrObject
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
-        if (!OpenVINOLibraryLoader.Is202302OrGreater())
-        {
-            if (!File.Exists(modelPath)) throw new FileNotFoundException($"Model path not found: {modelPath}", modelPath);
-        }
 
         ov_model* model;
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -239,10 +234,6 @@ public class OVCore : CppPtrObject
     {
         ThrowIfDisposed();
         if (modelPath == null) throw new ArgumentNullException(nameof(modelPath));
-        if (!OpenVINOLibraryLoader.Is202302OrGreater())
-        {
-            if (!File.Exists(modelPath)) throw new FileNotFoundException($"Model path not found: {modelPath}", modelPath);
-        }
 
         properties ??= new();
         GCHandle[] gchs = new GCHandle[properties.Count * 2];
@@ -412,12 +403,7 @@ public class OVCore : CppPtrObject
     }
 
     /// <summary>
-    /// Reads models from IR / ONNX / PDPD / TF / TFLite formats. 
-    /// <para>
-    /// Starting from version 2023.2, this method will invoke a newer interface <see cref="ov_core_read_model_from_memory_buffer"/>,
-    /// which supports models including '\0' character in the file. This is particularly useful for binary format models like PaddlePaddle, ONNX, etc.
-    /// </para>
-    /// <para>In previous versions, such binary files were interpreted as strings, leading to an early termination at encountering '\0', thus limiting the scope of usage.</para>
+    /// Reads models from IR / ONNX / PDPD / TF / TFLite formats.
     /// </summary>
     /// <param name="modelData">Data with a model in IR / ONNX / PDPD / TF / TFLite format.</param>
     /// <param name="weights">Shared pointer to a constant <see cref="Tensor"/> with weights.</param>
@@ -432,24 +418,14 @@ public class OVCore : CppPtrObject
         ov_model* model;
         fixed (byte* modelDataPtr = modelData)
         {
-            if (OpenVINOLibraryLoader.Is202302OrGreater())
-            {
-                OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory_buffer(
-                    (ov_core*)Handle, modelDataPtr, modelData.Length, (ov_tensor*)weights?.DangerousGetHandle(), &model));
-            }
-            else
-            {
-                OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory(
-                    (ov_core*)Handle, modelDataPtr, (ov_tensor*)weights?.DangerousGetHandle(), &model));
-            }
+            OpenVINOException.ThrowIfFailed(ov_core_read_model_from_memory_buffer(
+                (ov_core*)Handle, modelDataPtr, modelData.Length, (ov_tensor*)weights?.DangerousGetHandle(), &model));
         }
         return new Model(model, owned: true);
     }
 
     /// <summary>
-    /// Reads models from IR / ONNX / PDPD / TF / TFLite formats using model data and optional weights data. Starting from version 2023.2, this method will invoke a newer interface 'ov_core_read_model_from_memory_buffer',
-    /// which supports models including '\0' character in the file. This is particularly useful for binary format models like PaddlePaddle, ONNX, etc.
-    /// In earlier versions, such binary files were interpreted as strings leading to an early termination at encountering '\0', thus limiting the scope of usage. 
+    /// Reads models from IR / ONNX / PDPD / TF / TFLite formats using model data and optional weights data.
     /// </summary>
     /// <param name="modelData">ByteArray with a model in IR / ONNX / PDPD / TF / TFLite format.</param>
     /// <param name="weightsData">Optional byte array of weights data. If provided, this will be converted to a Tensor.</param>
