@@ -13,55 +13,31 @@ Please check my cnblogs blog for more details:
 
 ## Packages
 
-### Core packages
+### Main packages
 
-| Package                                | Version 📌                                                                                                                                                | Description                  |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Sdcb.OpenVINO                          | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.svg)](https://nuget.org/packages/Sdcb.OpenVINO)                                                   | .NET PInvoke interface       |
-| Sdcb.OpenVINO.Extensions.OpenCvSharp4  | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.Extensions.OpenCvSharp4.svg)](https://nuget.org/packages/Sdcb.OpenVINO.Extensions.OpenCvSharp4)   | OpenVINO OpenCvSharp4 extensions   |
+| Package                               | Version | Description                           |
+| ------------------------------------- | ------- | ------------------------------------- |
+| Sdcb.OpenVINO                         | 0.7.1   | .NET PInvoke interface                |
+| Sdcb.OpenVINO.Extensions.OpenCvSharp4 | 0.7.0   | OpenVINO OpenCvSharp4 extensions      |
+| Sdcb.OpenVINO.PaddleOCR               | 0.8.0   | OpenVINO Paddle OCR Toolkit           |
+| Sdcb.OpenVINO.PaddleOCR.Models.Online | 0.8.0   | Online Models for OpenVINO Paddle OCR |
 
 ### Platform shared runtime packages
 
 Current `Sdcb.OpenVINO` native runtime packages target OpenVINO 2026.2.0 only. On Linux/macOS, the loader only resolves the `2620` native library suffix, such as `libopenvino_c.so.2620` and `libopenvino_c.2620.dylib`.
 
-| Package                                | Version 📌                                                                                                                                                | Description                  |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Sdcb.OpenVINO.runtime.centos.8-x64     | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.centos.8-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.centos.8-x64)         | Runtime for CentOS 8 x64     |
-| Sdcb.OpenVINO.runtime.linux-arm        | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.linux-arm.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.linux-arm)               | Runtime for Debian 9+ ARM    |
-| Sdcb.OpenVINO.runtime.rhel.8-x64       | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.rhel.8-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.rhel.8-x64)             | Runtime for RHEL 8 x64       |
-| Sdcb.OpenVINO.runtime.ubuntu.22.04-arm64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.22.04-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.22.04-arm64) | Runtime for Ubuntu 22.04 ARM64 |
-| Sdcb.OpenVINO.runtime.ubuntu.22.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.22.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.22.04-x64) | Runtime for Ubuntu 22.04 x64 |
-| Sdcb.OpenVINO.runtime.ubuntu.24.04-x64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.ubuntu.24.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.ubuntu.24.04-x64) | Runtime for Ubuntu 24.04 x64 |
-| Sdcb.OpenVINO.runtime.android-x64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.android-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.android-x64)           | Runtime for Android x64      |
-| Sdcb.OpenVINO.runtime.osx.12.6-arm64   | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.osx.12.6-arm64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.osx.12.6-arm64)     | Runtime for macOS 12.6 ARM64 |
-| Sdcb.OpenVINO.runtime.win-x64          | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.win-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.win-x64)                   | Runtime for Windows x64      |
-| Sdcb.OpenVINO.runtime.win-mt-x64       | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.runtime.win-mt-x64.svg)](https://nuget.org/packages/Sdcb.OpenVINO.runtime.win-mt-x64)             | Runtime for Windows x64 with VC MT runtime |
-
-### OpenCvSharp4 mini runtime
-
-| Id                                     | Version | Size      | OS      | Arch |
-| -------------------------------------- | ----- | -------- | ------------ | ----- |
-| Sdcb.OpenCvSharp4.mini.runtime.centos.7-arm64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.centos.7-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.centos.7-arm64) | 3.23MB  | CentOS 7     | ARM64 |
-| Sdcb.OpenCvSharp4.mini.runtime.centos.7-x64       | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.centos.7-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.centos.7-x64) | 16.75MB | CentOS 7     | x64   |
-| Sdcb.OpenCvSharp4.mini.runtime.debian.11-arm64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.11-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.11-arm64) | 4.05MB  | Debian 11    | ARM64 |
-| Sdcb.OpenCvSharp4.mini.runtime.debian.11-x64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.11-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.11-x64) | 18.13MB | Debian 11    | x64   |
-| Sdcb.OpenCvSharp4.mini.runtime.debian.12-arm64    | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.12-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.12-arm64) | 4.18MB  | Debian 12    | ARM64 |
-| Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64) | 17.47MB | Debian 12    | x64   |
-| Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-arm64 | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-arm64) | 4.18MB  | Ubuntu 22.04 | ARM64 |
-| Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64   | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.ubuntu.22.04-x64) | 17.47MB | Ubuntu 22.04 | x64   |
-| Sdcb.OpenCvSharp4.mini.runtime.android-arm64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.android-arm64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.android-arm64) | 4.04MB  | Android      | ARM64 |
-| Sdcb.OpenCvSharp4.mini.runtime.android-x64      | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenCvSharp4.mini.runtime.android-x64.svg)](https://nuget.org/packages/Sdcb.OpenCvSharp4.mini.runtime.android-x64) | 5.9MB  | Android      | x64 |
-
-
-## Linux docker images(deprecated)
-
-| Docker Image           | Version 📌                                                                                                            | Description                                   |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| sdflysha/openvino-base | [![Docker](https://img.shields.io/docker/v/sdflysha/openvino-base)](https://hub.docker.com/r/sdflysha/openvino-base) | .NET 7 SDK, OpenCvSharp 4.8, Ubuntu 22.04 x64 |
-
-Note: 
-
-This docker image was built by [this dockerfile](https://github.com/sdcb/dockerfiles/blob/main/openvino/openvino-base/dockerfile), You can build other docker images as well.
+| Package                                  | Version  | Description                           |
+| ---------------------------------------- | -------- | ------------------------------------- |
+| Sdcb.OpenVINO.runtime.android-x64        | 2026.2.0 | Runtime for Android x64               |
+| Sdcb.OpenVINO.runtime.centos.8-x64       | 2026.2.0 | Runtime for CentOS 8 x64              |
+| Sdcb.OpenVINO.runtime.linux-arm          | 2026.2.0 | Runtime for Debian 9+ ARM             |
+| Sdcb.OpenVINO.runtime.osx.12.6-arm64     | 2026.2.0 | Runtime for macOS 12.6 ARM64          |
+| Sdcb.OpenVINO.runtime.rhel.8-x64         | 2026.2.0 | Runtime for RHEL 8 x64                |
+| Sdcb.OpenVINO.runtime.ubuntu.22.04-arm64 | 2026.2.0 | Runtime for Ubuntu 22.04 ARM64        |
+| Sdcb.OpenVINO.runtime.ubuntu.22.04-x64   | 2026.2.0 | Runtime for Ubuntu 22.04 x64          |
+| Sdcb.OpenVINO.runtime.ubuntu.24.04-x64   | 2026.2.0 | Runtime for Ubuntu 24.04 x64          |
+| Sdcb.OpenVINO.runtime.win-mt-x64         | 2026.2.0 | Runtime for Windows x64 with VC MT runtime |
+| Sdcb.OpenVINO.runtime.win-x64            | 2026.2.0 | Runtime for Windows x64               |
 
 ## Infer examples:
 
@@ -89,12 +65,10 @@ Please refer to [this project](https://github.com/sdcb/mini-openvino-paddleocr)
 
 ### Packages
 
-| Package                               | Version 📌                                                                                                                                              | Description                           |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
-| Sdcb.OpenVINO.PaddleOCR               | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.PaddleOCR.svg)](https://nuget.org/packages/Sdcb.OpenVINO.PaddleOCR)                             | OpenVINO Paddle OCR Toolkit           |
-| Sdcb.OpenVINO.PaddleOCR.Models.Online | [![NuGet](https://img.shields.io/nuget/v/Sdcb.OpenVINO.PaddleOCR.Models.Online.svg)](https://nuget.org/packages/Sdcb.OpenVINO.PaddleOCR.Models.Online) | Online Models for OpenVINO Paddle OCR |
-
-The build instructions/docs is in this [opencvsharp-mini-runtime](https://github.com/sdcb/opencvsharp-mini-runtime) repository.
+| Package                               | Version | Description                           |
+| ------------------------------------- | ------- | ------------------------------------- |
+| Sdcb.OpenVINO.PaddleOCR               | 0.8.0   | OpenVINO Paddle OCR Toolkit           |
+| Sdcb.OpenVINO.PaddleOCR.Models.Online | 0.8.0   | Online Models for OpenVINO Paddle OCR |
 
 ### Usage
 
