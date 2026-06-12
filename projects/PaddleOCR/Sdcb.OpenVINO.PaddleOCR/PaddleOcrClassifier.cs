@@ -12,6 +12,8 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 public class PaddleOcrClassifier : IDisposable
 {
     private readonly CompiledModel _compiledModel;
+    private readonly ClassificationPreprocessMode _preprocessMode;
+    private readonly ClassificationResizeMode _resizeMode;
 
     /// <summary>
     /// Rotation threshold value used to determine if the image should be rotated.
@@ -40,6 +42,8 @@ public class PaddleOcrClassifier : IDisposable
         DeviceOptions? device = null)
     {
         Shape = model.Shape;
+        _preprocessMode = model.PreprocessMode;
+        _resizeMode = model.ResizeMode;
         _compiledModel = model.CreateCompiledModel(device, prePostProcessing: (m, ppp) =>
         {
             using PreProcessInputInfo ppii = ppp.Inputs.Primary;
@@ -138,11 +142,12 @@ public class PaddleOcrClassifier : IDisposable
                         3 => src.FastClone(),
                         var x => throw new Exception($"Unexpect src channel: {x}, allow: (1/3/4)")
                     };
-                    return ResizePadding(channel3, Shape);
+                    using Mat resized = Resize(channel3, Shape, _resizeMode);
+                    return Normalize(resized, _preprocessMode);
                 })
                 .ToArray();
             using Mat combined = normalizeds.StackingVertically();
-            combined.ConvertTo(final, MatType.CV_32FC3, 2.0 / 255, -1.0);
+            combined.CopyTo(final);
         }
         finally
         {
@@ -153,6 +158,42 @@ public class PaddleOcrClassifier : IDisposable
         }
 
         return final;
+    }
+
+    private static Mat Normalize(Mat src, ClassificationPreprocessMode preprocessMode)
+    {
+        if (preprocessMode == ClassificationPreprocessMode.Legacy)
+        {
+            Mat result = new();
+            src.ConvertTo(result, MatType.CV_32FC3, 2.0 / 255, -1.0);
+            return result;
+        }
+
+        using Mat rgb = src.CvtColor(ColorConversionCodes.BGR2RGB);
+        Mat normalized = new();
+        rgb.ConvertTo(normalized, MatType.CV_32FC3, 1.0 / 255);
+        Mat[] channels = normalized.Split();
+        normalized.Dispose();
+        try
+        {
+            float[] means = { 0.485f, 0.456f, 0.406f };
+            float[] stds = { 0.229f, 0.224f, 0.225f };
+            for (int i = 0; i < channels.Length; ++i)
+            {
+                channels[i].ConvertTo(channels[i], MatType.CV_32FC1, 1.0 / stds[i], -means[i] / stds[i]);
+            }
+
+            Mat result = new();
+            Cv2.Merge(channels, result);
+            return result;
+        }
+        finally
+        {
+            foreach (Mat channel in channels)
+            {
+                channel.Dispose();
+            }
+        }
     }
 
     /// <summary>
@@ -183,6 +224,16 @@ public class PaddleOcrClassifier : IDisposable
     {
         Ocr180DegreeClsResult res = ShouldRotate180(src);
         res.RotateIfShould(src);
+    }
+
+    private static Mat Resize(Mat src, NCHW shape, ClassificationResizeMode resizeMode)
+    {
+        return resizeMode switch
+        {
+            ClassificationResizeMode.DirectResize => src.Resize(new Size(shape.Width, shape.Height)),
+            ClassificationResizeMode.ResizeAndPad => ResizePadding(src, shape),
+            _ => throw new ArgumentOutOfRangeException(nameof(resizeMode), resizeMode, null),
+        };
     }
 
     private static Mat ResizePadding(Mat src, NCHW shape)

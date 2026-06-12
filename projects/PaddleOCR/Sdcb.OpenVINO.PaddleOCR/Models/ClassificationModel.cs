@@ -16,6 +16,16 @@ public abstract class ClassificationModel : OcrBaseModel
     public abstract NCHW Shape { get; }
 
     /// <summary>
+    /// Gets the preprocessing mode for this classification model.
+    /// </summary>
+    public virtual ClassificationPreprocessMode PreprocessMode => ClassificationPreprocessMode.Legacy;
+
+    /// <summary>
+    /// Gets the resize mode for this classification model.
+    /// </summary>
+    public virtual ClassificationResizeMode ResizeMode => ClassificationResizeMode.ResizeAndPad;
+
+    /// <summary>
     /// The default OcrShape used in the classification model.
     /// </summary>
     public static NCHW DefaultShape = new(-1, 3, 48, 192);
@@ -41,4 +51,36 @@ public abstract class ClassificationModel : OcrBaseModel
     {
         model.ReshapePrimaryInput(new PartialShape(Dimension.Dynamic, 3, Shape.Height, Shape.Width));
     }
+}
+
+/// <summary>
+/// Defines preprocessing modes for text line orientation classifiers.
+/// </summary>
+public enum ClassificationPreprocessMode
+{
+    /// <summary>
+    /// Uses the historical PaddleOCR classifier normalization.
+    /// </summary>
+    Legacy,
+
+    /// <summary>
+    /// Uses RGB ImageNet mean/std normalization.
+    /// </summary>
+    ImageNetRgb,
+}
+
+/// <summary>
+/// Defines resize modes for text line orientation classifiers.
+/// </summary>
+public enum ClassificationResizeMode
+{
+    /// <summary>
+    /// Preserves the historical PaddleOCR classifier resize behavior by cropping wide images and padding narrow images.
+    /// </summary>
+    ResizeAndPad,
+
+    /// <summary>
+    /// Resizes directly to the model input size.
+    /// </summary>
+    DirectResize,
 }

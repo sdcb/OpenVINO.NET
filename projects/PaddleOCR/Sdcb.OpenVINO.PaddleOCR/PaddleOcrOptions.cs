@@ -19,6 +19,7 @@ public class PaddleOcrOptions
     public PaddleOcrOptions(DeviceOptions allDeviceOptions)
     {
         DetectionDeviceOptions = allDeviceOptions;
+        DocumentOrientationDeviceOptions = allDeviceOptions;
         ClassificationDeviceOptions = allDeviceOptions;
         RecognitionDeviceOptions = allDeviceOptions;
 
@@ -34,6 +35,11 @@ public class PaddleOcrOptions
     /// The DetectionStaticSize property can be used to specify a specific size as model graph size (instead of dynamic graph).
     /// </summary>
     public DeviceOptions? DetectionDeviceOptions { get; set; }
+
+    /// <summary>
+    /// Gets or sets the device options for document orientation classification.
+    /// </summary>
+    public DeviceOptions? DocumentOrientationDeviceOptions { get; set; }
 
     /// <summary>
     /// Gets or sets the device options for classification.

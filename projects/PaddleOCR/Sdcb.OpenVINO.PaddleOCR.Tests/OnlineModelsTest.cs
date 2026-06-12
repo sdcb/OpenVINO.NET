@@ -41,6 +41,10 @@ public class OnlineModelsTest
                 {
                     _console.WriteLine($"Text: {region.Text}, Score: {region.Score}, RectCenter: {region.Rect.Center}, RectSize: {region.Rect.Size}, Angle: {region.Rect.Angle}");
                 }
+
+                Assert.Contains("Open Command Line", result.Text);
+                Assert.Contains("Visual Assist", result.Text);
+                Assert.Contains("IDE", result.Text);
             }
         }
     }

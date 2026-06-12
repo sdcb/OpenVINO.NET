@@ -13,7 +13,7 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <remarks>
 /// Used for downloading and extracting a model from a url, and creating a new StreamDictFileRecognizationModel with the downloaded contents.
 /// </remarks>
-public record LocalDictOnlineRecognizationModel(string Name, string DictName, Uri Uri, ModelVersion Version)
+public record LocalDictOnlineRecognizationModel(string Name, string DictName, Uri Uri, ModelVersion Version) : IOnlineRecognizationModel
 {
     /// <summary>
     /// Gets or sets the root directory for the downloaded models.

@@ -35,9 +35,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
 
+  <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO\Sdcb.OpenVINO.csproj" />
     <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO.Extensions.OpenCvSharp4\Sdcb.OpenVINO.Extensions.OpenCvSharp4.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <PackageReference Include="Sdcb.OpenVINO" Version="0.7.1" />
+    <PackageReference Include="Sdcb.OpenVINO.Extensions.OpenCvSharp4" Version="0.7.0" />
   </ItemGroup>
 
 </Project>

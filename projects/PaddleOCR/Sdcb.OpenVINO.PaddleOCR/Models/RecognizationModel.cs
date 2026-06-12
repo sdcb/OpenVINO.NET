@@ -48,6 +48,7 @@ public abstract class RecognizationModel : OcrBaseModel
         ModelVersion.V2 => new(-1, 3, 32, 320),
         ModelVersion.V3 => new(-1, 3, 48, 320),
         ModelVersion.V4 => new(-1, 3, 48, 320),
+        ModelVersion.V6 => new(-1, 3, 48, 320),
         _ => throw new ArgumentOutOfRangeException($"Unknown OCR model version: {Version}."),
     };
 

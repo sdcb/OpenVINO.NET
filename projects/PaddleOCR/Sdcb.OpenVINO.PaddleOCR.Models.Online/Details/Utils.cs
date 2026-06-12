@@ -52,12 +52,15 @@ internal static class Utils
         throw new Exception($"Failed to download {localFile} from all uris: {string.Join(", ", uris.Select(x => x.ToString()))}");
     }
 
-    public static async Task DownloadAndExtractAsync(string name, Uri uri, string rootDir, CancellationToken cancellationToken)
+    public static async Task DownloadAndExtractAsync(string name, Uri uri, string rootDir, CancellationToken cancellationToken, params string[] expectedFileNames)
     {
         Directory.CreateDirectory(rootDir);
-        string paramsFile = Path.Combine(rootDir, "inference.pdiparams");
+        if (expectedFileNames == null || expectedFileNames.Length == 0)
+        {
+            expectedFileNames = new[] { "inference.pdiparams", "inference.pdmodel" };
+        }
 
-        if (!File.Exists(paramsFile))
+        if (!CheckLocalModel(rootDir, expectedFileNames, throwOnError: false))
         {
             string localTarFile = Path.Combine(rootDir, uri.Segments.Last());
             if (!File.Exists(localTarFile) || new FileInfo(localTarFile).Length == 0)
@@ -94,7 +97,7 @@ internal static class Utils
                     archive.WriteToDirectory(rootDir);
                 }
 
-                CheckLocalOCRModel(rootDir);
+                CheckLocalModel(rootDir, expectedFileNames, throwOnError: true);
             }
 
             File.Delete(localTarFile);
@@ -193,26 +196,29 @@ internal static class Utils
 
     public static void CheckLocalOCRModel(string rootDir)
     {
-        string[] filesToCheck = new[]
-        {
-            Path.Combine(rootDir, "inference.pdiparams"),
-            Path.Combine(rootDir, "inference.pdmodel"), 
-        };
+        CheckLocalModel(rootDir, new[] { "inference.pdiparams", "inference.pdmodel" }, throwOnError: true);
+    }
 
-        foreach (string path in filesToCheck)
+    private static bool CheckLocalModel(string rootDir, string[] expectedFileNames, bool throwOnError)
+    {
+        foreach (string fileName in expectedFileNames)
         {
-            string fileName = Path.GetFileName(path);
+            string path = Path.Combine(rootDir, fileName);
 
             if (!File.Exists(path))
             {
+                if (!throwOnError) return false;
                 throw new Exception($"{fileName} not found in {rootDir}, model error?");
             }
 
             if (new FileInfo(path).Length == 0)
             {
+                if (!throwOnError) return false;
                 throw new Exception($"{fileName} invalid(length = 0), model error?");
             }
         }
+
+        return true;
     }
 
     public readonly static Type RootType = typeof(Settings);

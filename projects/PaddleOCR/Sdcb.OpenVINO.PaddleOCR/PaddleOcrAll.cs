@@ -11,6 +11,11 @@ namespace Sdcb.OpenVINO.PaddleOCR;
 public class PaddleOcrAll : IDisposable
 {
     /// <summary>
+    /// Gets the document orientation classifier used by this OCR engine, or null if no document classifier is used.
+    /// </summary>
+    public PaddleOcrDocumentOrientationClassifier? DocumentOrientationClassifier { get; }
+
+    /// <summary>
     /// Gets the object detector used by this OCR engine.
     /// </summary>
     public PaddleOcrDetector Detector { get; }
@@ -29,6 +34,11 @@ public class PaddleOcrAll : IDisposable
     /// Gets or sets a value indicating whether to enable 180-degree classification.
     /// </summary>
     public bool Enable180Classification { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable full-document orientation classification.
+    /// </summary>
+    public bool EnableDocumentOrientationClassification { get; set; } = false;
 
     /// <summary>
     /// Gets or sets a value indicating whether to allow rotation detection.
@@ -51,6 +61,10 @@ public class PaddleOcrAll : IDisposable
     /// <param name="options">The options for running the OCR engine.</param>
     public PaddleOcrAll(FullOcrModel model, PaddleOcrOptions options)
     {
+        if (model.DocumentOrientationModel != null)
+        {
+            DocumentOrientationClassifier = new PaddleOcrDocumentOrientationClassifier(model.DocumentOrientationModel, options.DocumentOrientationDeviceOptions);
+        }
         Detector = new PaddleOcrDetector(model.DetectionModel, options.DetectionDeviceOptions, options.DetectionStaticSize);
         if (model.ClassificationModel != null)
         {
@@ -66,7 +80,24 @@ public class PaddleOcrAll : IDisposable
     /// <param name="classifier">The object classifier to use, or null if no classifier is used.</param>
     /// <param name="recognizer">The text recognizer to use.</param>
     public PaddleOcrAll(PaddleOcrDetector detector, PaddleOcrClassifier? classifier, PaddleOcrRecognizer recognizer)
+        : this(documentOrientationClassifier: null, detector, classifier, recognizer)
     {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PaddleOcrAll"/> class with the specified OCR pipeline components.
+    /// </summary>
+    /// <param name="documentOrientationClassifier">The document orientation classifier to use, or null if no document classifier is used.</param>
+    /// <param name="detector">The object detector to use.</param>
+    /// <param name="classifier">The text line orientation classifier to use, or null if no classifier is used.</param>
+    /// <param name="recognizer">The text recognizer to use.</param>
+    public PaddleOcrAll(
+        PaddleOcrDocumentOrientationClassifier? documentOrientationClassifier,
+        PaddleOcrDetector detector,
+        PaddleOcrClassifier? classifier,
+        PaddleOcrRecognizer recognizer)
+    {
+        DocumentOrientationClassifier = documentOrientationClassifier;
         Detector = detector;
         Classifier = classifier;
         Recognizer = recognizer;
@@ -100,10 +131,13 @@ public class PaddleOcrAll : IDisposable
             throw new Exception($"Unable to do 180 degree Classification when classifier model is not set.");
         }
 
-        RotatedRect[] rects = Detector.Run(src);
+        using Mat? uprightSrc = CreateUprightImage(src, out int documentAngle);
+        Mat ocrSrc = uprightSrc ?? src;
+
+        RotatedRect[] rects = Detector.Run(ocrSrc);
 
         Mat[] mats = rects
-            .Select(rect => AllowRotateDetection ? GetRotateCropImage(src, rect) : src[GetCropedRect(rect.BoundingRect(), src.Size())])
+            .Select(rect => AllowRotateDetection ? GetRotateCropImage(ocrSrc, rect) : ocrSrc[GetCropedRect(rect.BoundingRect(), ocrSrc.Size())])
             .ToArray();
         
         try
@@ -114,7 +148,7 @@ public class PaddleOcrAll : IDisposable
             }
 
             return new PaddleOcrResult(Recognizer.Run(mats)
-                .Select((result, i) => new PaddleOcrResultRegion(rects[i], result.Text, result.Score))
+                .Select((result, i) => new PaddleOcrResultRegion(MapRectToOriginal(rects[i], ocrSrc.Size(), documentAngle), result.Text, result.Score))
                 .ToArray());
         }
         finally
@@ -126,6 +160,48 @@ public class PaddleOcrAll : IDisposable
         }
     }
 
+    private Mat? CreateUprightImage(Mat src, out int documentAngle)
+    {
+        documentAngle = 0;
+        if (!EnableDocumentOrientationClassification || DocumentOrientationClassifier == null)
+        {
+            return null;
+        }
+
+        PaddleOcrDocumentOrientationResult orientation = DocumentOrientationClassifier.Run(src);
+        documentAngle = orientation.Angle;
+        if (documentAngle == 0)
+        {
+            return null;
+        }
+
+        return orientation.RotateToUpright(src);
+    }
+
+    private static RotatedRect MapRectToOriginal(RotatedRect rect, Size uprightSize, int documentAngle)
+    {
+        if (documentAngle == 0)
+        {
+            return rect;
+        }
+
+        Point2f[] points = rect.Points()
+            .Select(x => MapPointToOriginal(x, uprightSize, documentAngle))
+            .ToArray();
+        return Cv2.MinAreaRect(points);
+    }
+
+    private static Point2f MapPointToOriginal(Point2f point, Size uprightSize, int documentAngle)
+    {
+        return documentAngle switch
+        {
+            90 => new Point2f(uprightSize.Height - point.Y, point.X),
+            180 => new Point2f(uprightSize.Width - point.X, uprightSize.Height - point.Y),
+            270 => new Point2f(point.Y, uprightSize.Width - point.X),
+            _ => point,
+        };
+    }
+
     /// <summary>
     /// Gets the cropped and rotated image specified by the given rectangle from the source image.
     /// </summary>
@@ -134,52 +210,55 @@ public class PaddleOcrAll : IDisposable
     /// <returns>The cropped and rotated image.</returns>
     public static Mat GetRotateCropImage(Mat src, RotatedRect rect)
     {
-        bool wider = rect.Size.Width > rect.Size.Height;
-        float angle = rect.Angle;
-        Size srcSize = src.Size();
-        Rect boundingRect = rect.BoundingRect();
+        Point2f[] srcPoints = OrderPointsClockwise(rect.Points());
 
-        int expTop = Math.Max(0, 0 - boundingRect.Top);
-        int expBottom = Math.Max(0, boundingRect.Bottom - srcSize.Height);
-        int expLeft = Math.Max(0, 0 - boundingRect.Left);
-        int expRight = Math.Max(0, boundingRect.Right - srcSize.Width);
+        int cropWidth = Math.Max(1, (int)Math.Round(Math.Max(
+            GetDistance(srcPoints[0], srcPoints[1]),
+            GetDistance(srcPoints[2], srcPoints[3]))));
+        int cropHeight = Math.Max(1, (int)Math.Round(Math.Max(
+            GetDistance(srcPoints[0], srcPoints[3]),
+            GetDistance(srcPoints[1], srcPoints[2]))));
 
-        Rect rectToExp = boundingRect + new Point(expTop, expLeft);
-        Rect roiRect = Rect.FromLTRB(
-            boundingRect.Left + expLeft,
-            boundingRect.Top + expTop,
-            boundingRect.Right - expRight,
-            boundingRect.Bottom - expBottom);
-        using Mat boundingMat = src[roiRect];
-        using Mat expanded = boundingMat.CopyMakeBorder(expTop, expBottom, expLeft, expRight, BorderTypes.Replicate);
-        Point2f[] rp = rect.Points()
-            .Select(v => new Point2f(v.X - rectToExp.X, v.Y - rectToExp.Y))
-            .ToArray();
-
-        Point2f[] srcPoints = (wider, angle) switch
+        Point2f[] dstPoints =
         {
-            (true, >= 0 and < 45) => new[] { rp[1], rp[2], rp[3], rp[0] },
-            _ => new[] { rp[0], rp[3], rp[2], rp[1] }
+            new(0, 0),
+            new(cropWidth, 0),
+            new(cropWidth, cropHeight),
+            new(0, cropHeight),
         };
 
-        var ptsDst0 = new Point2f(0, 0);
-        var ptsDst1 = new Point2f(rect.Size.Width, 0);
-        var ptsDst2 = new Point2f(rect.Size.Width, rect.Size.Height);
-        var ptsDst3 = new Point2f(0, rect.Size.Height);
+        using Mat matrix = Cv2.GetPerspectiveTransform(srcPoints, dstPoints);
+        Mat dest = src.WarpPerspective(matrix, new Size(cropWidth, cropHeight), InterpolationFlags.Cubic, BorderTypes.Replicate);
 
-        using Mat matrix = Cv2.GetPerspectiveTransform(srcPoints, new[] { ptsDst0, ptsDst1, ptsDst2, ptsDst3 });
-
-        Mat dest = expanded.WarpPerspective(matrix, new Size(rect.Size.Width, rect.Size.Height), InterpolationFlags.Nearest, BorderTypes.Replicate);
-
-        if (!wider)
+        if (dest.Height * 1.0 / dest.Width >= 1.5)
         {
-            Cv2.Transpose(dest, dest);
+            Mat rotated = new();
+            Cv2.Rotate(dest, rotated, RotateFlags.Rotate90Counterclockwise);
+            dest.Dispose();
+            return rotated;
         }
-        else if (angle > 45)
-        {
-            Cv2.Flip(dest, dest, FlipMode.X);
-        }
+
         return dest;
+    }
+
+    private static Point2f[] OrderPointsClockwise(Point2f[] points)
+    {
+        Point2f[] xSorted = points.OrderBy(p => p.X).ToArray();
+        Point2f[] leftMost = xSorted.Take(2).OrderBy(p => p.Y).ToArray();
+        Point2f[] rightMost = xSorted.Skip(2).ToArray();
+
+        Point2f tl = leftMost[0];
+        Point2f bl = leftMost[1];
+        Point2f br = rightMost.OrderByDescending(p => GetDistance(tl, p)).First();
+        Point2f tr = rightMost.Single(p => p != br);
+        return new[] { tl, tr, br, bl };
+    }
+
+    private static double GetDistance(Point2f p1, Point2f p2)
+    {
+        double dx = p1.X - p2.X;
+        double dy = p1.Y - p2.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
     }
 
     /// <summary>
@@ -187,6 +266,7 @@ public class PaddleOcrAll : IDisposable
     /// </summary>
     public void Dispose()
     {
+        DocumentOrientationClassifier?.Dispose();
         Detector.Dispose();
         Classifier?.Dispose();
         Recognizer.Dispose();

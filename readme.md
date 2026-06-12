@@ -102,6 +102,68 @@ You can refer to this github for mini-openvino-paddleocr demo: https://github.co
 
 Actually it's very similar to my another project [PaddleSharp](https://github.com/sdcb/PaddleSharp/blob/master/docs/ocr.md)
 
+### PP-OCRv6 ONNX online models
+
+`Sdcb.OpenVINO.PaddleOCR.Models.Online` provides PP-OCRv6 Chinese ONNX model presets:
+
+| Model | Detection | Recognition | Text line 180-degree classifier | Document orientation classifier |
+| ----- | --------- | ----------- | -------------------------------- | ------------------------------- |
+| `OnlineFullModels.ChineseV6Medium` | `PP-OCRv6_medium_det_onnx_infer` | `PP-OCRv6_medium_rec_onnx_infer` | `PP-LCNet_x1_0_textline_ori_onnx_infer` | `PP-LCNet_x1_0_doc_ori_onnx_infer` |
+| `OnlineFullModels.ChineseV6Small` | `PP-OCRv6_small_det_onnx_infer` | `PP-OCRv6_small_rec_onnx_infer` | `PP-LCNet_x0_25_textline_ori_onnx_infer` | `PP-LCNet_x1_0_doc_ori_onnx_infer` |
+| `OnlineFullModels.ChineseV6Tiny` | `PP-OCRv6_tiny_det_onnx_infer` | `PP-OCRv6_tiny_rec_onnx_infer` | `PP-LCNet_x0_25_textline_ori_onnx_infer` | `PP-LCNet_x1_0_doc_ori_onnx_infer` |
+
+```csharp
+using OpenCvSharp;
+using Sdcb.OpenVINO;
+using Sdcb.OpenVINO.PaddleOCR;
+using Sdcb.OpenVINO.PaddleOCR.Models;
+using Sdcb.OpenVINO.PaddleOCR.Models.Online;
+
+FullOcrModel model = await OnlineFullModels.ChineseV6Small.DownloadAsync();
+
+using PaddleOcrAll ocr = new(model, new PaddleOcrOptions(new DeviceOptions("CPU")))
+{
+    AllowRotateDetection = true,
+    Enable180Classification = true,
+
+    // Disabled by default. Enable it only when the input may be a full page
+    // rotated by 0, 90, 180 or 270 degrees.
+    EnableDocumentOrientationClassification = true,
+};
+
+using Mat src = Cv2.ImRead("test.jpg");
+PaddleOcrResult result = ocr.Run(src);
+Console.WriteLine(result.Text);
+```
+
+Notes:
+
+* PP-OCRv6 recognition labels are loaded from the downloaded model `inference.yml`.
+* PP-OCRv6 detection uses the official DB postprocess defaults: `BoxThreshold = 0.2`, `BoxScoreThreahold = 0.45`, `UnclipRatio = 1.4`. These properties can still be overwritten after constructing `PaddleOcrDetector`.
+* Full-document orientation classification is not enabled by default, even when the selected `OnlineFullModels` preset includes the document orientation model.
+
+The detector, text line classifier, recognizer, and document orientation classifier can also be used independently:
+
+```csharp
+using OpenCvSharp;
+using Sdcb.OpenVINO;
+using Sdcb.OpenVINO.PaddleOCR;
+using Sdcb.OpenVINO.PaddleOCR.Models.Online;
+
+using Mat src = Cv2.ImRead("document.jpg");
+
+using PaddleOcrDocumentOrientationClassifier docOrientation = new(
+    await OnlineDocumentOrientationClassificationModel.PPDocOrientationX10.DownloadAsync(),
+    new DeviceOptions("CPU"));
+PaddleOcrDocumentOrientationResult orientation = docOrientation.Run(src);
+using Mat upright = orientation.RotateToUpright(src);
+
+using PaddleOcrClassifier textLineOrientation = new(
+    await OnlineOnnxClassificationModel.TextLineOrientationX025.DownloadAsync(),
+    new DeviceOptions("CPU"));
+Ocr180DegreeClsResult lineResult = textLineOrientation.ShouldRotate180(upright);
+```
+
 # LICENSE
 
 [Apache](./LICENSE.txt)

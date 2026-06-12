@@ -10,7 +10,11 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <remarks>
 /// Contains static instances for commonly used models and a method for downloading a full OCR model.
 /// </remarks>
-public record class OnlineFullModels(OnlineDetectionModel DetModel, OnlineClassificationModel? ClsModel, LocalDictOnlineRecognizationModel RecModel)
+public record class OnlineFullModels(
+    IOnlineDetectionModel DetModel,
+    IOnlineClassificationModel? ClsModel,
+    IOnlineRecognizationModel RecModel,
+    IOnlineDocumentOrientationClassificationModel? DocOrientationModel = null)
 {
     /// <summary>
     /// Downloads a full OCR model asynchronously.
@@ -19,11 +23,39 @@ public record class OnlineFullModels(OnlineDetectionModel DetModel, OnlineClassi
     /// <returns><see cref="FullOcrModel"/> instance.</returns>
     public async Task<FullOcrModel> DownloadAsync(CancellationToken cancellationToken = default)
     {
-        FileDetectionModel localDetModel = await DetModel.DownloadAsync(cancellationToken);
-        FileClassificationModel? localClsModel = ClsModel != null ? await ClsModel.DownloadAsync(cancellationToken) : null;
+        DetectionModel localDetModel = await DetModel.DownloadAsync(cancellationToken);
+        ClassificationModel? localClsModel = ClsModel != null ? await ClsModel.DownloadAsync(cancellationToken) : null;
         RecognizationModel localRecModel = await RecModel.DownloadAsync(cancellationToken);
-        return new FullOcrModel(localDetModel, localClsModel, localRecModel);
+        DocumentOrientationClassificationModel? localDocOrientationModel = DocOrientationModel != null ? await DocOrientationModel.DownloadAsync(cancellationToken) : null;
+        return new FullOcrModel(localDetModel, localClsModel, localRecModel, localDocOrientationModel);
     }
+
+    /// <summary>
+    /// The Chinese PP-OCRv6 medium ONNX version.
+    /// </summary>
+    public readonly static OnlineFullModels ChineseV6Medium = new(
+        OnlineOnnxDetectionModel.ChineseV6Medium,
+        OnlineOnnxClassificationModel.TextLineOrientationX10,
+        OnlineOnnxRecognizationModel.ChineseV6Medium,
+        OnlineDocumentOrientationClassificationModel.PPDocOrientationX10);
+
+    /// <summary>
+    /// The Chinese PP-OCRv6 small ONNX version.
+    /// </summary>
+    public readonly static OnlineFullModels ChineseV6Small = new(
+        OnlineOnnxDetectionModel.ChineseV6Small,
+        OnlineOnnxClassificationModel.TextLineOrientationX025,
+        OnlineOnnxRecognizationModel.ChineseV6Small,
+        OnlineDocumentOrientationClassificationModel.PPDocOrientationX10);
+
+    /// <summary>
+    /// The Chinese PP-OCRv6 tiny ONNX version.
+    /// </summary>
+    public readonly static OnlineFullModels ChineseV6Tiny = new(
+        OnlineOnnxDetectionModel.ChineseV6Tiny,
+        OnlineOnnxClassificationModel.TextLineOrientationX025,
+        OnlineOnnxRecognizationModel.ChineseV6Tiny,
+        OnlineDocumentOrientationClassificationModel.PPDocOrientationX10);
 
     /// <summary>
     /// The Chinese V4 version.

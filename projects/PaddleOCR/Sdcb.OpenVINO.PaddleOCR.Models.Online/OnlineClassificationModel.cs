@@ -10,7 +10,7 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <summary>
 /// Represents an online classification model that can be downloaded and used for text angle classification.
 /// </summary>
-public record OnlineClassificationModel(string Name, Uri Uri, ModelVersion Version)
+public record OnlineClassificationModel(string Name, Uri Uri, ModelVersion Version) : IOnlineClassificationModel
 {
     /// <summary>
     /// Gets the root directory of the model.
@@ -26,6 +26,11 @@ public record OnlineClassificationModel(string Name, Uri Uri, ModelVersion Versi
     {
         await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken);
         return new FileClassificationModel(RootDirectory, Version);
+    }
+
+    async Task<ClassificationModel> IOnlineClassificationModel.DownloadAsync(CancellationToken cancellationToken)
+    {
+        return await DownloadAsync(cancellationToken);
     }
 
     /// <summary>

@@ -78,6 +78,13 @@ public class PaddleOcrDetector : IDisposable
         DeviceOptions? options = null,
         Size? staticShapeSize = null)
     {
+        if (model.Version == ModelVersion.V6)
+        {
+            BoxThreshold = 0.2f;
+            BoxScoreThreahold = 0.45f;
+            UnclipRatio = 1.4f;
+        }
+
         if (staticShapeSize != null)
         {
             StaticShapeSize = new(
@@ -87,7 +94,7 @@ public class PaddleOcrDetector : IDisposable
 
         _compiledModel = model.CreateCompiledModel(options, afterReadModel: m =>
         {
-            if (model.Version != ModelVersion.V4)
+            if (model.Version != ModelVersion.V4 && model.Version != ModelVersion.V6)
             {
                 m.ReshapePrimaryInput(new PartialShape(1, 3, Dimension.Dynamic, Dimension.Dynamic));
             }
@@ -102,7 +109,7 @@ public class PaddleOcrDetector : IDisposable
             {
                 m.ReshapePrimaryInput(new PartialShape(1, StaticShapeSize.Value.Height, StaticShapeSize.Value.Width, 3));
             }
-            else if (model.Version != ModelVersion.V4)
+            else if (model.Version != ModelVersion.V4 && model.Version != ModelVersion.V6)
             {
                 m.ReshapePrimaryInput(new PartialShape(1, Dimension.Dynamic, Dimension.Dynamic, 3));
             }

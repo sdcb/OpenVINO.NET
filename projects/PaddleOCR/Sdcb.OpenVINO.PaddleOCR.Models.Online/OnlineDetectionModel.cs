@@ -10,7 +10,7 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <summary>
 /// Represents a model for online object detection.
 /// </summary>
-public record OnlineDetectionModel(string Name, Uri Uri, ModelVersion Version)
+public record OnlineDetectionModel(string Name, Uri Uri, ModelVersion Version) : IOnlineDetectionModel
 {
     /// <summary>
     /// Gets the root directory of the model.
@@ -27,6 +27,11 @@ public record OnlineDetectionModel(string Name, Uri Uri, ModelVersion Version)
         await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken);
 
         return new FileDetectionModel(RootDirectory, Version);
+    }
+
+    async Task<DetectionModel> IOnlineDetectionModel.DownloadAsync(CancellationToken cancellationToken)
+    {
+        return await DownloadAsync(cancellationToken);
     }
 
     /// <summary>
