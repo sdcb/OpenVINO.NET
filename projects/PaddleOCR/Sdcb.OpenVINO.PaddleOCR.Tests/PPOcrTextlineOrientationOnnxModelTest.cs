@@ -16,8 +16,8 @@ public class PPOcrTextlineOrientationOnnxModelTest
 
     public static TheoryData<string> Models => new()
     {
-        nameof(OnlineOnnxClassificationModel.TextLineOrientationX025),
-        nameof(OnlineOnnxClassificationModel.TextLineOrientationX10),
+        nameof(OnlineClassificationModel.TextLineOrientationX025),
+        nameof(OnlineClassificationModel.TextLineOrientationX10),
     };
 
     [Theory]
@@ -69,12 +69,12 @@ public class PPOcrTextlineOrientationOnnxModelTest
         Assert.True(results[1].ShouldRotate180);
     }
 
-    private static OnlineOnnxClassificationModel GetModel(string modelName)
+    private static OnlineClassificationModel GetModel(string modelName)
     {
         return modelName switch
         {
-            nameof(OnlineOnnxClassificationModel.TextLineOrientationX025) => OnlineOnnxClassificationModel.TextLineOrientationX025,
-            nameof(OnlineOnnxClassificationModel.TextLineOrientationX10) => OnlineOnnxClassificationModel.TextLineOrientationX10,
+            nameof(OnlineClassificationModel.TextLineOrientationX025) => OnlineClassificationModel.TextLineOrientationX025,
+            nameof(OnlineClassificationModel.TextLineOrientationX10) => OnlineClassificationModel.TextLineOrientationX10,
             _ => throw new ArgumentOutOfRangeException(nameof(modelName), modelName, null),
         };
     }

@@ -66,7 +66,7 @@ public class PPOcrV6OnnxModelLoadTest
     public async Task PPOcrV6DetectorUsesOfficialPostProcessDefaults()
     {
         using PaddleOcrDetector detector = new(
-            await OnlineOnnxDetectionModel.ChineseV6Small.DownloadAsync(),
+            await OnlineDetectionModel.ChineseV6Small.DownloadAsync(),
             new DeviceOptions("CPU"));
 
         Assert.Equal(0.2f, detector.BoxThreshold.GetValueOrDefault());

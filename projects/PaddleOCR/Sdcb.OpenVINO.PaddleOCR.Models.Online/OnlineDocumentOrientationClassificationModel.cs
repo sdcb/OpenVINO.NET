@@ -11,7 +11,7 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <summary>
 /// Represents an online ONNX document orientation classification model.
 /// </summary>
-public record OnlineDocumentOrientationClassificationModel(string Name, Uri Uri) : IOnlineDocumentOrientationClassificationModel
+public record OnlineDocumentOrientationClassificationModel(string Name, Uri Uri)
 {
     /// <summary>
     /// Gets the root directory of the model.
@@ -25,11 +25,6 @@ public record OnlineDocumentOrientationClassificationModel(string Name, Uri Uri)
     {
         await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken, "inference.onnx", "inference.yml");
         return new FileDocumentOrientationClassificationModel(RootDirectory);
-    }
-
-    async Task<DocumentOrientationClassificationModel> IOnlineDocumentOrientationClassificationModel.DownloadAsync(CancellationToken cancellationToken)
-    {
-        return await DownloadAsync(cancellationToken);
     }
 
     /// <summary>

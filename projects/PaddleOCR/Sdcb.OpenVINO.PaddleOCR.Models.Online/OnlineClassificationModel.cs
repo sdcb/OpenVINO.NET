@@ -10,7 +10,7 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <summary>
 /// Represents an online classification model that can be downloaded and used for text angle classification.
 /// </summary>
-public record OnlineClassificationModel(string Name, Uri Uri, ModelVersion Version) : IOnlineClassificationModel
+public record OnlineClassificationModel(string Name, Uri Uri, ModelVersion Version)
 {
     /// <summary>
     /// Gets the root directory of the model.
@@ -21,17 +21,28 @@ public record OnlineClassificationModel(string Name, Uri Uri, ModelVersion Versi
     /// Downloads and extracts the model asynchronously.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A <see cref="FileClassificationModel"/> that represent the downloaded model.</returns>
-    public async Task<FileClassificationModel> DownloadAsync(CancellationToken cancellationToken = default)
+    /// <returns>A <see cref="ClassificationModel"/> that represent the downloaded model.</returns>
+    public async Task<ClassificationModel> DownloadAsync(CancellationToken cancellationToken = default)
     {
+        if (Version == ModelVersion.V6)
+        {
+            await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken, "inference.onnx", "inference.yml");
+            return new FileOnnxClassificationModel(RootDirectory, Version);
+        }
+
         await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken);
         return new FileClassificationModel(RootDirectory, Version);
     }
 
-    async Task<ClassificationModel> IOnlineClassificationModel.DownloadAsync(CancellationToken cancellationToken)
-    {
-        return await DownloadAsync(cancellationToken);
-    }
+    /// <summary>
+    /// PP-LCNet x0.25 ONNX text line orientation model.
+    /// </summary>
+    public static OnlineClassificationModel TextLineOrientationX025 => new("PP-LCNet_x0_25_textline_ori_onnx_infer", new Uri("https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-LCNet_x0_25_textline_ori_onnx_infer.tar"), ModelVersion.V6);
+
+    /// <summary>
+    /// PP-LCNet x1.0 ONNX text line orientation model.
+    /// </summary>
+    public static OnlineClassificationModel TextLineOrientationX10 => new("PP-LCNet_x1_0_textline_ori_onnx_infer", new Uri("https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-LCNet_x1_0_textline_ori_onnx_infer.tar"), ModelVersion.V6);
 
     /// <summary>
     /// Gets an online classification model for slim quantized text angle classification (Size: 2.1M).
@@ -48,6 +59,8 @@ public record OnlineClassificationModel(string Name, Uri Uri, ModelVersion Versi
     /// </summary>
     public static OnlineClassificationModel[] All => new[]
     {
+        TextLineOrientationX025,
+        TextLineOrientationX10,
         ChineseMobileSlimV2,
         ChineseMobileV2,
     };

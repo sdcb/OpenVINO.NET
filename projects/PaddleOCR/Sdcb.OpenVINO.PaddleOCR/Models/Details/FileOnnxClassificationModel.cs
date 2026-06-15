@@ -8,6 +8,19 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Details;
 public class FileOnnxClassificationModel : ClassificationModel
 {
     /// <summary>
+    /// The default input shape for PP-LCNet text line orientation ONNX models.
+    /// </summary>
+    public static NCHW DefaultTextLineOrientationShape { get; } = new(-1, 3, 80, 160);
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileOnnxClassificationModel"/> class.
+    /// </summary>
+    public FileOnnxClassificationModel(string directoryPath, ModelVersion version)
+        : this(directoryPath, version, DefaultTextLineOrientationShape)
+    {
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="FileOnnxClassificationModel"/> class.
     /// </summary>
     public FileOnnxClassificationModel(

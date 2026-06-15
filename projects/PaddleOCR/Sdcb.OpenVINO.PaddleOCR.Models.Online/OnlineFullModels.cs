@@ -11,10 +11,10 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// Contains static instances for commonly used models and a method for downloading a full OCR model.
 /// </remarks>
 public record class OnlineFullModels(
-    IOnlineDetectionModel DetModel,
-    IOnlineClassificationModel? ClsModel,
-    IOnlineRecognizationModel RecModel,
-    IOnlineDocumentOrientationClassificationModel? DocOrientationModel = null)
+    OnlineDetectionModel DetModel,
+    OnlineClassificationModel? ClsModel,
+    OnlineRecognizationModel RecModel,
+    OnlineDocumentOrientationClassificationModel? DocOrientationModel = null)
 {
     /// <summary>
     /// Downloads a full OCR model asynchronously.
@@ -34,27 +34,27 @@ public record class OnlineFullModels(
     /// The Chinese PP-OCRv6 medium ONNX version.
     /// </summary>
     public readonly static OnlineFullModels ChineseV6Medium = new(
-        OnlineOnnxDetectionModel.ChineseV6Medium,
-        OnlineOnnxClassificationModel.TextLineOrientationX10,
-        OnlineOnnxRecognizationModel.ChineseV6Medium,
+        OnlineDetectionModel.ChineseV6Medium,
+        OnlineClassificationModel.TextLineOrientationX10,
+        OnlineRecognizationModel.ChineseV6Medium,
         OnlineDocumentOrientationClassificationModel.PPDocOrientationX10);
 
     /// <summary>
     /// The Chinese PP-OCRv6 small ONNX version.
     /// </summary>
     public readonly static OnlineFullModels ChineseV6Small = new(
-        OnlineOnnxDetectionModel.ChineseV6Small,
-        OnlineOnnxClassificationModel.TextLineOrientationX025,
-        OnlineOnnxRecognizationModel.ChineseV6Small,
+        OnlineDetectionModel.ChineseV6Small,
+        OnlineClassificationModel.TextLineOrientationX025,
+        OnlineRecognizationModel.ChineseV6Small,
         OnlineDocumentOrientationClassificationModel.PPDocOrientationX10);
 
     /// <summary>
     /// The Chinese PP-OCRv6 tiny ONNX version.
     /// </summary>
     public readonly static OnlineFullModels ChineseV6Tiny = new(
-        OnlineOnnxDetectionModel.ChineseV6Tiny,
-        OnlineOnnxClassificationModel.TextLineOrientationX025,
-        OnlineOnnxRecognizationModel.ChineseV6Tiny,
+        OnlineDetectionModel.ChineseV6Tiny,
+        OnlineClassificationModel.TextLineOrientationX025,
+        OnlineRecognizationModel.ChineseV6Tiny,
         OnlineDocumentOrientationClassificationModel.PPDocOrientationX10);
 
     /// <summary>

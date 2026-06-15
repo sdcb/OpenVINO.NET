@@ -13,19 +13,14 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <remarks>
 /// Used for downloading and extracting a model from a url, and creating a new StreamDictFileRecognizationModel with the downloaded contents.
 /// </remarks>
-public record LocalDictOnlineRecognizationModel(string Name, string DictName, Uri Uri, ModelVersion Version) : IOnlineRecognizationModel
+public record LocalDictOnlineRecognizationModel(string Name, string DictName, Uri Uri, ModelVersion Version) : OnlineRecognizationModel(Name, Uri, Version)
 {
-    /// <summary>
-    /// Gets or sets the root directory for the downloaded models.
-    /// </summary>
-    public string RootDirectory => Path.Combine(Settings.GlobalModelDirectory, Name);
-
     /// <summary>
     /// Downloads and extracts a RecognizationModel asynchronously.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The downloaded and extracted RecognizationModel.</returns>
-    public async Task<RecognizationModel> DownloadAsync(CancellationToken cancellationToken = default)
+    public override async Task<RecognizationModel> DownloadAsync(CancellationToken cancellationToken = default)
     {
         await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken);
         return new StreamDictFileRecognizationModel(RootDirectory, SharedUtils.LoadDicts(DictName), Version);

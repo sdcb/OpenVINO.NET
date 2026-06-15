@@ -10,7 +10,7 @@ namespace Sdcb.OpenVINO.PaddleOCR.Models.Online;
 /// <summary>
 /// Represents a model for online object detection.
 /// </summary>
-public record OnlineDetectionModel(string Name, Uri Uri, ModelVersion Version) : IOnlineDetectionModel
+public record OnlineDetectionModel(string Name, Uri Uri, ModelVersion Version)
 {
     /// <summary>
     /// Gets the root directory of the model.
@@ -21,18 +21,33 @@ public record OnlineDetectionModel(string Name, Uri Uri, ModelVersion Version) :
     /// Downloads and extracts the model files to the root directory asynchronously.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>A <see cref="FileDetectionModel"/> representing the downloaded and extracted file model.</returns>
-    public async Task<FileDetectionModel> DownloadAsync(CancellationToken cancellationToken = default)
+    /// <returns>A <see cref="DetectionModel"/> representing the downloaded and extracted file model.</returns>
+    public async Task<DetectionModel> DownloadAsync(CancellationToken cancellationToken = default)
     {
-        await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken);
+        if (Version == ModelVersion.V6)
+        {
+            await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken, "inference.onnx");
+            return new FileOnnxDetectionModel(RootDirectory, Version);
+        }
 
+        await Utils.DownloadAndExtractAsync(Name, Uri, RootDirectory, cancellationToken);
         return new FileDetectionModel(RootDirectory, Version);
     }
 
-    async Task<DetectionModel> IOnlineDetectionModel.DownloadAsync(CancellationToken cancellationToken)
-    {
-        return await DownloadAsync(cancellationToken);
-    }
+    /// <summary>
+    /// PP-OCRv6 medium ONNX detection model.
+    /// </summary>
+    public static OnlineDetectionModel ChineseV6Medium => new("PP-OCRv6_medium_det_onnx_infer", new Uri("https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_medium_det_onnx_infer.tar"), ModelVersion.V6);
+
+    /// <summary>
+    /// PP-OCRv6 small ONNX detection model.
+    /// </summary>
+    public static OnlineDetectionModel ChineseV6Small => new("PP-OCRv6_small_det_onnx_infer", new Uri("https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_small_det_onnx_infer.tar"), ModelVersion.V6);
+
+    /// <summary>
+    /// PP-OCRv6 tiny ONNX detection model.
+    /// </summary>
+    public static OnlineDetectionModel ChineseV6Tiny => new("PP-OCRv6_tiny_det_onnx_infer", new Uri("https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_tiny_det_onnx_infer.tar"), ModelVersion.V6);
 
     /// <summary>
     /// [New] v4 model, supporting Chinese, English, multilingual text detection
@@ -117,6 +132,9 @@ public record OnlineDetectionModel(string Name, Uri Uri, ModelVersion Version) :
     /// </summary>
     public static OnlineDetectionModel[] All => new[]
     {
+        ChineseV6Medium,
+        ChineseV6Small,
+        ChineseV6Tiny,
         ChineseV4,
         ChineseServerV4,
         ChineseV3Slim,
