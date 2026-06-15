@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -13,26 +11,9 @@ using static NativeMethods;
 
 internal static class OpenVINOLibraryLoader
 {
-    internal static void WindowsNetFXLoad()
-    {
-        if (!IsAndroid())
-        {
-            string libsPath = Path.GetDirectoryName(Process.GetCurrentProcess().Modules.Cast<ProcessModule>()
-                .Single(x => Path.GetFileNameWithoutExtension(x.ModuleName) == "openvino_c")
-                .FileName)!;
-            AddLibPathToWindowsEnvironment(libsPath);
-        }
-    }
-
     internal static bool IsAndroid()
     {
         return Environment.OSVersion.Platform == PlatformID.Unix && Environment.GetEnvironmentVariable("ANDROID_ROOT") != null;
-    }
-
-    internal static void AddLibPathToWindowsEnvironment(string libPath)
-    {
-        const string envId = "PATH";
-        Environment.SetEnvironmentVariable(envId, Environment.GetEnvironmentVariable(envId) + Path.PathSeparator + libPath);
     }
 
     /// <summary>
