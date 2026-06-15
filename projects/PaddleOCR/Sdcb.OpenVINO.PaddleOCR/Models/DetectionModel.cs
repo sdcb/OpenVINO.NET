@@ -23,5 +23,9 @@ public abstract class DetectionModel : OcrBaseModel
     /// <param name="directoryPath">The directory path where model files are located.</param>
     /// <param name="version">The version of detection model.</param>
     /// <returns>An instance of the DetectionModel class.</returns>
-    public static DetectionModel FromDirectory(string directoryPath, ModelVersion version) => new FileDetectionModel(directoryPath, version);
+    public static DetectionModel FromDirectory(string directoryPath, ModelVersion version) => version switch
+    {
+        ModelVersion.V6 => new FileOnnxDetectionModel(directoryPath, version),
+        _ => new FileDetectionModel(directoryPath, version),
+    };
 }

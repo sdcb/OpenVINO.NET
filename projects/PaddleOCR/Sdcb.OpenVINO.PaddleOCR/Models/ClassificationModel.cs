@@ -44,7 +44,11 @@ public abstract class ClassificationModel : OcrBaseModel
     /// <param name="directoryPath">The path to the directory containing the model files</param>
     /// <param name="version">The version of the classification model.</param>
     /// <returns>a new ClassificationModel object</returns>
-    public static ClassificationModel FromDirectory(string directoryPath, ModelVersion version = ModelVersion.V2) => new FileClassificationModel(directoryPath, version);
+    public static ClassificationModel FromDirectory(string directoryPath, ModelVersion version = ModelVersion.V2) => version switch
+    {
+        ModelVersion.V6 => new FileOnnxClassificationModel(directoryPath, version),
+        _ => new FileClassificationModel(directoryPath, version),
+    };
 
     /// <inheritdoc/>
     public override void AfterReadModel(Model model)

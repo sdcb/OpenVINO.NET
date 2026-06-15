@@ -60,4 +60,11 @@ public abstract class RecognizationModel : OcrBaseModel
     /// <param name="version">The version of recognition model.</param>
     /// <returns>The RecognizationModel object created with the specified directory path, label path and model version.</returns>
     public static RecognizationModel FromDirectory(string directoryPath, string labelPath, ModelVersion version) => new FileRecognizationModel(directoryPath, labelPath, version);
+
+    /// <summary>
+    /// Create a V6 ONNX RecognizationModel object with the specified directory path.
+    /// </summary>
+    /// <param name="directoryPath">The directory path of the V6 ONNX recognition model.</param>
+    /// <returns>The V6 ONNX RecognizationModel object created with the specified directory path.</returns>
+    public static RecognizationModel FromV6Directory(string directoryPath) => new FileOnnxRecognizationModel(directoryPath, ModelVersion.V6);
 }
