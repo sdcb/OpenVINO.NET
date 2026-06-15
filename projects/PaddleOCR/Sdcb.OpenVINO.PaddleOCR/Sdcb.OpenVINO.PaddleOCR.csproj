@@ -42,7 +42,7 @@
     <ProjectReference Include="..\..\..\src\Sdcb.OpenVINO.Extensions.OpenCvSharp4\Sdcb.OpenVINO.Extensions.OpenCvSharp4.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <PackageReference Include="Sdcb.OpenVINO" Version="0.7.1" />
+    <PackageReference Include="Sdcb.OpenVINO" Version="0.8.1" />
     <PackageReference Include="Sdcb.OpenVINO.Extensions.OpenCvSharp4" Version="0.7.0" />
   </ItemGroup>
 

@@ -21,13 +21,24 @@ void Refresh()
 
 object LoadTable()
 {
-	return Projects
-		.Select(x => new
-		{
-			Project = x.name, 
-			Version = x.version, 
-			Build = new Button("Build", o => Build(x))
-		});
+	return new
+	{
+		Functions = Util.HorizontalRun(true,
+			new Button("Clear Cache", _ => ClearNuGetCache())),
+		Table = Projects
+			.Select(x => new
+			{
+				Project = x.name,
+				Version = x.version,
+				Build = new Button("Build", o => Build(x))
+			})
+	};
+}
+
+void ClearNuGetCache()
+{
+	DotNetRun("nuget locals http-cache --clear");
+	DotNetRun("nuget locals temp --clear");
 }
 
 void Build(ProjectVersion p)
